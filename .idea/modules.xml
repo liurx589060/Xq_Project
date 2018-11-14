@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/Xq_Project.iml" filepath="$PROJECT_DIR$/Xq_Project.iml" />
+      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/chart.module/chart.module.iml" filepath="$PROJECT_DIR$/chart.module/chart.module.iml" />
+      <module fileurl="file://$PROJECT_DIR$/util.module/util.module.iml" filepath="$PROJECT_DIR$/util.module/util.module.iml" />
+      <module fileurl="file://E:\AS_WorkingSpace\Xq_Project\chart.module\xqchartmodule.iml" filepath="E:\AS_WorkingSpace\Xq_Project\chart.module\xqchartmodule.iml" />
+    </modules>
+  </component>
+</project>

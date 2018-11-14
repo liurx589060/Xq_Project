@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true">
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:src="@drawable/welcome_bg"
+        android:scaleType="fitXY"/>
+
+    <RelativeLayout
+        android:id="@+id/welcome_relayout_time"
+        android:layout_width="@dimen/dp_52"
+        android:layout_height="@dimen/dp_22"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginRight="20dp"
+        android:layout_marginTop="20dp"
+        android:background="@drawable/welcome_time_bg"
+        android:gravity="center">
+
+        <TextView
+            android:id="@+id/welcome_tv_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#ffffff"
+            android:textSize="@dimen/sp_12"
+            android:textStyle="bold"
+            />
+    </RelativeLayout>
+
+</RelativeLayout>

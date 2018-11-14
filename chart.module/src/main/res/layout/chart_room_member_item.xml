@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent" android:layout_height="match_parent">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp_70"
+        >
+
+        <RelativeLayout
+            android:id="@+id/chart_room_relayout_left"
+            android:layout_width="@dimen/dp_110"
+            android:layout_height="match_parent"
+            android:background="@drawable/shape_member_bg"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true">
+
+            <ImageView
+                android:id="@+id/chart_room_img_head_left"
+                android:layout_width="@dimen/dp_70"
+                android:layout_height="@dimen/dp_70"
+                app:srcCompat="@drawable/chart_room_head_test"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentTop="true"
+                android:scaleType="centerCrop"/>
+
+            <ImageView
+                android:id="@+id/chart_room_img_label_light_left"
+                android:layout_width="@dimen/dp_20"
+                android:layout_height="@dimen/dp_29"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentBottom="true"
+                android:scaleType="fitXY"
+                app:srcCompat="@drawable/chart_room_label_light" />
+
+            <ImageButton
+                android:id="@+id/chart_room_imgBtn_mic_left"
+                android:layout_width="@dimen/dp_25"
+                android:layout_height="@dimen/dp_33"
+                android:layout_toRightOf="@+id/chart_room_img_head_left"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="@dimen/dp_5"
+                app:srcCompat="@drawable/chart_room_imgbtn_mic"
+                android:background="@android:color/transparent"
+                android:scaleType="fitXY"/>
+
+            <ImageButton
+                android:id="@+id/chart_room_imgBtn_Light_left"
+                android:layout_width="@dimen/dp_25"
+                android:layout_height="@dimen/dp_33"
+                android:layout_toRightOf="@+id/chart_room_img_head_left"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="@dimen/dp_5"
+                app:srcCompat="@drawable/chart_room_imgbtn_light"
+                android:background="@android:color/transparent"
+                android:scaleType="fitXY"
+                android:visibility="gone"/>
+
+            <TextView
+                android:id="@+id/chart_room_text_index_left"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentTop="true"
+                android:includeFontPadding="false"
+                android:text="1"
+                android:textStyle="bold"
+                android:textSize="@dimen/sp_22"
+                android:typeface="serif"
+                android:textColor="#f2f610"/>
+        </RelativeLayout>
+
+
+        <RelativeLayout
+            android:id="@+id/chart_room_relayout_right"
+            android:layout_width="@dimen/dp_110"
+            android:layout_height="match_parent"
+            android:background="@drawable/shape_member_bg"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true">
+
+            <ImageView
+                android:id="@+id/chart_room_img_head_right"
+                android:layout_width="@dimen/dp_70"
+                android:layout_height="@dimen/dp_70"
+                app:srcCompat="@drawable/chart_room_head_test"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentTop="true"
+                android:scaleType="centerCrop"/>
+
+            <ImageView
+                android:id="@+id/chart_room_img_label_light_right"
+                android:layout_width="@dimen/dp_20"
+                android:layout_height="@dimen/dp_29"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentBottom="true"
+                android:scaleType="fitXY"
+                app:srcCompat="@drawable/chart_room_label_light" />
+
+            <ImageButton
+                android:id="@+id/chart_room_imgBtn_mic_right"
+                android:layout_width="@dimen/dp_25"
+                android:layout_height="@dimen/dp_33"
+                android:layout_toLeftOf="@+id/chart_room_img_head_right"
+                android:layout_centerVertical="true"
+                android:layout_marginRight="@dimen/dp_5"
+                app:srcCompat="@drawable/chart_room_imgbtn_mic"
+                android:background="@android:color/transparent"
+                android:scaleType="fitXY"/>
+
+            <ImageButton
+                android:id="@+id/chart_room_imgBtn_Light_right"
+                android:layout_width="@dimen/dp_25"
+                android:layout_height="@dimen/dp_33"
+                android:layout_toRightOf="@+id/chart_room_img_head_right"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="@dimen/dp_5"
+                app:srcCompat="@drawable/chart_room_imgbtn_light"
+                android:background="@android:color/transparent"
+                android:scaleType="fitXY"
+                android:visibility="gone"/>
+
+            <TextView
+                android:id="@+id/chart_room_text_index_right"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentTop="true"
+                android:includeFontPadding="false"
+                android:text="1"
+                android:textStyle="bold"
+                android:textSize="@dimen/sp_22"
+                android:typeface="serif"
+                android:textColor="#f2f610"/>
+        </RelativeLayout>
+    </RelativeLayout>
+</LinearLayout>
