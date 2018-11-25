@@ -44,7 +44,7 @@
             android:layout_marginLeft="@dimen/dp_20"
             android:layout_alignParentTop="true"
             android:layout_marginTop="@dimen/dp_60"
-            app:srcCompat="@mipmap/ic_launcher_round" />
+            android:src="@drawable/chart_room_default_head" />
     </RelativeLayout>
 
     <LinearLayout

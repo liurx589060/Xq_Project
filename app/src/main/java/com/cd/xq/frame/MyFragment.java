@@ -195,7 +195,7 @@ public class MyFragment extends BaseFragment {
 
     private boolean getIsRemote() {
         SharedPreferences sp = getActivity().getSharedPreferences(Constant.SP_NAME, Activity.MODE_PRIVATE);
-        return sp.getBoolean("isRemote",false);
+        return sp.getBoolean("isRemote",true);
     }
 
     @Override

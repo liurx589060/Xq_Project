@@ -1,5 +1,6 @@
 package com.cd.xq.module.util.network;
 
+import com.cd.xq.module.util.Constant;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -15,7 +16,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
  */
 
 public class NetWorkMg {
-    public static String IP_ADDRESS = "192.168.1.101";
+    public static String IP_ADDRESS = Constant.CONSTANT_REMOTE_IP;
     public static String GENDER = "男";
 
     public static Retrofit newRetrofit() {
@@ -37,6 +38,7 @@ public class NetWorkMg {
 
     public static String getCameraUrl() {
         return "rtmp://" + NetWorkMg.IP_ADDRESS + "/live/stream1";
+        //return "rtmp://" + "192.168.1.101" + "/live/stream1";
     }
 
     public static String getAudioUrl_Guest() {

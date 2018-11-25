@@ -88,7 +88,8 @@ public class JMsgSender {
                 if (0 == responseCode) {
                     Log.i("yy","sendRoomMessage success --" + chartRoomSendBean.getUserName());
                 } else {
-                    Log.e("yy","sendRoomMessage failed --" + chartRoomSendBean.getUserName());
+                    Log.e("yy","sendRoomMessage failed --" + chartRoomSendBean.getUserName() + "===\n" + responseMessage + "\nroomID="
+                            + chartRoomSendBean.getRoomId());
                 }
             }
         });

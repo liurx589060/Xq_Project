@@ -234,15 +234,15 @@ public class MainActivity extends BaseActivity {
 
     private boolean getIsRemote() {
         SharedPreferences sp = getSharedPreferences(Constant.SP_NAME, Activity.MODE_PRIVATE);
-        return sp.getBoolean("isRemote",false);
+        return sp.getBoolean("isRemote",true);
     }
 
-    @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if(keyCode == KeyEvent.KEYCODE_BACK) {
-            System.exit(0);
-            return true;
-        }
-        return super.onKeyDown(keyCode, event);
-    }
+//    @Override
+//    public boolean onKeyDown(int keyCode, KeyEvent event) {
+//        if(keyCode == KeyEvent.KEYCODE_BACK) {
+//            System.exit(0);
+//            return true;
+//        }
+//        return super.onKeyDown(keyCode, event);
+//    }
 }

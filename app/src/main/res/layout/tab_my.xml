@@ -265,39 +265,38 @@
                     android:textSize="@dimen/sp_16" />
             </RelativeLayout>
 
+            <Button
+                android:id="@+id/my_btn_switch"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/dp_33"
+                android:background="@drawable/selector_login_btn_bg"
+                android:text="切换账号"
+                android:textSize="@dimen/sp_16"
+                android:textColor="@drawable/selector_login_btn_text"
+                android:layout_marginTop="@dimen/dp_30"/>
+
+            <EditText
+                android:id="@+id/ip_edit"
+                android:layout_width="@dimen/dp_200"
+                android:layout_height="wrap_content"
+                android:text="192.168.1.101"
+                android:layout_marginTop="@dimen/dp_20"/>
+
+            <Button
+                android:id="@+id/btn_save"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="保存"
+                android:layout_marginTop="@dimen/dp_5"/>
+
+            <CheckBox
+                android:id="@+id/checkbox_remote"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="远程"
+                android:layout_marginTop="@dimen/dp_5"/>
+
         </LinearLayout>
     </ScrollView>
-
-    <Button
-        android:id="@+id/my_btn_switch"
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/dp_33"
-        android:background="@drawable/selector_login_btn_bg"
-        android:text="切换账号"
-        android:textSize="@dimen/sp_16"
-        android:textColor="@drawable/selector_login_btn_text"
-        android:layout_marginTop="@dimen/dp_30"/>
-
-    <EditText
-        android:id="@+id/ip_edit"
-        android:layout_width="@dimen/dp_200"
-        android:layout_height="wrap_content"
-        android:text="192.168.1.101"
-        android:layout_marginTop="@dimen/dp_20"/>
-
-    <Button
-        android:id="@+id/btn_save"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="保存"
-        android:layout_marginTop="@dimen/dp_5"/>
-
-    <CheckBox
-        android:id="@+id/checkbox_remote"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="远程"
-        android:layout_marginTop="@dimen/dp_5"/>
-
 
 </LinearLayout>

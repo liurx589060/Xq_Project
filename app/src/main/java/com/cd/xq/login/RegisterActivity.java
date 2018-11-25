@@ -1,8 +1,10 @@
 package com.cd.xq.login;
 
+import android.annotation.TargetApi;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.text.InputType;
@@ -380,8 +382,13 @@ public class RegisterActivity extends BaseActivity {
         MultipartBody.Part body =
                 MultipartBody.Part.createFormData("uploadFile", file.getName(), requestFile);
         mApi.uploadFile(params,body).enqueue(new Callback<UserResp>() {
+            @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
             @Override
             public void onResponse(Call<UserResp> call, Response<UserResp> response) {
+                if(RegisterActivity.this == null || RegisterActivity.this.isDestroyed()) {
+                    return;
+                }
+
                 if(response == null || response.body() == null) {
                     Tools.toast(getApplicationContext(),"设置头像失败",true);
                     return;
@@ -395,7 +402,12 @@ public class RegisterActivity extends BaseActivity {
                 DataManager.getInstance().getUserInfo().setHead_image(response.body().getData().getHead_image());
                 isUpdate = true;
 
-                setData();
+                //更新头像
+                Glide.with(RegisterActivity.this)
+                        .load(DataManager.getInstance().getUserInfo().getHead_image())
+                        .centerCrop()
+                        .bitmapTransform(new GlideCircleTransform(RegisterActivity.this))
+                        .into(registerImgHead);
 
                 //删除裁剪的图片
                 File file1 = new File(imagePath);

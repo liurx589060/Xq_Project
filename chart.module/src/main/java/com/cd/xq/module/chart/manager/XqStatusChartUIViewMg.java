@@ -811,6 +811,8 @@ public class XqStatusChartUIViewMg extends AbsChartView implements IHandleListen
                 case STATUS_CHART:
                     if(mCurrentIndex == index) {
                         viewInstance.setChartStatus();
+                    }else {
+                        viewInstance.setNormalStatus();
                     }
                     break;
             }

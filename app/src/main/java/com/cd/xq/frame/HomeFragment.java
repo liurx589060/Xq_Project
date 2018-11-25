@@ -2,6 +2,7 @@ package com.cd.xq.frame;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.support.annotation.Nullable;
 import android.util.Base64;
 import android.view.LayoutInflater;
@@ -16,6 +17,7 @@ import com.cd.xq.module.chart.ChartRoomActivity;
 import com.cd.xq.module.chart.status.statusBeans.StatusMatchBean;
 import com.cd.xq.module.util.Constant;
 import com.cd.xq.module.util.base.BaseFragment;
+import com.cd.xq.module.util.beans.JMNormalSendBean;
 import com.cd.xq.module.util.beans.jmessage.Data;
 import com.cd.xq.module.util.beans.jmessage.JMChartResp;
 import com.cd.xq.module.util.beans.jmessage.JMChartRoomSendBean;
@@ -44,9 +46,15 @@ import java.util.Map;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
+import cn.jpush.im.android.api.JMessageClient;
+import cn.jpush.im.android.api.callback.GetGroupMembersCallback;
+import cn.jpush.im.android.api.callback.RequestCallback;
+import cn.jpush.im.android.api.model.UserInfo;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
+
+import static android.app.Activity.RESULT_OK;
 
 /**
  * Created by Administrator on 2018/11/11.
@@ -361,6 +369,8 @@ public class HomeFragment extends BaseFragment {
         super.onLogin();
         if(DataManager.getInstance().getUserInfo().getRole_type().equals(Constant.ROLRTYPE_ANGEL)) {
             mRadioGroup.setVisibility(View.VISIBLE);
+        }else {
+            mRadioGroup.setVisibility(View.GONE);
         }
     }
 

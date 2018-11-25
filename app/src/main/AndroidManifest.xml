@@ -21,6 +21,8 @@
         android:name=".XqApplication"
         android:theme="@style/AppTheme">
         <activity android:name=".welcome.WelcomeActivity"
+            android:screenOrientation="portrait"
+            android:configChanges="orientation|keyboard|keyboardHidden|navigation"
             >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -31,15 +33,20 @@
 
 
         <activity android:name=".frame.MainActivity"
-            android:theme="@style/ActivityTheme"
+            android:screenOrientation="portrait"
+            android:configChanges="orientation|keyboard|keyboardHidden|navigation"
             android:launchMode="singleTask"
             />
 
         <activity
-
+            android:screenOrientation="portrait"
+            android:configChanges="orientation|keyboard|keyboardHidden|navigation"
             android:name=".login.LoginActivity" />
 
-        <activity android:name=".login.RegisterActivity"/>
+        <activity
+            android:screenOrientation="portrait"
+            android:configChanges="orientation|keyboard|keyboardHidden|navigation"
+            android:name=".login.RegisterActivity"/>
 
         <!--图片选择器-->
         <activity

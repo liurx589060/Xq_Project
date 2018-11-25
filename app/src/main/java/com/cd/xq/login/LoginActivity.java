@@ -95,6 +95,8 @@ public class LoginActivity extends BaseActivity {
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.login_btn_close:
+                setResult(RESULT_OK);
+                this.finish();
                 break;
             case R.id.login_edit_userName:
                 break;
@@ -152,14 +154,15 @@ public class LoginActivity extends BaseActivity {
                             DataManager.getInstance().setUserInfo(userResp.getData());
                             mLoadingDialog.dismiss();
                             saveUser(JMessageClient.getMyInfo().getUserName(),password,JMessageClient.getMyInfo().getAppKey());
+                            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                             if(mFrom == FROM_WELCOME) {
                                 Tools.toast(getApplicationContext(),"登录成功",false);
-                                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                                startActivity(intent);
                             }else if(mFrom == FROM_MY) {
-                                setResult(RESULT_OK);
+                                //setResult(RESULT_OK);
                                 Tools.toast(getApplicationContext(),"切换账号成功",false);
+                                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
                             }
+                            startActivity(intent);
                             LoginActivity.this.finish();
                         }else if(userResp.getStatus() == XqErrorCode.ERROR_USER_PASSWORD_WRONG) {
                             Tools.toast(getApplicationContext(),"密码错误",true);
