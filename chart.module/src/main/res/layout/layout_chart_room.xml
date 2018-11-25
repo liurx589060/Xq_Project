@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <RelativeLayout
+            android:layout_width="@dimen/dp_240"
+            android:layout_height="@dimen/dp_33"
+            android:background="@drawable/chart_room_describe_bg"
+            android:layout_gravity="center_horizontal">
+
+            <TextView
+                android:id="@+id/chart_room_activity_text_describe"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="匹配阶段"
+                android:textColor="#ffffff"
+                android:textSize="@dimen/sp_16"
+                android:gravity="center"/>
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="@dimen/dp_80"
+            android:layout_height="@dimen/dp_20"
+            android:background="@drawable/chart_room_time_bg"
+            android:layout_gravity="center_horizontal">
+
+            <TextView
+                android:id="@+id/chart_room_activity_text_time"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="8S"
+                android:textColor="#fb0404"
+                android:textSize="@dimen/sp_16"
+                android:gravity="center"/>
+
+        </RelativeLayout>
+
+        <LinearLayout
+            android:id="@+id/chart_room_activity_member_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/dp_30"
+            android:orientation="vertical"
+            >
+
+            <include
+                android:id="@+id/chart_room_activity_member_item_0"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                layout="@layout/chart_room_member_item"/>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/dp_2"
+                android:background="#cecece"
+                android:layout_marginTop="@dimen/dp_10">
+
+            </RelativeLayout>
+
+        </LinearLayout>
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/chart_room_recyclerView_member"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+        </android.support.v7.widget.RecyclerView>
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/chart_room_recyclerView_system"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+        </android.support.v7.widget.RecyclerView>
+
+    </LinearLayout>
+
+    <ImageView
+        android:id="@+id/chart_room_activity_img_end"
+        android:layout_width="@dimen/dp_40"
+        android:layout_height="@dimen/dp_40"
+        android:src="@drawable/chart_room_end"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="@dimen/dp_370"/>
+
+    <ImageView
+        android:id="@+id/chart_room_activity_img_disturb"
+        android:layout_width="@dimen/dp_40"
+        android:layout_height="@dimen/dp_40"
+        android:src="@drawable/chart_room_disturb"
+        android:layout_marginTop="@dimen/dp_85"
+        android:layout_alignParentLeft="true"
+        android:layout_marginLeft="@dimen/dp_100"
+        />
+
+    <ImageView
+        android:id="@+id/chart_room_activity_img_exit"
+        android:layout_width="@dimen/dp_30"
+        android:layout_height="@dimen/dp_30"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginLeft="@dimen/dp_10"
+        android:layout_marginTop="@dimen/dp_10"
+        android:scaleType="fitXY"
+        android:background="@drawable/chart_room_exit"/>
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="#00000000"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="@dimen/dp_320"
+        android:layout_centerHorizontal="true"
+        android:gravity="top|center_horizontal">
+
+        <RadioGroup
+            android:id="@+id/chart_room_activity_radioGroup_liveType"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            >
+
+            <RadioButton
+                android:id="@+id/radio_camera"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="camera"
+                android:textColor="#1296db"/>
+
+            <RadioButton
+                android:id="@+id/radio_mic"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/dp_10"
+                android:text="mic"
+                android:textColor="#1296db" />
+        </RadioGroup>
+
+    </RelativeLayout>
+</RelativeLayout>

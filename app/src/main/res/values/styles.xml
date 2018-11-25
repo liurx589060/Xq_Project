@@ -17,4 +17,14 @@
         <item name="android:textAllCaps">false</item>
     </style>
 
+    <style name="ActivityTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:configChanges">orientation|keyboard|keyboardHidden|navigation</item>
+        <item name="android:windowSoftInputMode">adjustPan|stateVisible</item>
+    </style>
+
 </resources>

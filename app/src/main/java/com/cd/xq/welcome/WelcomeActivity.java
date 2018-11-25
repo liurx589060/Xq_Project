@@ -1,20 +1,41 @@
 package com.cd.xq.welcome;
 
+import android.annotation.SuppressLint;
+import android.app.Dialog;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.WindowManager;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.cd.xq.R;
+import com.cd.xq.frame.MainActivity;
 import com.cd.xq.login.LoginActivity;
+import com.cd.xq.login.RegisterActivity;
+import com.cd.xq.module.util.Constant;
+import com.cd.xq.module.util.beans.user.UserInfoBean;
+import com.cd.xq.module.util.beans.user.UserResp;
+import com.cd.xq.module.util.manager.DataManager;
+import com.cd.xq.module.util.network.NetWorkMg;
+import com.cd.xq.module.util.network.RequestApi;
+import com.cd.xq.module.util.tools.DialogFactory;
+import com.cd.xq.module.util.tools.Tools;
+import com.cd.xq.module.util.tools.XqErrorCode;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import cn.jpush.im.android.api.JMessageClient;
+import cn.jpush.im.android.api.model.UserInfo;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
 
 /**
  * Created by Administrator on 2018/10/28.
@@ -35,6 +56,10 @@ public class WelcomeActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if ((getIntent().getFlags() & Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT) != 0) {
+            finish();
+            return;
+        }
         //设置全屏
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_welcome);
@@ -57,8 +82,14 @@ public class WelcomeActivity extends AppCompatActivity {
     }
 
     private void jumpToMainActivity() {
-        Intent intent = new Intent(this, LoginActivity.class);
-        startActivity(intent);
+        if(JMessageClient.getMyInfo() != null) {
+            //自动登陆
+            Intent intent = new Intent(this, MainActivity.class);
+            startActivity(intent);
+        }else {
+            Intent intent = new Intent(this, LoginActivity.class);
+            startActivity(intent);
+        }
         this.finish();
     }
 

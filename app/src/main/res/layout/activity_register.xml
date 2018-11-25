@@ -12,7 +12,6 @@
         android:layout_height="wrap_content"
         android:paddingBottom="@dimen/dp_20">
 
-
         <TextView
             android:id="@+id/register_done"
             android:layout_width="wrap_content"
@@ -317,6 +316,5 @@
             </RelativeLayout>
         </LinearLayout>
     </ScrollView>
-
 
 </LinearLayout>

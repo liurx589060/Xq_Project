@@ -1,9 +1,13 @@
 package com.cd.xq;
 
+import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.support.multidex.MultiDex;
 
+import com.cd.xq.module.util.Constant;
+import com.cd.xq.module.util.network.NetWorkMg;
 import com.tencent.bugly.crashreport.CrashReport;
 import com.tencent.rtmp.TXLiveBase;
 
@@ -22,7 +26,7 @@ public class XqApplication extends Application {
         JMessageClient.setDebugMode(true);
         JMessageClient.init(this);
         //bugly
-        CrashReport.initCrashReport(getApplicationContext(), "4c34f4883b", true);
+        CrashReport.initCrashReport(getApplicationContext(), "baaced6d7c", true);
 
         TXLiveBase.setAppID("1252463788");
         TXLiveBase.setConsoleEnabled(true);

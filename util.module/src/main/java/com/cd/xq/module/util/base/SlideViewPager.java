@@ -43,9 +43,6 @@ public class SlideViewPager extends ViewPager {
 
     @Override
     public boolean dispatchTouchEvent(MotionEvent ev) {
-        if(isSlide) {
-            return super.dispatchTouchEvent(ev);
-        }
-        return false;
+        return super.dispatchTouchEvent(ev);
     }
 }

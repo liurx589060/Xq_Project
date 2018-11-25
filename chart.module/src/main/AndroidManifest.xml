@@ -2,6 +2,10 @@
     package="com.cd.xq_chart.module">
 
     <application>
-        <activity android:name="com.cd.xq.module.chart.ChartRoomActivity"></activity>
+        <activity
+            android:name="com.cd.xq.module.chart.ChartRoomActivity"
+            >
+
+        </activity>
     </application>
 </manifest>

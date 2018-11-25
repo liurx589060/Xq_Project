@@ -1,5 +1,6 @@
 package com.cd.xq.module.util.base;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.support.v4.app.Fragment;
 import android.view.View;
@@ -14,4 +15,8 @@ public class BaseFragment extends Fragment {
     public int getStatusColor() {
         return Color.parseColor("#ffa07a");
     }
+
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {}
+
+    public void onLogin() {}
 }

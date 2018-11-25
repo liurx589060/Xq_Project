@@ -50,6 +50,7 @@
         android:orientation="horizontal"
         android:background="@drawable/login_edit_bg"
         android:hint="密码"
+        android:inputType="textPassword"
         android:textColorHint="#999999"
         android:textColor="#ffffff"
         android:textSize="@dimen/sp_16"

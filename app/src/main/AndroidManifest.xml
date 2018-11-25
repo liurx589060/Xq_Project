@@ -2,6 +2,16 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.cd.xq">
 
+    <uses-permission android:name="android.permission.WAKE_LOCK"/>
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-feature android:name="android.hardware.Camera"/>
+    <uses-feature android:name="android.hardware.camera.autofocus" />
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/app_icon"
@@ -10,7 +20,8 @@
         android:supportsRtl="true"
         android:name=".XqApplication"
         android:theme="@style/AppTheme">
-        <activity android:name=".welcome.WelcomeActivity">
+        <activity android:name=".welcome.WelcomeActivity"
+            >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -20,11 +31,28 @@
 
 
         <activity android:name=".frame.MainActivity"
-            android:launchMode="singleTask"/>
+            android:theme="@style/ActivityTheme"
+            android:launchMode="singleTask"
+            />
 
-        <activity android:name=".login.LoginActivity" />
+        <activity
+
+            android:name=".login.LoginActivity" />
 
         <activity android:name=".login.RegisterActivity"/>
+
+        <!--图片选择器-->
+        <activity
+            android:name="cn.finalteam.rxgalleryfinal.ui.activity.MediaActivity"
+            android:screenOrientation="portrait"
+            android:exported="true"
+            />
+        <activity
+            android:name="com.yalantis.ucrop.UCropActivity"
+            android:screenOrientation="portrait"
+            />
+
+        <service android:name="cn.jpush.android.service.DaemonService"></service>
     </application>
 
 </manifest>

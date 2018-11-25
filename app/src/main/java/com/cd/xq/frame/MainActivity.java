@@ -1,25 +1,44 @@
 package com.cd.xq.frame;
 
+import android.annotation.SuppressLint;
+import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
-import android.support.v4.view.ViewPager;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.cd.xq.R;
+import com.cd.xq.login.RegisterActivity;
+import com.cd.xq.module.util.Constant;
 import com.cd.xq.module.util.base.BaseActivity;
 import com.cd.xq.module.util.base.BaseFragment;
 import com.cd.xq.module.util.base.SlideViewPager;
+import com.cd.xq.module.util.beans.user.UserResp;
+import com.cd.xq.module.util.manager.DataManager;
+import com.cd.xq.module.util.network.NetWorkMg;
+import com.cd.xq.module.util.network.RequestApi;
+import com.cd.xq.module.util.tools.Tools;
+import com.cd.xq.module.util.tools.XqErrorCode;
+import com.cd.xq.utils.CheckUtil;
+import com.cd.xq.welcome.WelcomeActivity;
 
 import java.util.ArrayList;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import cn.jpush.im.android.api.JMessageClient;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
 
 /**
  * Created by Administrator on 2018/10/28.
@@ -40,13 +59,70 @@ public class MainActivity extends BaseActivity {
     private final int F_SEL_TITLE_COLOR = Color.parseColor("#1296db");
     private final int F_NORMAL_TITLE_COLOR = Color.parseColor("#707070");
 
+    private RequestApi mApi;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
 
+        if(getIsRemote()) {
+            NetWorkMg.IP_ADDRESS = Constant.CONSTANT_REMOTE_IP;
+        }else {
+            NetWorkMg.IP_ADDRESS = getSpIpAddress();
+        }
+
+        mApi = NetWorkMg.newRetrofit().create(RequestApi.class);
+        if(JMessageClient.getMyInfo() != null) {
+            //自动登陆
+            autoLogin();
+        }
         init();
+    }
+
+    /**
+     * 自动登陆自己的服务器
+     */
+    @SuppressLint("CheckResult")
+    private void autoLogin() {
+        SharedPreferences sp = getSharedPreferences(Constant.SP_NAME, Context.MODE_PRIVATE);
+        final String userName = sp.getString("userName","");
+        final String password = sp.getString("password","");
+        mApi.login(userName,password)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Consumer<UserResp>() {
+                    @Override
+                    public void accept(UserResp userResp) throws Exception {
+                        if(userResp.getStatus() == XqErrorCode.SUCCESS) {
+                            DataManager.getInstance().setUserInfo(userResp.getData());
+                            for(int i = 0 ; i < mFragmentHolderList.size() ; i++) {
+                                if(mFragmentHolderList.get(i).mFragment != null) {
+                                    mFragmentHolderList.get(i).mFragment.onLogin();
+                                }
+                            }
+
+                            //检测信息是否完整
+                            if (CheckUtil.checkToCompleteUserInfo(DataManager.getInstance().getUserInfo())) {
+                                Intent intent = new Intent(MainActivity.this, RegisterActivity.class);
+                                Bundle bundle = new Bundle();
+                                bundle.putInt("from", RegisterActivity.FROM_LEAK_INFO);
+                                intent.putExtras(bundle);
+                                startActivityForResult(intent,2);
+                            }
+                        }else if(userResp.getStatus() == XqErrorCode.ERROR_USER_PASSWORD_WRONG) {
+                            Tools.toast(getApplicationContext(),"密码错误",true);
+                        }else if(userResp.getStatus() == XqErrorCode.ERROR_USER_REGIST_UNEXIST) {
+                            Tools.toast(getApplicationContext(),"用户不存在",true);
+                        }
+                    }
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Exception {
+                        Tools.toast(getApplicationContext(),throwable.toString(),true);
+                    }
+                });
     }
 
     private void init() {
@@ -57,7 +133,7 @@ public class MainActivity extends BaseActivity {
             holder.mNormalImageID = F_NORMAL_IMAGE_ID[i];
             holder.mSelectedImageID = F_SEL_IMAGE_ID[i];
             holder.mTitle = F_TITLE[i];
-            Fragment fragment = null;
+            BaseFragment fragment = null;
             switch (i) {
                 case 0:
                     fragment = new HomeFragment();
@@ -138,6 +214,35 @@ public class MainActivity extends BaseActivity {
         public int mSelectedImageID;
         public int mNormalImageID;
         public String mTitle;
-        public Fragment mFragment;
+        public BaseFragment mFragment;
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        for(int i = 0 ; i < mFragmentHolderList.size() ; i++) {
+            if(mFragmentHolderList.get(i).mFragment != null) {
+                mFragmentHolderList.get(i).mFragment.onActivityResult(requestCode,resultCode,data);
+            }
+        }
+    }
+
+    private String getSpIpAddress() {
+        SharedPreferences sp = getSharedPreferences(Constant.SP_NAME, Activity.MODE_PRIVATE);
+        return sp.getString("ipAddress","192.168.1.101");
+    }
+
+    private boolean getIsRemote() {
+        SharedPreferences sp = getSharedPreferences(Constant.SP_NAME, Activity.MODE_PRIVATE);
+        return sp.getBoolean("isRemote",false);
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if(keyCode == KeyEvent.KEYCODE_BACK) {
+            System.exit(0);
+            return true;
+        }
+        return super.onKeyDown(keyCode, event);
     }
 }
