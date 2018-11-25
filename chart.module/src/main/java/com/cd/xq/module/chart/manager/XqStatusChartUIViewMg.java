@@ -17,6 +17,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RadioGroup;
@@ -90,6 +91,7 @@ import static com.cd.xq.module.chart.manager.XqStatusChartUIViewMg.EnumMemberSta
  */
 
 public class XqStatusChartUIViewMg extends AbsChartView implements IHandleListener {
+    public FrameLayout mParentFrameLayout;
     public enum EnumMemberStatus {
         STATUS_NORMAL, //正常
         STATUS_SELECT, //选择
@@ -436,8 +438,9 @@ public class XqStatusChartUIViewMg extends AbsChartView implements IHandleListen
         }
     }
 
-    public XqStatusChartUIViewMg(ChartRoomActivity xqActivity) {
+    public XqStatusChartUIViewMg(ChartRoomActivity xqActivity,FrameLayout frameLayout) {
         this.mXqActivity = xqActivity;
+        mParentFrameLayout = frameLayout;
     }
 
     /**
@@ -461,11 +464,11 @@ public class XqStatusChartUIViewMg extends AbsChartView implements IHandleListen
         viewMgList.add(mXqCameraViewMg);
         viewMgList.add(mXqPlayerViewMg);
 
-        mXqActivity.setContentView(mXqCameraViewMg.getView());
-        mXqActivity.addContentView(mXqPlayerViewMg.getView(),new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.MATCH_PARENT));
-        mXqActivity.addContentView(mRootView,new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.MATCH_PARENT));
+        ViewGroup.LayoutParams params = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT);
+        mParentFrameLayout.addView(mXqCameraViewMg.getView(),params);
+        mParentFrameLayout.addView(mXqPlayerViewMg.getView(),params);
+        mParentFrameLayout.addView(mRootView,params);
     }
 
     private void updateSystemEvent() {

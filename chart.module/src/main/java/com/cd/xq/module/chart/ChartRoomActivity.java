@@ -1,22 +1,14 @@
 package com.cd.xq.module.chart;
 
-import android.app.Activity;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v7.widget.RecyclerView;
 import android.view.KeyEvent;
-import android.view.View;
-import android.widget.ImageButton;
-import android.widget.ImageView;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
+import android.widget.FrameLayout;
 
 import com.cd.xq.module.chart.manager.XqStatusChartUIViewMg;
 import com.cd.xq.module.util.base.BaseActivity;
 import com.cd.xq_chart.module.R;
-
-import java.util.ArrayList;
 
 /**
  * Created by Administrator on 2018/11/14.
@@ -29,7 +21,8 @@ public class ChartRoomActivity extends BaseActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mXqStatusChartUIViewMg = new XqStatusChartUIViewMg(this);
+        setContentView(R.layout.activity_chart_room);
+        mXqStatusChartUIViewMg = new XqStatusChartUIViewMg(this, (FrameLayout) findViewById(R.id.chart_activity_frameLayout));
         mXqStatusChartUIViewMg.init();
     }
 
