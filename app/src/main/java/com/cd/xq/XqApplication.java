@@ -8,6 +8,8 @@ import android.support.multidex.MultiDex;
 
 import com.cd.xq.module.util.Constant;
 import com.cd.xq.module.util.network.NetWorkMg;
+import com.hc.lib.msc.MscManager;
+import com.iflytek.msc.MSC;
 import com.tencent.bugly.crashreport.CrashReport;
 import com.tencent.rtmp.TXLiveBase;
 
@@ -30,6 +32,8 @@ public class XqApplication extends Application {
 
         TXLiveBase.setAppID("1252463788");
         TXLiveBase.setConsoleEnabled(true);
+
+        MscManager.initMsc(this);
     }
 
     @Override

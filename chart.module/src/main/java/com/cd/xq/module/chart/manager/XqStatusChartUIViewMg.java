@@ -65,6 +65,8 @@ import com.cd.xq.module.util.tools.Tools;
 import com.cd.xq.module.util.tools.XqErrorCode;
 import com.cd.xq_chart.module.R;
 import com.google.gson.Gson;
+import com.hc.lib.msc.HCMscParams;
+import com.hc.lib.msc.MscDefaultSpeech;
 
 import org.json.JSONObject;
 
@@ -144,6 +146,7 @@ public class XqStatusChartUIViewMg extends AbsChartView implements IHandleListen
     private BaseStatus mStartStatusBasebean;
     private int mCurrentQuestDisturbCount = 0;
     private final int DISTURB_COUNT = 3; //一轮可插话的次数
+    private int mPreManSelectedIndex = -1;
 
     @Override
     public View getView() {
@@ -180,6 +183,7 @@ public class XqStatusChartUIViewMg extends AbsChartView implements IHandleListen
         }
         //重置roomId
         DataManager.getInstance().getChartData().setRoomId(0);
+        MscDefaultSpeech.getInstance().destroy();
     }
 
     @Override
@@ -192,6 +196,7 @@ public class XqStatusChartUIViewMg extends AbsChartView implements IHandleListen
     }
 
     public void init() {
+        MscDefaultSpeech.getInstance().getMscParams().setEngineType(HCMscParams.CLOUND);
         mApi = NetWorkMg.newRetrofit().create(RequestApi.class);
         mAngelMembersMap = new HashMap<>();
         mManMembersMap = new HashMap<>();
@@ -331,6 +336,8 @@ public class XqStatusChartUIViewMg extends AbsChartView implements IHandleListen
         }
 
         UserInfoBean angelBean = mAngelMembersMap.get(0);
+        mAngelViewInstance.textIndex.setVisibility(View.GONE);
+        mAngelViewInstance.imageIndex.setVisibility(View.VISIBLE);
         if(angelBean != null) {
             String text = "爱";
             if(angelBean.getNick_name().equals(DataManager.getInstance().getUserInfo().getNick_name())) {
@@ -351,6 +358,7 @@ public class XqStatusChartUIViewMg extends AbsChartView implements IHandleListen
         }
 
         UserInfoBean manBean = mManMembersMap.get(0);
+        mManViewInstance.textIndex.setTextColor(Color.parseColor("#0000ff"));
         mManViewInstance.textIndex.setText("男");
         if(manBean != null) {
             String text = "男";
@@ -607,6 +615,15 @@ public class XqStatusChartUIViewMg extends AbsChartView implements IHandleListen
                     mIsDistub = false;
                 }
 
+                //语音播放
+                String content = sendBean.getMsg();
+                if(sendBean.getProcessStatus() == JMChartRoomSendBean.CHART_STATUS_CHAT_FINAL) {
+                    content += "流程已结束，可自行离开房间";
+                }
+                if(sendBean.getProcessStatus() != JMChartRoomSendBean.CHART_STATUS_MATCHING) {
+                    MscDefaultSpeech.getInstance().startSpeaking(mXqActivity,content);
+                }
+
                 switch (statusResp.getHandleType()) {
                     case HANDLE_MATCH:
                         getChartRoomMembersList(DataManager.getInstance().getChartData().getRoomId());
@@ -796,6 +813,14 @@ public class XqStatusChartUIViewMg extends AbsChartView implements IHandleListen
                 //是男嘉宾
                 if(manSelectedResultList.contains(String.valueOf(index))) {
                     //选中的女生
+                    viewInstance.setLightLabelStatus(true);
+                }else {
+                    viewInstance.setLightLabelStatus(false);
+                }
+            }
+
+            if(selfUserBean.getRole_type().equals(Constant.ROLETYPE_GUEST) && selfUserBean.getGender().equals(Constant.GENDER_LADY)) {
+                if(mLadySelecteResult && index == DataManager.getInstance().getSelfMember().getIndex()) {
                     viewInstance.setLightLabelStatus(true);
                 }else {
                     viewInstance.setLightLabelStatus(false);
@@ -1032,7 +1057,12 @@ public class XqStatusChartUIViewMg extends AbsChartView implements IHandleListen
                 if(bean.getGender().equals(Constant.GENDER_LADY)) {
                     bean.setLadySelected(mLadySelecteResult);
                 }else if (bean.getGender().equals(Constant.GENDER_MAN)) {
-                    bean.setManSelects(String.valueOf(mManSelectedIndex));
+                    int index = mManSelectedIndex;
+                    if(index == mPreManSelectedIndex) {
+                        index = (mPreManSelectedIndex+1)%DataManager.getInstance().getChartData().getLimitLady();
+                    }
+                    bean.setManSelects(String.valueOf(index));
+                    mPreManSelectedIndex = index;
                 }
                 sendRoomMessage(bean);
                 break;
@@ -1385,6 +1415,7 @@ public class XqStatusChartUIViewMg extends AbsChartView implements IHandleListen
         public ImageButton imageBtnLight;
         public TextView textIndex;
         public ImageView imageGender;
+        public ImageView imageIndex;
 
         private ColorDrawable mTransparentDrawable;
 
@@ -1431,6 +1462,7 @@ public class XqStatusChartUIViewMg extends AbsChartView implements IHandleListen
             viewHolderLeft.reLayoutBg = itemView.findViewById(R.id.chart_room_relayout_left);
             viewHolderLeft.textIndex = itemView.findViewById(R.id.chart_room_text_index_left);
             viewHolderLeft.imageGender = itemView.findViewById(R.id.chart_room_img_label_gender_left);
+            viewHolderLeft.imageIndex = itemView.findViewById(R.id.chart_room_image_index_left);
 
             viewHolderRight.imageBtnLight = itemView.findViewById(R.id.chart_room_imgBtn_Light_right);
             viewHolderRight.imageBtnMic = itemView.findViewById(R.id.chart_room_imgBtn_mic_right);
@@ -1439,6 +1471,7 @@ public class XqStatusChartUIViewMg extends AbsChartView implements IHandleListen
             viewHolderRight.reLayoutBg = itemView.findViewById(R.id.chart_room_relayout_right);
             viewHolderRight.textIndex = itemView.findViewById(R.id.chart_room_text_index_right);
             viewHolderRight.imageGender = itemView.findViewById(R.id.chart_room_img_label_gender_right);
+            viewHolderRight.imageIndex = itemView.findViewById(R.id.chart_room_image_index_right);
 
             Glide.with(mXqActivity)
                     .load(R.drawable.chart_room_default_head)

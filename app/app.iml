@@ -149,6 +149,7 @@
     <orderEntry type="library" name="cn.jiguang.sdk:jmessage-2.5.0" level="project" />
     <orderEntry type="library" name="com.android.support:support-annotations:26.1.0@jar" level="project" />
     <orderEntry type="library" name="com.android.support:support-core-ui-26.1.0" level="project" />
+    <orderEntry type="library" name="msclib-release:@aar" level="project" />
     <orderEntry type="library" name="com.nostra13.universalimageloader:universal-image-loader:1.9.5@jar" level="project" />
     <orderEntry type="library" name="com.android.support:support-compat-26.1.0" level="project" />
     <orderEntry type="library" name="android.arch.core:common:1.0.0@jar" level="project" />

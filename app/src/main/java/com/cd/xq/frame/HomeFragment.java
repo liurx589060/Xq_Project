@@ -310,7 +310,7 @@ public class HomeFragment extends BaseFragment {
             String input = new StringBuilder().
                     append(Constant.TX_LIVE_PUSH_KEY).
                     append(Constant.TX_LIVE_BIZID + "_"
-                            + String.valueOf(DataManager.getInstance().getChartData().getRoomId())).
+                            + String.valueOf(DataManager.getInstance().getUserInfo().getUser_id())).
                     append(Long.toHexString(txTime).toUpperCase()).toString();
             Log.d("yy",input);
 
@@ -328,10 +328,10 @@ public class HomeFragment extends BaseFragment {
             }
 
             mTXPlayerAddress = "rtmp://" + Constant.TX_LIVE_BIZID + ".liveplay.myqcloud.com/live/"
-                    + Constant.TX_LIVE_BIZID + "_" + DataManager.getInstance().getChartData().getRoomId();
+                    + Constant.TX_LIVE_BIZID + "_" + DataManager.getInstance().getUserInfo().getUser_id();
 
             String ip = "rtmp://" + Constant.TX_LIVE_BIZID + ".livepush.myqcloud.com/live/"
-                    + Constant.TX_LIVE_BIZID + "_" + DataManager.getInstance().getChartData().getRoomId()
+                    + Constant.TX_LIVE_BIZID + "_" + DataManager.getInstance().getUserInfo().getUser_id()
                     + "?bizid=" + Constant.TX_LIVE_BIZID;
             mTXPushAddress = new StringBuilder().
                     append(ip).

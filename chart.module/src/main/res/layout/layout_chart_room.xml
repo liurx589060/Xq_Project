@@ -37,7 +37,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:text="8S"
-                android:textColor="#fb0404"
+                android:textColor="#ffffff"
                 android:textSize="@dimen/sp_16"
                 android:gravity="center"/>
 

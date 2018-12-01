@@ -25,7 +25,7 @@ public class StatusManFirstSelectBean extends BaseStatus {
 
     @Override
     public int getLiveTimeCount() {
-        return 10;
+        return 20;
     }
 
     @Override

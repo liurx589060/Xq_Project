@@ -116,8 +116,8 @@ public class XqTxPushViewMg extends AbsChartView {
         mRootView = LayoutInflater.from(activity).inflate(R.layout.layout_viewmg_xqtxpush,null);
 
         mLivePusher = new TXLivePusher(mActivity);
-        mLivePushConfig = new TXLivePushConfig();
 
+        mLivePushConfig = new TXLivePushConfig();
         mVideoView = (TXCloudVideoView) mRootView.findViewById(R.id.tx_push_videoview);
         mVideoView.setMirror(true);
         mLivePusher.startCameraPreview(mVideoView);
@@ -161,9 +161,13 @@ public class XqTxPushViewMg extends AbsChartView {
             }
         });
 
-        mLivePusher.setVideoQuality(TXLiveConstants.VIDEO_QUALITY_HIGH_DEFINITION,
-                false,
-                false);
+//        mLivePusher.setVideoQuality(TXLiveConstants.VIDEO_QUALITY_HIGH_DEFINITION,
+//                false,
+//                false);
+
+        mLivePusher.setVideoQuality(TXLiveConstants.VIDEO_QUALITY_REALTIEM_VIDEOCHAT,
+                true,
+                true);
 
         TXPhoneStateListener mPhoneListener = new TXPhoneStateListener(mLivePusher);
         TelephonyManager tm = (TelephonyManager) activity.getSystemService(Service.TELEPHONY_SERVICE);

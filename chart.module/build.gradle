@@ -33,5 +33,6 @@ dependencies {
     compile project(':util.module')
 
     compile(name:'LiteAVSDK_Smart_5.1.5293',ext:'aar')
+    compile(name: 'msclib-release', ext: 'aar')
 
 }

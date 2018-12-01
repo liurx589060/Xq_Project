@@ -78,7 +78,17 @@
                 android:textSize="@dimen/sp_18"
                 android:typeface="serif"
                 android:layout_marginTop="@dimen/dp_m_2"
-                android:textColor="#ffa07a"/>
+                android:textColor="#ff00ff"/>
+
+            <ImageView
+                android:id="@+id/chart_room_image_index_left"
+                android:layout_width="@dimen/dp_15"
+                android:layout_height="@dimen/dp_15"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentTop="true"
+                android:src="@drawable/chart_room_image_angle_index"
+                android:scaleType="fitXY"
+                android:visibility="gone"/>
         </RelativeLayout>
 
 
@@ -152,7 +162,17 @@
                 android:textSize="@dimen/sp_18"
                 android:typeface="serif"
                 android:layout_marginTop="@dimen/dp_m_2"
-                android:textColor="#ffa07a"/>
+                android:textColor="#ff00ff"/>
+
+            <ImageView
+                android:id="@+id/chart_room_image_index_right"
+                android:layout_width="@dimen/dp_20"
+                android:layout_height="@dimen/dp_20"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentTop="true"
+                android:src="@drawable/chart_room_image_angle_index"
+                android:scaleType="fitXY"
+                android:visibility="gone"/>
         </RelativeLayout>
     </RelativeLayout>
 </LinearLayout>

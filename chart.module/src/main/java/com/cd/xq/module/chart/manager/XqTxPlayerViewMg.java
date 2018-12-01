@@ -141,9 +141,13 @@ public class XqTxPlayerViewMg extends AbsChartView {
             mLivePlayer.setRenderRotation(TXLiveConstants.RENDER_ROTATION_PORTRAIT);
 
             TXLivePlayConfig mPlayConfig = new TXLivePlayConfig();
+//            mPlayConfig.setAutoAdjustCacheTime(true);
+//            mPlayConfig.setMaxAutoAdjustCacheTime(CACHE_TIME_SMOOTH);
+//            mPlayConfig.setMinAutoAdjustCacheTime(CACHE_TIME_FAST);
+
             mPlayConfig.setAutoAdjustCacheTime(true);
-            mPlayConfig.setMaxAutoAdjustCacheTime(CACHE_TIME_SMOOTH);
             mPlayConfig.setMinAutoAdjustCacheTime(CACHE_TIME_FAST);
+            mPlayConfig.setMaxAutoAdjustCacheTime(CACHE_TIME_FAST);
             mLivePlayer.setConfig(mPlayConfig);
         }catch (Exception e) {
             e.printStackTrace();
