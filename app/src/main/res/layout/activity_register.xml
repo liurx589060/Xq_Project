@@ -5,12 +5,14 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:focusable="true"
+    android:focusableInTouchMode="true"
     >
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingBottom="@dimen/dp_20">
+        android:paddingBottom="@dimen/dp_10">
 
         <TextView
             android:id="@+id/register_done"
@@ -45,6 +47,23 @@
             android:layout_alignParentTop="true"
             android:layout_marginTop="@dimen/dp_60"
             android:src="@drawable/chart_room_default_head" />
+
+        <EditText
+            android:id="@+id/register_edit_ps"
+            android:layout_toRightOf="@+id/register_img_head"
+            android:layout_alignParentTop="true"
+            android:layout_marginTop="@dimen/dp_50"
+            android:layout_marginRight="@dimen/dp_20"
+            android:layout_marginLeft="@dimen/dp_20"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/dp_90"
+            android:hint="个人特殊说明（如：本人要求身高170以上）(选填)"
+            android:textSize="@dimen/sp_10"
+            android:textColor="#333333"
+            android:gravity="top"
+            android:padding="@dimen/dp_6"
+            android:background="@drawable/shape_register_text_ps_bg"
+            />
     </RelativeLayout>
 
     <LinearLayout
@@ -314,6 +333,7 @@
                     android:text="请输入工作地点   >"
                     android:textSize="@dimen/sp_16" />
             </RelativeLayout>
+
         </LinearLayout>
     </ScrollView>
 

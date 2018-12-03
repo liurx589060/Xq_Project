@@ -108,6 +108,8 @@ public class RegisterActivity extends BaseActivity {
     TextView registerTextGzdd;
     @BindView(R.id.register_relayout_gzdd)
     RelativeLayout registerRelayoutGzdd;
+    @BindView(R.id.register_edit_ps)
+    EditText registerEditPs;
 
     private String SUFFIX = "  >";
 
@@ -116,11 +118,11 @@ public class RegisterActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
         ButterKnife.bind(this);
-        if(getIntent().getExtras() != null) {
-            mFrom = getIntent().getExtras().getInt("from",FROM_LOGIN);
+        if (getIntent().getExtras() != null) {
+            mFrom = getIntent().getExtras().getInt("from", FROM_LOGIN);
         }
 
-        if(mFrom == FROM_LEAK_INFO) {
+        if (mFrom == FROM_LEAK_INFO) {
             registerBtnClose.setVisibility(View.INVISIBLE);
         }
         init();
@@ -138,7 +140,7 @@ public class RegisterActivity extends BaseActivity {
 
     private void setData() {
         UserInfoBean userInfo = DataManager.getInstance().getUserInfo();
-        if(userInfo == null) {
+        if (userInfo == null) {
             return;
         }
 
@@ -156,37 +158,38 @@ public class RegisterActivity extends BaseActivity {
         registerTextXueli.setText(userInfo.getScholling() + SUFFIX);
         registerTextZhiye.setText(userInfo.getProfessional() + SUFFIX);
         registerTextRole.setText(userInfo.getRole_type() + SUFFIX);
+        registerEditPs.setText(userInfo.getSpecial_info());
     }
 
     @OnClick({R.id.register_relayout_role, R.id.register_relayout_nick, R.id.register_relayout_gender, R.id.register_relayout_age, R.id.register_relayout_tall, R.id.register_relayout_xueli, R.id.register_relayout_jiguan, R.id.register_relayout_zhiye, R.id.register_relayout_gzdd})
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.register_relayout_role:
-                showSelectDialog("角色",new String[]{"angel","guest"},registerTextRole);
+                showSelectDialog("角色", new String[]{"angel", "guest"}, registerTextRole);
                 break;
             case R.id.register_relayout_nick:
-                showEditDialog("昵称",registerTextNick.getText().toString(),registerTextNick);
+                showEditDialog("昵称", registerTextNick.getText().toString(), registerTextNick);
                 break;
             case R.id.register_relayout_gender:
-                showSelectDialog("性别",new String[]{"男","女"},registerTextGender);
+                showSelectDialog("性别", new String[]{"男", "女"}, registerTextGender);
                 break;
             case R.id.register_relayout_age:
-                showEditDialog("年龄",registerTextAge.getText().toString(),registerTextAge);
+                showEditDialog("年龄", registerTextAge.getText().toString(), registerTextAge);
                 break;
             case R.id.register_relayout_tall:
-                showEditDialog("身高",registerTextTall.getText().toString(),registerTextTall);
+                showEditDialog("身高", registerTextTall.getText().toString(), registerTextTall);
                 break;
             case R.id.register_relayout_xueli:
-                showSelectDialog("学历",new String[]{"本科以下","本科","硕士","博士及以上"},registerTextXueli);
+                showSelectDialog("学历", new String[]{"本科以下", "本科", "硕士", "博士及以上"}, registerTextXueli);
                 break;
             case R.id.register_relayout_jiguan:
-                showEditDialog("籍贯",registerTextJiguan.getText().toString(),registerTextJiguan);
+                showEditDialog("籍贯", registerTextJiguan.getText().toString(), registerTextJiguan);
                 break;
             case R.id.register_relayout_zhiye:
-                showEditDialog("职业",registerTextZhiye.getText().toString(),registerTextZhiye);
+                showEditDialog("职业", registerTextZhiye.getText().toString(), registerTextZhiye);
                 break;
             case R.id.register_relayout_gzdd:
-                showEditDialog("工作地点",registerTextGzdd.getText().toString(),registerTextGzdd);
+                showEditDialog("工作地点", registerTextGzdd.getText().toString(), registerTextGzdd);
                 break;
         }
     }
@@ -198,7 +201,7 @@ public class RegisterActivity extends BaseActivity {
 
     @OnClick(R.id.register_btn_close)
     public void onRegisterBtnCloseClicked() {
-        if(isUpdate) {
+        if (isUpdate) {
             setResult(RESULT_OK);
         }
         this.finish();
@@ -210,16 +213,16 @@ public class RegisterActivity extends BaseActivity {
     }
 
     private void showEditDialog(String title, String hintText, final View view) {
-        String rHintText = hintText.replace(SUFFIX,"");
+        String rHintText = hintText.replace(SUFFIX, "");
         final EditText editText = new EditText(this);
-        if(view == registerTextTall) {
-            rHintText = rHintText.replace("cm","");
+        if (view == registerTextTall) {
+            rHintText = rHintText.replace("cm", "");
             editText.setInputType(InputType.TYPE_CLASS_NUMBER);
         }
-        if(mFrom == FROM_MY) {
+        if (mFrom == FROM_MY) {
             editText.setText(rHintText);
             editText.setSelection(editText.getText().length());
-        }else {
+        } else {
             editText.setHint(rHintText);
         }
         final AlertDialog.Builder inputDialog =
@@ -232,13 +235,13 @@ public class RegisterActivity extends BaseActivity {
                         String text;
                         text = editText.getText().toString();
 
-                        if(view == registerTextTall) {
+                        if (view == registerTextTall) {
                             text += "cm" + SUFFIX;
-                        }else {
+                        } else {
                             text += SUFFIX;
                         }
-                        if(view instanceof TextView) {
-                            ((TextView)view).setText(text);
+                        if (view instanceof TextView) {
+                            ((TextView) view).setText(text);
                         }
                         dialog.dismiss();
                     }
@@ -260,8 +263,8 @@ public class RegisterActivity extends BaseActivity {
                 .setSingleChoiceItems(items, -1, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        if(view instanceof TextView) {
-                            ((TextView)view).setText(items[which] + SUFFIX);
+                        if (view instanceof TextView) {
+                            ((TextView) view).setText(items[which] + SUFFIX);
                         }
                         dialog.dismiss();
                     }
@@ -279,35 +282,37 @@ public class RegisterActivity extends BaseActivity {
 
     private void updateUserInfo() {
         UserInfoBean mUserInfo = DataManager.getInstance().getUserInfo();
-        mUserInfo.setNick_name(registerTextNick.getText().toString().replace(SUFFIX,""));
-        mUserInfo.setAge(parseInt(registerTextAge.getText().toString().replace(SUFFIX,"")));
-        mUserInfo.setGender(registerTextGender.getText().toString().replace(SUFFIX,""));
-        mUserInfo.setJob_address(registerTextGzdd.getText().toString().replace(SUFFIX,""));
+        mUserInfo.setNick_name(registerTextNick.getText().toString().replace(SUFFIX, ""));
+        mUserInfo.setAge(parseInt(registerTextAge.getText().toString().replace(SUFFIX, "")));
+        mUserInfo.setGender(registerTextGender.getText().toString().replace(SUFFIX, ""));
+        mUserInfo.setJob_address(registerTextGzdd.getText().toString().replace(SUFFIX, ""));
         int marrige = 0;
 //        if(mEditMarrige.getText().toString().contains("已婚")) {
 //            marrige = 1;
 //        }
         mUserInfo.setMarrige(marrige);
-        mUserInfo.setNative_place(registerTextJiguan.getText().toString().replace(SUFFIX,""));
+        mUserInfo.setNative_place(registerTextJiguan.getText().toString().replace(SUFFIX, ""));
         mUserInfo.setPhone("");
-        mUserInfo.setProfessional(registerTextZhiye.getText().toString().replace(SUFFIX,""));
-        mUserInfo.setScholling(registerTextXueli.getText().toString().replace(SUFFIX,""));
-        mUserInfo.setTall(parseInt(registerTextTall.getText().toString().replace("cm","").replace(SUFFIX,"")));
-        mUserInfo.setRole_type(registerTextRole.getText().toString().replace(SUFFIX,""));
+        mUserInfo.setProfessional(registerTextZhiye.getText().toString().replace(SUFFIX, ""));
+        mUserInfo.setScholling(registerTextXueli.getText().toString().replace(SUFFIX, ""));
+        mUserInfo.setTall(parseInt(registerTextTall.getText().toString().replace("cm", "").replace(SUFFIX, "")));
+        mUserInfo.setRole_type(registerTextRole.getText().toString().replace(SUFFIX, ""));
+        mUserInfo.setSpecial_info(registerEditPs.getText().toString());
 
-        Map<String,Object> params = new HashMap<>();
-        params.put("userName",mUserInfo.getUser_name());
-        params.put("nickName",mUserInfo.getNick_name());
-        params.put("gender",mUserInfo.getGender());
-        params.put("age",mUserInfo.getAge());
-        params.put("tall",mUserInfo.getTall());
-        params.put("scholling",mUserInfo.getScholling());
-        params.put("professional",mUserInfo.getProfessional());
-        params.put("native_place",mUserInfo.getNative_place());
-        params.put("marrige",mUserInfo.getMarrige());
-        params.put("job_address",mUserInfo.getJob_address());
-        params.put("phone",mUserInfo.getPhone());
-        params.put("role_type",mUserInfo.getRole_type());
+        Map<String, Object> params = new HashMap<>();
+        params.put("userName", mUserInfo.getUser_name());
+        params.put("nickName", mUserInfo.getNick_name());
+        params.put("gender", mUserInfo.getGender());
+        params.put("age", mUserInfo.getAge());
+        params.put("tall", mUserInfo.getTall());
+        params.put("scholling", mUserInfo.getScholling());
+        params.put("professional", mUserInfo.getProfessional());
+        params.put("native_place", mUserInfo.getNative_place());
+        params.put("marrige", mUserInfo.getMarrige());
+        params.put("job_address", mUserInfo.getJob_address());
+        params.put("phone", mUserInfo.getPhone());
+        params.put("role_type", mUserInfo.getRole_type());
+        params.put("special_info", mUserInfo.getSpecial_info());
 
         mApi.updateUserInfo(params)
                 .subscribeOn(Schedulers.io())
@@ -317,12 +322,12 @@ public class RegisterActivity extends BaseActivity {
                     public void accept(UserResp userResp) throws Exception {
                         Log.i(new Gson().toJson(userResp));
                         DataManager.getInstance().setUserInfo(userResp.getData());
-                        if(mFrom == FROM_LOGIN) {
-                            Tools.toast(getApplicationContext(),"注册成功",false);
+                        if (mFrom == FROM_LOGIN) {
+                            Tools.toast(getApplicationContext(), "注册成功", false);
                             Intent intent = new Intent(RegisterActivity.this, MainActivity.class);
                             startActivity(intent);
-                        }else {
-                            Tools.toast(getApplicationContext(),"更新成功",false);
+                        } else {
+                            Tools.toast(getApplicationContext(), "更新成功", false);
                             setResult(RESULT_OK);
                         }
                         RegisterActivity.this.finish();
@@ -331,7 +336,7 @@ public class RegisterActivity extends BaseActivity {
                     @Override
                     public void accept(Throwable throwable) throws Exception {
                         Log.e(throwable.toString());
-                        Tools.toast(RegisterActivity.this,throwable.toString(),true);
+                        Tools.toast(RegisterActivity.this, throwable.toString(), true);
                     }
                 });
     }
@@ -344,7 +349,7 @@ public class RegisterActivity extends BaseActivity {
                     @Override
                     public void cropAfter(Object o) {
                         //裁剪结果后，上传图片
-                        Log.d("yy","" + o.toString());
+                        Log.d("yy", "" + o.toString());
                         upLoadHeadImage(o.toString(), DataManager.getInstance().getUserInfo().getUser_name());
                     }
 
@@ -364,7 +369,7 @@ public class RegisterActivity extends BaseActivity {
                     @Override
                     protected void onEvent(ImageRadioResultEvent imageRadioResultEvent) throws Exception {
                         //图片选择结果
-                        Log.e("yy",new Gson().toJson(imageRadioResultEvent));
+                        Log.e("yy", new Gson().toJson(imageRadioResultEvent));
                     }
                 })
                 .openGallery();
@@ -375,30 +380,30 @@ public class RegisterActivity extends BaseActivity {
 
         Map<String, RequestBody> params = new HashMap<>();
         //以下参数是伪代码，参数需要换成自己服务器支持的
-        params.put("userName", RequestBody.create(MediaType.parse("text/plain"),userName));
+        params.put("userName", RequestBody.create(MediaType.parse("text/plain"), userName));
 
         // create RequestBody instance from file
         RequestBody requestFile = RequestBody.create(MediaType.parse("multipart/form-data"), file);
         MultipartBody.Part body =
                 MultipartBody.Part.createFormData("uploadFile", file.getName(), requestFile);
-        mApi.uploadFile(params,body).enqueue(new Callback<UserResp>() {
+        mApi.uploadFile(params, body).enqueue(new Callback<UserResp>() {
             @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
             @Override
             public void onResponse(Call<UserResp> call, Response<UserResp> response) {
-                if(RegisterActivity.this == null || RegisterActivity.this.isDestroyed()) {
+                if (RegisterActivity.this == null || RegisterActivity.this.isDestroyed()) {
                     return;
                 }
 
-                if(response == null || response.body() == null) {
-                    Tools.toast(getApplicationContext(),"设置头像失败",true);
+                if (response == null || response.body() == null) {
+                    Tools.toast(getApplicationContext(), "设置头像失败", true);
                     return;
                 }
-                if(response.body().getStatus() != XqErrorCode.SUCCESS) {
-                    Log.e("yy",response.body().getMsg());
-                    Tools.toast(getApplicationContext(),response.body().getMsg(),true);
+                if (response.body().getStatus() != XqErrorCode.SUCCESS) {
+                    Log.e("yy", response.body().getMsg());
+                    Tools.toast(getApplicationContext(), response.body().getMsg(), true);
                     return;
                 }
-                Tools.toast(getApplicationContext(),"设置头像成功",false);
+                Tools.toast(getApplicationContext(), "设置头像成功", false);
                 DataManager.getInstance().getUserInfo().setHead_image(response.body().getData().getHead_image());
                 isUpdate = true;
 
@@ -411,18 +416,18 @@ public class RegisterActivity extends BaseActivity {
 
                 //删除裁剪的图片
                 File file1 = new File(imagePath);
-                if(file1.exists()) {
+                if (file1.exists()) {
                     file1.delete();
                 }
             }
 
             @Override
             public void onFailure(Call<UserResp> call, Throwable throwable) {
-                Log.e("yy",throwable.getMessage());
-                Tools.toast(getApplicationContext(),throwable.getMessage(),true);
+                Log.e("yy", throwable.getMessage());
+                Tools.toast(getApplicationContext(), throwable.getMessage(), true);
                 //删除裁剪的图片
                 File file1 = new File(imagePath);
-                if(file1.exists()) {
+                if (file1.exists()) {
                     file1.delete();
                 }
             }
@@ -433,8 +438,8 @@ public class RegisterActivity extends BaseActivity {
         int result = 0;
         try {
             result = Integer.parseInt(str);
-        }catch (Exception e) {
-            Log.e("yy",e.toString());
+        } catch (Exception e) {
+            Log.e("yy", e.toString());
         }
         return result;
     }

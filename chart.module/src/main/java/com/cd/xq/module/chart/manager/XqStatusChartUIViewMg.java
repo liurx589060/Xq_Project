@@ -147,6 +147,8 @@ public class XqStatusChartUIViewMg extends AbsChartView implements IHandleListen
     private int mCurrentQuestDisturbCount = 0;
     private final int DISTURB_COUNT = 3; //一轮可插话的次数
     private int mPreManSelectedIndex = -1;
+    private HeadInfoViewMg mHeadInfoViewMg;
+    private View mHeadInfoBgRelayout;
 
     @Override
     public View getView() {
@@ -274,6 +276,14 @@ public class XqStatusChartUIViewMg extends AbsChartView implements IHandleListen
         });
 
         mRadioGroupLiveType.setOnCheckedChangeListener(mCheckChangedListener);
+        mHeadInfoViewMg = new HeadInfoViewMg(mXqActivity,mRootView.findViewById(R.id.chart_room_activity_headInfo));
+        mHeadInfoBgRelayout = mRootView.findViewById(R.id.chart_room_activity_relayout_headInfo);
+        mHeadInfoBgRelayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mHeadInfoBgRelayout.setVisibility(View.GONE);
+            }
+        });
 
         initAndSetContentView();
         initAngelManViewInstance();
@@ -287,6 +297,7 @@ public class XqStatusChartUIViewMg extends AbsChartView implements IHandleListen
         mBtnDisturb.setVisibility(View.GONE);
         mBtnEnd.setVisibility(View.GONE);
         mRadioGroupLiveType.setVisibility(View.GONE);
+        mHeadInfoBgRelayout.setVisibility(View.GONE);
     }
 
     private void initAngelManViewInstance() {
@@ -335,7 +346,7 @@ public class XqStatusChartUIViewMg extends AbsChartView implements IHandleListen
             }
         }
 
-        UserInfoBean angelBean = mAngelMembersMap.get(0);
+        final UserInfoBean angelBean = mAngelMembersMap.get(0);
         mAngelViewInstance.textIndex.setVisibility(View.GONE);
         mAngelViewInstance.imageIndex.setVisibility(View.VISIBLE);
         if(angelBean != null) {
@@ -355,9 +366,15 @@ public class XqStatusChartUIViewMg extends AbsChartView implements IHandleListen
                     .placeholder(R.drawable.chart_room_default_head)
                     .bitmapTransform(new GlideCircleTransform(mXqActivity))
                     .into(mAngelViewInstance.imageHead);
+            mAngelViewInstance.imageHead.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    setHeadInfoData(angelBean);
+                }
+            });
         }
 
-        UserInfoBean manBean = mManMembersMap.get(0);
+        final UserInfoBean manBean = mManMembersMap.get(0);
         mManViewInstance.textIndex.setTextColor(Color.parseColor("#0000ff"));
         mManViewInstance.textIndex.setText("男");
         if(manBean != null) {
@@ -377,6 +394,12 @@ public class XqStatusChartUIViewMg extends AbsChartView implements IHandleListen
                     .placeholder(R.drawable.chart_room_default_head)
                     .bitmapTransform(new GlideCircleTransform(mXqActivity))
                     .into(mManViewInstance.imageHead);
+            mManViewInstance.imageHead.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    setHeadInfoData(manBean);
+                }
+            });
         }
 
         mMemberAdapter.notifyDataSetChanged();
@@ -607,6 +630,9 @@ public class XqStatusChartUIViewMg extends AbsChartView implements IHandleListen
                 if(sendBean.getProcessStatus() == mOrderStatusMap.get(JMChartRoomSendBean.CHART_STATUS_INTRO_MAN).getStatus()) {
                     //自我介绍开始则因此离开按键
 //                    mBtnExit.setVisibility(View.GONE);
+                    if(!DataManager.getInstance().getUserInfo().getRole_type().equals(Constant.ROLRTYPE_ANGEL)) {
+                        mBtnExit.setVisibility(View.GONE);
+                    }
                 }
 
                 if(sendBean.getProcessStatus() == JMChartRoomSendBean.CHART_STATUS_LADY_SELECT_SECOND
@@ -768,7 +794,7 @@ public class XqStatusChartUIViewMg extends AbsChartView implements IHandleListen
 
         public void setData(final ViewInstance viewInstance, int position, int offset) {
             final int index = offset + position;
-            UserInfoBean bean = mLadyMembersMap.get(index);
+            final UserInfoBean bean = mLadyMembersMap.get(index);
             if(bean == null) {
                 viewInstance.textIndex.setText(String.valueOf(index+1));
                 Glide.with(mXqActivity)
@@ -793,6 +819,12 @@ public class XqStatusChartUIViewMg extends AbsChartView implements IHandleListen
                     .placeholder(R.drawable.chart_room_default_head)
                     .bitmapTransform(new GlideCircleTransform(mXqActivity))
                     .into(viewInstance.imageHead);
+            viewInstance.imageHead.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    setHeadInfoData(bean);
+                }
+            });
 
             final ArrayList<String> manSelectedResultList = new ArrayList<>();
             if(mStartStatusRoomSendBean.getProcessStatus() == JMChartRoomSendBean.CHART_STATUS_MAN_SELECT_FINAL
@@ -898,7 +930,8 @@ public class XqStatusChartUIViewMg extends AbsChartView implements IHandleListen
             JMChartRoomSendBean bean = mSystemEventList.get(position);
             if(bean == null) return;
             holder.mTxvEventTime.setText(bean.getTime());
-            holder.mTxvEvent.setText(bean.getMsg() + "\n" + new Gson().toJson(bean));
+            //holder.mTxvEvent.setText(bean.getMsg() + "\n" + new Gson().toJson(bean));
+            holder.mTxvEvent.setText(bean.getMsg());
         }
 
         @Override
@@ -1223,7 +1256,7 @@ public class XqStatusChartUIViewMg extends AbsChartView implements IHandleListen
 
                 //显示切换直播方式按钮
                 mCheckChangedListener.setSendMessage(true);
-                mRadioGroupLiveType.setVisibility(View.VISIBLE);
+                //mRadioGroupLiveType.setVisibility(View.VISIBLE);
             }
         }
         mTimeRunnable = new Runnable() {
@@ -1510,5 +1543,22 @@ public class XqStatusChartUIViewMg extends AbsChartView implements IHandleListen
                     }
                 }).create()
                 .show();
+    }
+
+    private void setHeadInfoData(UserInfoBean bean) {
+        mHeadInfoBgRelayout.setVisibility(View.VISIBLE);
+        mHeadInfoViewMg.setImgHead(bean.getHead_image());
+        mHeadInfoViewMg.setSpecialInfo(bean.getSpecial_info());
+        mHeadInfoViewMg.setNickName(bean.getNick_name());
+        mHeadInfoViewMg.setSpecailInfoVisible(false);
+        StringBuilder builder = new StringBuilder();
+        builder.append("性别： ").append(bean.getGender()).append("        ")
+                .append("年龄： ").append(String.valueOf(bean.getAge())).append("\n\n")
+                .append("身高： ").append(String.valueOf(bean.getTall())).append("cm").append("\n\n")
+                .append("学历： ").append(bean.getScholling()).append("\n\n")
+                .append("籍贯： ").append(bean.getNative_place()).append("\n\n")
+                .append("职业： ").append(bean.getProfessional()).append("\n\n")
+                .append("工作地点： ").append(bean.getJob_address()).append("\n\n");
+        mHeadInfoViewMg.setContent(builder.toString());
     }
 }

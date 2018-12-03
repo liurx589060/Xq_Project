@@ -60,7 +60,7 @@
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/dp_2"
-                android:background="#cecece"
+                android:background="#33aaaaaa"
                 android:layout_marginTop="@dimen/dp_10">
 
             </RelativeLayout>
@@ -144,5 +144,26 @@
                 android:textColor="#1296db" />
         </RadioGroup>
 
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/chart_room_activity_relayout_headInfo"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:background="#dddddd">
+
+            <include
+                android:id="@+id/chart_room_activity_headInfo"
+                layout="@layout/layout_head_info"
+                android:layout_width="@dimen/dp_180"
+                android:layout_height="@dimen/dp_300"
+                />
+
+        </LinearLayout>
     </RelativeLayout>
 </RelativeLayout>

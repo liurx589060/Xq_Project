@@ -27,12 +27,12 @@ public class BaseActivity extends AppCompatActivity {
     }
 
     private void toSetSatusBar() {
-        if(isTranslucentStatusBar())
-        {
-            translucentStatusBar(true);
-        }else {
-            setStatusBarColor(getStatusBarColor());
-        }
+//        if(isTranslucentStatusBar())
+//        {
+//            translucentStatusBar(true);
+//        }else {
+//            setStatusBarColor(getStatusBarColor());
+//        }
     }
 
     @Override

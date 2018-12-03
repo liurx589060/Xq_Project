@@ -201,7 +201,7 @@ public class MainActivity extends BaseActivity {
                 if(i == index) {
                     textView.setTextColor(F_SEL_TITLE_COLOR);
                     imageView.setImageResource(holder.mSelectedImageID);
-                    setStatusBarColor(((BaseFragment)holder.mFragment).getStatusColor());
+                    //setStatusBarColor(((BaseFragment)holder.mFragment).getStatusColor());
                 }else {
                     textView.setTextColor(F_NORMAL_TITLE_COLOR);
                     imageView.setImageResource(holder.mNormalImageID);

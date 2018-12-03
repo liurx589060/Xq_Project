@@ -31,6 +31,7 @@ public class UserInfoBean implements Serializable{
     private int marrige = 0;
     private String job_address = "";
     private String phone = "";
+    private String special_info = "";
     private int limitLevel = -1;
     private int limitLady = 10;
     private int limitMan = 1;
@@ -228,5 +229,13 @@ public class UserInfoBean implements Serializable{
 
     public void setLimitAngel(int limitAngel) {
         this.limitAngel = limitAngel;
+    }
+
+    public String getSpecial_info() {
+        return special_info;
+    }
+
+    public void setSpecial_info(String special_info) {
+        this.special_info = special_info;
     }
 }
