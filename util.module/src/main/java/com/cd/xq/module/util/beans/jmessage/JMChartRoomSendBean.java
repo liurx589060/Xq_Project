@@ -1,5 +1,6 @@
 package com.cd.xq.module.util.beans.jmessage;
 
+import com.cd.xq.module.util.Constant;
 import com.cd.xq.module.util.status.BaseStatus;
 
 /**
@@ -30,6 +31,9 @@ public class JMChartRoomSendBean {
     public static final int CHART_HELP_STATUS_CHART_MUTIL_PEOPLE = 102;       //多人连麦
     public static final int CHART_HELP_STATUS_CHART_CHANGR_LIVETYPE = 103;       //直播方式更改
     public static final int CHART_HELP_STATUS_CHART_EXIT_ROOM = 104;       //离开房间
+
+    public static final int CHART_ONLOOKER_ENTER = 1000;          //围观者进入
+    public static final int CHART_ONLOOKER_EXIT = 1001;          //围观者离开
 
     public static final int LIVE_CAMERA = 0x101;
     public static final int LIVE_MIC = 0x102;

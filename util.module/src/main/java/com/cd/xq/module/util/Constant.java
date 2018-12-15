@@ -6,6 +6,7 @@ package com.cd.xq.module.util;
 
 public class Constant {
     public static String CONSTANT_REMOTE_IP = "47.107.190.107";
+    public static String CONSTANT_LOCOL_IP = "192.168.1.101";
 
     public static String thumbUrl = "http://p.nanrenwo.net/uploads/allimg/161104/8450-161104134439-50.jpg";
     public static String SP_NAME = "xq_cd";
@@ -13,6 +14,8 @@ public class Constant {
     public static String ROLRTYPE_ANGEL = "angel";
     public static String ROLETYPE_GUEST = "guest";
     public static String ROLETYPE_ALL = "guest|angel";
+    public static int ROOM_ROLETYPE_PARTICIPANTS = 1;   //参与者
+    public static int ROOM_ROLETYPE_ONLOOKER = 2;   //围观者
     public static int MAX_LADY_COUNT = 10;
 
     public static String GENDER_MAN = "男";

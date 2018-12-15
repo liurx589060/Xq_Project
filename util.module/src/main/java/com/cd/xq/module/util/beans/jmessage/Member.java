@@ -1,6 +1,7 @@
 package com.cd.xq.module.util.beans.jmessage;
 
 
+import com.cd.xq.module.util.Constant;
 import com.cd.xq.module.util.beans.user.UserInfoBean;
 
 /**
@@ -9,6 +10,7 @@ import com.cd.xq.module.util.beans.user.UserInfoBean;
 
 public class Member {
     private int index = 0;
+    private int roomRoleType = Constant.ROOM_ROLETYPE_ONLOOKER;
     private UserInfoBean userInfo;
 
     public int getIndex() {
@@ -28,5 +30,9 @@ public class Member {
 
     public void setUserInfo(UserInfoBean userInfo) {
         this.userInfo = userInfo;
+    }
+
+    public int getRoomRoleType() {
+        return roomRoleType;
     }
 }

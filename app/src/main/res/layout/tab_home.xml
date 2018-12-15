@@ -44,4 +44,35 @@
             android:layout_weight="1"
             android:text="腾讯云" />
     </RadioGroup>
+
+    <RadioGroup
+        android:id="@+id/radioGroup_Public"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:orientation="horizontal"
+        android:layout_marginTop="20dp"
+        android:visibility="gone">
+
+        <RadioButton
+            android:id="@+id/radio_public"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="公开"
+            android:checked="true"/>
+
+        <RadioButton
+            android:id="@+id/radio_unPublic"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="非公开" />
+    </RadioGroup>
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/home_onLooker_RecyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+    </android.support.v7.widget.RecyclerView>
 </LinearLayout>

@@ -53,12 +53,18 @@ public abstract class BaseStatus {
 
     private int mCompleteCount = 0;
     private IHandleListener mListener = null;
-    protected Data mData = DataManager.getInstance().getChartData();
-    protected UserInfoBean mUserInfo = DataManager.getInstance().getUserInfo();
-    protected Member mSelfMember = DataManager.getInstance().getSelfMember();
+    protected Data mData ;
+    protected UserInfoBean mUserInfo;
+    protected Member mSelfMember;
     private int mOrder = -1;//流程序号
     private int mStartIndex = 0;//轮转的开始索引
     protected int mCurrentIndex = -1;
+
+    public BaseStatus() {
+        mData = DataManager.getInstance().getChartData();
+        mUserInfo = DataManager.getInstance().getUserInfo();
+        mSelfMember = DataManager.getInstance().getSelfMember();
+    }
 
     /**
      * 字符的类型标识
@@ -239,6 +245,7 @@ public abstract class BaseStatus {
         bean.setRoomId(data.getRoomId());
         bean.setTime(Tools.getCurrentDateTime());
         bean.setUserName(selfInfo.getUser_name());
+        bean.setProcessStatus(getStatus());
         return bean;
     }
 

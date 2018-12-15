@@ -63,7 +63,13 @@ public class StatusMatchBean extends BaseStatus {
 
     @Override
     public JMChartRoomSendBean getChartSendBeanWillSend(JMChartRoomSendBean receiveBean,MessageType messageType) {
-        return createBaseChartRoomSendBean();
+        JMChartRoomSendBean sendBean = createBaseChartRoomSendBean();
+        sendBean.setMsg("玩家"+ mUserInfo.getUser_name() +"进入房间");
+        sendBean.setProcessStatus(getStatus());
+        sendBean.setMessageType(messageType);
+        sendBean.setUpdateMembers(true);
+
+        return sendBean;
     }
 
     @Override

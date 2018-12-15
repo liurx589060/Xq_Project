@@ -229,12 +229,12 @@ public class MainActivity extends BaseActivity {
 
     private String getSpIpAddress() {
         SharedPreferences sp = getSharedPreferences(Constant.SP_NAME, Activity.MODE_PRIVATE);
-        return sp.getString("ipAddress","192.168.1.101");
+        return sp.getString("ipAddress",Constant.CONSTANT_LOCOL_IP);
     }
 
     private boolean getIsRemote() {
         SharedPreferences sp = getSharedPreferences(Constant.SP_NAME, Activity.MODE_PRIVATE);
-        return sp.getBoolean("isRemote",true);
+        return sp.getBoolean("isRemote",false);
     }
 
 //    @Override

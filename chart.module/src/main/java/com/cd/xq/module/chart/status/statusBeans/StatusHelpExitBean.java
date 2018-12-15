@@ -62,12 +62,13 @@ public class StatusHelpExitBean extends BaseStatus {
         sendBean.setMsg("玩家"+ mUserInfo.getUser_name() +"离开房间");
         sendBean.setProcessStatus(getStatus());
         sendBean.setMessageType(messageType);
+        sendBean.setUpdateMembers(true);
         return sendBean;
     }
 
     @Override
     public void onPostHandler(StatusResp resp, JMChartRoomSendBean receiveBean) {
-        resp.setResetLive(true);
-        resp.setStopTiming(true);
+        resp.setResetLive(false);
+        resp.setStopTiming(false);
     }
 }

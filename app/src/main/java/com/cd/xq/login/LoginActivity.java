@@ -109,10 +109,10 @@ public class LoginActivity extends BaseActivity {
                 regist(loginEditUserName.getText().toString(),loginEditPassword.getText().toString());
                 break;
             case R.id.login_btn_forget_password:
+                Intent intent3 = new Intent(this, MainActivity.class);
+                startActivity(intent3);
                 break;
             case R.id.login_img_wx:
-                Intent intent2 = new Intent(this, ChartRoomActivity.class);
-                startActivity(intent2);
                 break;
         }
     }

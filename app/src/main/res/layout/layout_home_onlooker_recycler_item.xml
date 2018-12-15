@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingBottom="@dimen/dp_10"
+        android:paddingLeft="@dimen/dp_20"
+        android:paddingRight="@dimen/dp_20"
+        android:paddingTop="@dimen/dp_10">
+
+        <TextView
+            android:id="@+id/home_onlooker_recycler_item_roomId"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:text="151568"
+            android:textSize="@dimen/sp_20"
+            android:textColor="#333333"/>
+
+        <TextView
+            android:id="@+id/home_onlooker_recycler_item_creater"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBottom="@id/home_onlooker_recycler_item_roomId"
+            android:layout_toRightOf="@+id/home_onlooker_recycler_item_roomId"
+            android:text="创建者：随心"
+            android:layout_marginLeft="@dimen/dp_40"
+            android:textSize="@dimen/sp_16"
+            android:textColor="#333333"
+            android:visibility="gone"/>
+
+        <TextView
+            android:id="@+id/home_onlooker_recycler_item_describe"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/home_onlooker_recycler_item_roomId"
+            android:layout_alignLeft="@id/home_onlooker_recycler_item_roomId"
+            android:layout_marginTop="@dimen/dp_10"
+            android:text="深圳单身俱乐部"
+            android:textSize="@dimen/sp_14"
+            android:textColor="#333333"/>
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp_0_5"
+        android:background="#aaaaaa">
+
+    </RelativeLayout>
+</LinearLayout>

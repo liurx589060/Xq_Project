@@ -7,6 +7,8 @@ package com.cd.xq.module.util.tools;
 public class XqErrorCode {
     public static int SUCCESS = 0;
     //put your code here
+    public static int ERROR_NO_DATA = 9000;//没有数据
+
     public static int ERROR_NO_MATCH = 7000;//未匹配上
     public static int ERROR_EXIT_CHARTROOM = 7001;//退出失败
     public static int ERROR_LACK_PARAMS = 7002;//缺少参数

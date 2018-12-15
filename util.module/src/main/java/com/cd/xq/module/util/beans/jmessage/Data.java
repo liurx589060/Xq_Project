@@ -16,6 +16,7 @@ public class Data {
     private String pushAddress = "";
     private String playAddress = "";
     private List<Member> members;
+    private List<Member> onLookers;
     public void setRoomId(long roomId) {
          this.roomId = roomId;
      }
@@ -79,5 +80,16 @@ public class Data {
 
     public void setPlayAddress(String playAddress) {
         this.playAddress = playAddress;
+    }
+
+    public List<Member> getOnLookers() {
+        if(onLookers == null) {
+            onLookers = new ArrayList<>();
+        }
+        return onLookers;
+    }
+
+    public void setOnLookers(List<Member> onLookers) {
+        this.onLookers = onLookers;
     }
 }
