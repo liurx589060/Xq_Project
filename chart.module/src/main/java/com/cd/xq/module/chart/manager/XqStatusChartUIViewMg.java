@@ -68,6 +68,7 @@ import com.cd.xq.module.util.tools.Tools;
 import com.cd.xq.module.util.tools.XqErrorCode;
 import com.cd.xq_chart.module.R;
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.hc.lib.msc.HCMscParams;
 import com.hc.lib.msc.MscDefaultSpeech;
 
@@ -140,6 +141,7 @@ public class XqStatusChartUIViewMg extends AbsChartView implements IHandleListen
 
     private AlertDialog mLadySelectDialog;
     private ArrayList<String> mLadySelectedResultList = new ArrayList<>();
+    private ArrayList<String> mTempLadySelectedTrueList = new ArrayList<>();
     private boolean mLadySelecteResult = true;
     private boolean mIsDistub = false;
     private int mDistubIndex = -1;
@@ -152,6 +154,7 @@ public class XqStatusChartUIViewMg extends AbsChartView implements IHandleListen
     private int mPreManSelectedIndex = -1;
     private HeadInfoViewMg mHeadInfoViewMg;
     private View mHeadInfoBgRelayout;
+    private boolean mIsOnLookerRecCurrentStatus;
 
     @Override
     public View getView() {
@@ -741,6 +744,10 @@ public class XqStatusChartUIViewMg extends AbsChartView implements IHandleListen
                         if(sendBean.getProcessStatus() == JMChartRoomSendBean.CHART_ONLOOKER_EXIT
                                 || sendBean.getProcessStatus() == JMChartRoomSendBean.CHART_ONLOOKER_ENTER) {
                             isSetCurrentStatus = false;
+                            if(sendBean.getProcessStatus() == JMChartRoomSendBean.CHART_ONLOOKER_ENTER
+                                    && DataManager.getInstance().getSelfMember().getRoomRoleType() == Constant.ROOM_ROLETYPE_PARTICIPANTS) {
+                                sendToOnLookerCurrentStatus(sendBean.getUserName());
+                            }
                         }
                         break;
                 }
@@ -800,12 +807,26 @@ public class XqStatusChartUIViewMg extends AbsChartView implements IHandleListen
                             }
                         }
 
-                        if(statusResp.getHandleType() == BaseStatus.HandleType.HANDLE_SELECT_LADY_FINAL) {
-                            //女生最后一次选择
+                        if(statusResp.getHandleType() == BaseStatus.HandleType.HANDLE_SELECT_LADY_FINAL
+                                || statusResp.getHandleType() == BaseStatus.HandleType.HANDLE_SELECT_LADY_FIRST
+                                || statusResp.getHandleType() == BaseStatus.HandleType.HANDLE_SELECT_LADY_SECOND) {
                             if(sendBean.isLadySelected()) {
-                                mLadySelectedResultList.add(String.valueOf(sendBean.getIndexSelf()));
+                                mTempLadySelectedTrueList.add(String.valueOf(sendBean.getIndexSelf()));
+                            }
+
+                            if(statusResp.isLast()) {
+                                mLadySelectedResultList.clear();
+                                mLadySelectedResultList.addAll(mTempLadySelectedTrueList);
+                                mTempLadySelectedTrueList.clear();
                             }
                         }
+
+//                        if(statusResp.getHandleType() == BaseStatus.HandleType.HANDLE_SELECT_LADY_FINAL) {
+//                            //女生最后一次选择
+//                            if(sendBean.isLadySelected()) {
+//                                mLadySelectedResultList.add(String.valueOf(sendBean.getIndexSelf()));
+//                            }
+//                        }
                         break;
                     case HANDLE_HELP_DOING_DISTURB:
                         mIsDistub = false;
@@ -1506,18 +1527,79 @@ public class XqStatusChartUIViewMg extends AbsChartView implements IHandleListen
             mXqActivity.finish();
         }else if(normalSendBean.getCode() == JMChartRoomSendBean.CHART_HELP_STATUS_CHART_EXIT_ROOM
                 || normalSendBean.getCode() == JMChartRoomSendBean.CHART_ONLOOKER_EXIT) {
-//            JMChartRoomSendBean roomSendBean = new JMChartRoomSendBean();
-//            roomSendBean.setProcessStatus(normalSendBean.getCode());
-//            roomSendBean.setMsg(normalSendBean.getMsg());
-//            roomSendBean.setMessageType(BaseStatus.MessageType.TYPE_SEND);
-//            roomSendBean.setTime(normalSendBean.getTime());
-//            roomSendBean.setUpdateMembers(true);
-//            mHelpStatusMap.get(normalSendBean.getCode()).handlerRoomChart(roomSendBean);
-
             BaseStatus status = mHelpStatusMap.get(normalSendBean.getCode());
             JMChartRoomSendBean sendBean = status.getChartSendBeanWillSend(null, BaseStatus.MessageType.TYPE_SEND);
             status.handlerRoomChart(sendBean);
+        }else if(normalSendBean.getCode() == JMChartRoomSendBean.CHART_ONLOOKER_ENTER_STATUS) {
+            //围观者进入时的当前房间状态
+            if(!mIsOnLookerRecCurrentStatus) {
+                try {
+                    String extra = normalSendBean.getExtra();
+                    JSONObject object = new JSONObject(extra);
+                    String value = object.getString("manSelect");
+                    if(value != null) {
+                        ArrayList<String> list = new Gson().fromJson(value,new TypeToken<ArrayList<String>>(){}.getType());
+                        ((StatusManFirstSelectBean)mOrderStatusMap
+                                .get(JMChartRoomSendBean.CHART_STATUS_MAN_SELECT_FIRST)).setSelectLadyIndex(Tools.parseInt(list.get(0)));
+                        ((StatusManSecondSelectBean)mOrderStatusMap
+                                .get(JMChartRoomSendBean.CHART_STATUS_MAN_SELECT_SECOND)).setSelectLadyIndex(Tools.parseInt(list.get(1)));
+                        ((StatusManFinalSelectBean)mOrderStatusMap
+                                .get(JMChartRoomSendBean.CHART_STATUS_MAN_SELECT_FINAL)).setSelectLadyIndex(Tools.parseInt(list.get(2)));
+                    }
+
+                    value = object.getString("ladySelect");
+                    if(value != null) {
+                        ArrayList<String> list = new Gson().fromJson(value,new TypeToken<ArrayList<String>>(){}.getType());
+                        mLadySelectedResultList.clear();
+                        mLadySelectedResultList.addAll(list);
+                    }
+
+                    value = object.getString("status");
+                    if(value != null) {
+                        JMChartRoomSendBean bean = new Gson().fromJson(value,JMChartRoomSendBean.class);
+                        handleStatusBean(bean);
+                    }
+
+                    mMemberAdapter.notifyDataSetChanged();
+                    mIsOnLookerRecCurrentStatus = true;
+                }catch (Exception e) {
+                    com.cd.xq.module.util.tools.Log.e("onEventMainThread--" + e.toString());
+                }
+            }
         }
+    }
+
+    /**
+     * 发送当前状态给进入的围观者
+     */
+    private void sendToOnLookerCurrentStatus(String userName) {
+        JMNormalSendBean sendBean = new JMNormalSendBean();
+        sendBean.setCode(JMChartRoomSendBean.CHART_ONLOOKER_ENTER_STATUS);
+        sendBean.setTargetUserName(userName);
+        sendBean.setRoomId(DataManager.getInstance().getChartData().getRoomId());
+        JSONObject object = new JSONObject();
+        try {
+            ArrayList<String> manList = new ArrayList<>();
+            manList.add(String.valueOf(((StatusManFirstSelectBean)mOrderStatusMap
+                    .get(JMChartRoomSendBean.CHART_STATUS_MAN_SELECT_FIRST)).getSelectLadyIndex()));
+            manList.add(String.valueOf(((StatusManSecondSelectBean)mOrderStatusMap
+                    .get(JMChartRoomSendBean.CHART_STATUS_MAN_SELECT_SECOND)).getSelectLadyIndex()));
+            manList.add(String.valueOf(((StatusManFinalSelectBean)mOrderStatusMap
+                    .get(JMChartRoomSendBean.CHART_STATUS_MAN_SELECT_FINAL)).getSelectLadyIndex()));
+            String strManSelected = new Gson().toJson(manList);
+            object.put("manSelect",strManSelected);
+
+            String strLadySelected = new Gson().toJson(mLadySelectedResultList);
+            object.put("ladySelect",strLadySelected);
+            object.put("status",new Gson().toJson(mStartStatusRoomSendBean));
+        }catch (Exception e) {
+            Tools.toast(mXqActivity,"sendToOnLookerCurrentStatus--" + e.toString(),false);
+            com.cd.xq.module.util.tools.Log.e("sendToOnLookerCurrentStatus--" + e.toString());
+        }
+
+        String strExtra = object.toString();
+        sendBean.setExtra(strExtra);
+        JMsgSender.sendNomalMessage(sendBean);
     }
 
     private class ViewInstance {

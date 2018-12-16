@@ -37,4 +37,14 @@ public class Tools {
                 Locale.getDefault());
         return format.format(new Date());
     }
+
+    public static int parseInt(String value) {
+        int i = -1;
+        try {
+            i = Integer.parseInt(value);
+        }catch (Exception e) {
+            Log.e("parseInt--" + value);
+        }
+        return i;
+    }
 }

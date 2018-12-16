@@ -12,6 +12,7 @@ public class JMNormalSendBean {
     private String targetUserName = "";
     private String time = "";
     private long roomId;
+    private String extra;
 
     public int getCode() {
         return code;
@@ -51,5 +52,13 @@ public class JMNormalSendBean {
 
     public void setRoomId(long roomId) {
         this.roomId = roomId;
+    }
+
+    public String getExtra() {
+        return extra;
+    }
+
+    public void setExtra(String extra) {
+        this.extra = extra;
     }
 }
