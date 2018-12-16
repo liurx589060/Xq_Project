@@ -31,7 +31,7 @@
             android:layout_marginLeft="@dimen/dp_40"
             android:textSize="@dimen/sp_16"
             android:textColor="#333333"
-            android:visibility="gone"/>
+            />
 
         <TextView
             android:id="@+id/home_onlooker_recycler_item_describe"

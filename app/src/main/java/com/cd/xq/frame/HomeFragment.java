@@ -168,7 +168,7 @@ public class HomeFragment extends BaseFragment {
                             return;
                         }
 
-                        joinChartRoom(Constant.ROOM_ROLETYPE_PARTICIPANTS);
+                        joinChartRoom(Constant.ROOM_ROLETYPE_PARTICIPANTS,-1);
                     }
 
                     @Override
@@ -236,6 +236,7 @@ public class HomeFragment extends BaseFragment {
         params.put("pushAddress", Base64.encodeToString(mTXPushAddress.getBytes(), Base64.DEFAULT));
         params.put("playAddress", Base64.encodeToString(mTXPlayerAddress.getBytes(), Base64.DEFAULT));
         params.put("public",mPublic);
+        params.put("describe","一起来相亲吧");
 
         if (userInfo.getLimitLady() % 2 != 0) {
             Tools.toast(getActivity(), "请输入偶数", true);
@@ -271,7 +272,7 @@ public class HomeFragment extends BaseFragment {
                 });
     }
 
-    private void joinChartRoom(int roomRoleType) {
+    private void joinChartRoom(int roomRoleType,long roomId) {
         UserInfoBean userInfo = DataManager.getInstance().getUserInfo();
 
         Map<String, Object> params = new HashMap<>();
@@ -280,6 +281,9 @@ public class HomeFragment extends BaseFragment {
         params.put("level", userInfo.getLevel());
         params.put("roleType", userInfo.getRole_type());
         params.put("roomRoleType", roomRoleType);
+        if((Integer)params.get("roomRoleType") == Constant.ROOM_ROLETYPE_ONLOOKER) {
+            params.put("roomId",roomId);
+        }
         mApi.joinChartRoom(params)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -471,10 +475,10 @@ public class HomeFragment extends BaseFragment {
 
         @Override
         public void onBindViewHolder(OnLookerViewHolder holder, int position) {
-            BGetArrays info = m_roomList.get(position);
+            final BGetArrays info = m_roomList.get(position);
             holder.textRoomId.setText(String.valueOf(info.getRoomId()));
             holder.textDescibe.setText(info.getDescribe());
-            holder.textCreater.setText(info.getCreater());
+            holder.textCreater.setText("创建者：" + info.getCreater());
             holder.setListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -493,7 +497,7 @@ public class HomeFragment extends BaseFragment {
                                 return;
                             }
 
-                            joinChartRoom(Constant.ROOM_ROLETYPE_ONLOOKER);
+                            joinChartRoom(Constant.ROOM_ROLETYPE_ONLOOKER,info.getRoomId());
                         }
 
                         @Override

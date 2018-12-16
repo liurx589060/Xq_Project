@@ -36,6 +36,7 @@ import java.util.ArrayList;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import cn.jpush.im.android.api.JMessageClient;
+import cn.jpush.im.android.api.model.UserInfo;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
@@ -74,8 +75,10 @@ public class MainActivity extends BaseActivity {
         }
 
         mApi = NetWorkMg.newRetrofit().create(RequestApi.class);
-        if(JMessageClient.getMyInfo() != null) {
+        UserInfo userInfo = JMessageClient.getMyInfo();
+        if(userInfo != null) {
             //自动登陆
+            DataManager.getInstance().setJmUserName(userInfo.getUserName());
             autoLogin();
         }
         init();

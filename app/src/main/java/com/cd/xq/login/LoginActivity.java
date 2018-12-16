@@ -151,6 +151,7 @@ public class LoginActivity extends BaseActivity {
                     public void accept(UserResp userResp) throws Exception {
                         mLoadingDialog.dismiss();
                         if(userResp.getStatus() == XqErrorCode.SUCCESS) {
+                            DataManager.getInstance().setJmUserName(userName);
                             DataManager.getInstance().setUserInfo(userResp.getData());
                             mLoadingDialog.dismiss();
                             saveUser(JMessageClient.getMyInfo().getUserName(),password,JMessageClient.getMyInfo().getAppKey());

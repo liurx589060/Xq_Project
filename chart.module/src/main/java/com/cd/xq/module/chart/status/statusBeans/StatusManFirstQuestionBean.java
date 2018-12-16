@@ -64,9 +64,9 @@ public class StatusManFirstQuestionBean extends BaseStatus {
         if(messageType == MessageType.TYPE_SEND) {
             int nextIndex;
             if(receiveBean.getProcessStatus() != getStatus()) {
-                nextIndex = getStartIndex();
+                nextIndex = getStartIndex() + 1;
             }else {
-                nextIndex = getNextIndex(receiveBean);
+                nextIndex = getNextIndex(receiveBean) + 1;
             }
             sendBean.setMsg("请男" + nextIndex + "提问");
         }else if (messageType == MessageType.TYPE_RESPONSE) {

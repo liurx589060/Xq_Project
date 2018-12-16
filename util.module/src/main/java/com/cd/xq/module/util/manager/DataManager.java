@@ -12,6 +12,7 @@ public class DataManager {
     private static DataManager instance = new DataManager();
     private UserInfoBean userInfo;
     private Data chartData;
+    private String jmUserName;
 
     private DataManager(){}
 
@@ -28,6 +29,7 @@ public class DataManager {
 
     public void setUserInfo(UserInfoBean userInfo) {
         this.userInfo = userInfo;
+        this.userInfo.setUser_name(this.jmUserName);
     }
 
     public Data getChartData() {
@@ -48,5 +50,13 @@ public class DataManager {
             }
         }
         return new Member();
+    }
+
+    public String getJmUserName() {
+        return jmUserName;
+    }
+
+    public void setJmUserName(String jmUserName) {
+        this.jmUserName = jmUserName;
     }
 }
