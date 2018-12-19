@@ -1,6 +1,9 @@
 package com.cd.xq.frame;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
@@ -14,6 +17,7 @@ import android.widget.EditText;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 
+import com.cd.xq.AppConstant;
 import com.cd.xq.R;
 import com.cd.xq.beans.BGetArrays;
 import com.cd.xq.beans.NetResult;
@@ -38,6 +42,8 @@ import com.cd.xq.network.XqRequestApi;
 import com.hjq.permissions.OnPermission;
 import com.hjq.permissions.Permission;
 import com.hjq.permissions.XXPermissions;
+
+import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
@@ -82,6 +88,7 @@ public class HomeFragment extends BaseFragment {
     private String mTXPlayerAddress = "";
     private int mPushAddressType = 0;
     private int mPublic = 1;  // 1：公开    0：非公开
+    private JPushMessageReceiver mReceiver;
 
     private ArrayList<BGetArrays> m_roomList;
     private OnLookerRecyclerViewAdapter mOnLookerAdapter;
@@ -93,6 +100,11 @@ public class HomeFragment extends BaseFragment {
         unbinder = ButterKnife.bind(this, mRootView);
 
         init();
+
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(AppConstant.BROADCAST_JPUSH_MESSAGE_ACTION);
+        mReceiver = new JPushMessageReceiver();
+        getActivity().registerReceiver(mReceiver,filter);
         return mRootView;
     }
 
@@ -398,6 +410,7 @@ public class HomeFragment extends BaseFragment {
     public void onDestroyView() {
         super.onDestroyView();
         unbinder.unbind();
+        getActivity().unregisterReceiver(mReceiver);
     }
 
     @Override
@@ -434,14 +447,22 @@ public class HomeFragment extends BaseFragment {
                     public void accept(NetResult<List<BGetArrays>> bGetArraysNetResult) throws Exception {
                         if (bGetArraysNetResult.getStatus() != XqErrorCode.SUCCESS
                                 && bGetArraysNetResult.getStatus() != XqErrorCode.ERROR_NO_DATA) {
+                            Log.e(bGetArraysNetResult.getMsg());
                             Tools.toast(getActivity(), bGetArraysNetResult.getMsg(), true);
                             return;
                         }
+
+                        m_roomList.clear();
                         if(bGetArraysNetResult.getData() != null) {
-                            m_roomList.clear();
                             m_roomList.addAll(bGetArraysNetResult.getData());
-                            mOnLookerAdapter.notifyDataSetChanged();
                         }
+                        mOnLookerAdapter.notifyDataSetChanged();
+                    }
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Exception {
+                        Log.e("setOnLookerRecyclerView--" + throwable.toString());
+                        Tools.toast(getActivity(),throwable.toString(),false);
                     }
                 });
     }
@@ -512,6 +533,27 @@ public class HomeFragment extends BaseFragment {
         @Override
         public int getItemCount() {
             return m_roomList.size();
+        }
+    }
+
+    private class JPushMessageReceiver extends BroadcastReceiver {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Bundle bundle = intent.getExtras();
+            if(bundle != null) {
+                String message = bundle.getString("message");
+                try {
+                    JSONObject object = new JSONObject(message);
+                    if(object.getInt("type") == AppConstant.JPUSH_TYPE_CHAT_CREATE
+                            || object.getInt("type") == AppConstant.JPUSH_TYPE_CHAT_DELETE) {
+                        //更新聊天室列表
+                        setOnLookerRecyclerView();
+                    }
+                }catch (Exception e) {
+                    Log.e("JPushMessageReceiver--" + e.toString());
+                }
+            }
         }
     }
 }

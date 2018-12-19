@@ -1,21 +1,21 @@
 package com.cd.xq;
 
-import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.support.multidex.MultiDex;
+import android.util.ArraySet;
 
-import com.cd.xq.module.util.Constant;
-import com.cd.xq.module.util.network.NetWorkMg;
+import com.cd.xq.module.util.tools.Log;
 import com.hc.lib.msc.MscManager;
-import com.iflytek.msc.MSC;
 import com.tencent.bugly.crashreport.CrashReport;
 import com.tencent.rtmp.TXLiveBase;
 
-import cn.jpush.im.android.api.JMessageClient;
+import java.util.HashSet;
+import java.util.Set;
 
-import static com.tencent.bugly.Bugly.applicationContext;
+import cn.jpush.android.api.JPushInterface;
+import cn.jpush.android.api.TagAliasCallback;
+import cn.jpush.im.android.api.JMessageClient;
 
 /**
  * Created by Administrator on 2018/10/28.
@@ -25,8 +25,22 @@ public class XqApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+        //极光IM
         JMessageClient.setDebugMode(true);
         JMessageClient.init(this);
+
+        //极光推送
+        JPushInterface.setDebugMode(true);
+        JPushInterface.init(this);
+        HashSet<String> arraySet = new HashSet<>();
+        arraySet.add(AppConstant.JPUSH_TAG_CHAT);
+        JPushInterface.setTags(this, arraySet, new TagAliasCallback() {
+            @Override
+            public void gotResult(int i, String s, Set<String> set) {
+                Log.d("JPush--setTags=" + i + "--" + s);
+            }
+        });
+
         //bugly
         CrashReport.initCrashReport(getApplicationContext(), "baaced6d7c", true);
 
