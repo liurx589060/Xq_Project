@@ -9,5 +9,13 @@
             >
 
         </activity>
+
+        <activity
+            android:screenOrientation="portrait"
+            android:configChanges="orientation|keyboard|keyboardHidden|navigation"
+            android:name="com.cd.xq.module.chart.DoubleRoomActivity"
+            >
+
+        </activity>
     </application>
 </manifest>

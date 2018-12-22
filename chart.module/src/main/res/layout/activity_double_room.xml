@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent">
+
+    <com.tencent.rtmp.ui.TXCloudVideoView
+        android:id="@+id/double_room_tx_push_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#a3a3a3">
+
+    </com.tencent.rtmp.ui.TXCloudVideoView>
+
+    <RelativeLayout
+        android:layout_width="@dimen/dp_90"
+        android:layout_height="@dimen/dp_160"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="@dimen/dp_30"
+        android:layout_marginRight="@dimen/dp_30"
+        android:background="#a3a3a3">
+
+        <com.tencent.rtmp.ui.TXCloudVideoView
+            android:id="@+id/double_room_tx_play_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+        </com.tencent.rtmp.ui.TXCloudVideoView>
+
+    </RelativeLayout>
+
+    <ImageView
+        android:id="@+id/double_room_img_exit"
+        android:layout_width="@dimen/dp_30"
+        android:layout_height="@dimen/dp_30"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginLeft="@dimen/dp_10"
+        android:layout_marginTop="@dimen/dp_10"
+        android:scaleType="fitXY"
+        android:background="@drawable/chart_room_exit"/>
+
+</RelativeLayout>

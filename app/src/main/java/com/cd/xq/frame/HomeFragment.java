@@ -22,6 +22,7 @@ import com.cd.xq.R;
 import com.cd.xq.beans.BGetArrays;
 import com.cd.xq.beans.NetResult;
 import com.cd.xq.module.chart.ChartRoomActivity;
+import com.cd.xq.module.chart.DoubleRoomActivity;
 import com.cd.xq.module.chart.status.statusBeans.StatusMatchBean;
 import com.cd.xq.module.chart.status.statusBeans.StatusOnLookerEnterBean;
 import com.cd.xq.module.util.Constant;
@@ -119,6 +120,13 @@ public class HomeFragment extends BaseFragment {
         mBtnAngel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+//                Intent intent = new Intent(getActivity(), DoubleRoomActivity.class);
+//                Bundle bundle = new Bundle();
+//                bundle.putString("push","rtmp://192.168.1.101/live/stream_1");
+//                bundle.putString("play","rtmp://192.168.1.101/live/stream_2");
+//                intent.putExtras(bundle);
+//                getActivity().startActivity(intent);
+
                 requestPermission(new OnPermission() {
                     @Override
                     public void hasPermission(List<String> granted, boolean isAll) {
@@ -160,6 +168,13 @@ public class HomeFragment extends BaseFragment {
         mBtnGuest.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+//                Intent intent = new Intent(getActivity(), DoubleRoomActivity.class);
+//                Bundle bundle = new Bundle();
+//                bundle.putString("push","rtmp://192.168.1.101/live/stream_2");
+//                bundle.putString("play","rtmp://192.168.1.101/live/stream_1");
+//                intent.putExtras(bundle);
+//                getActivity().startActivity(intent);
+
                 requestPermission(new OnPermission() {
                     @Override
                     public void hasPermission(List<String> granted, boolean isAll) {

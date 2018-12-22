@@ -148,6 +148,7 @@ public class XqTxPlayerViewMg extends AbsChartView {
             mPlayConfig.setAutoAdjustCacheTime(true);
             mPlayConfig.setMinAutoAdjustCacheTime(CACHE_TIME_FAST);
             mPlayConfig.setMaxAutoAdjustCacheTime(CACHE_TIME_FAST);
+            mPlayConfig.enableAEC(true);
             mLivePlayer.setConfig(mPlayConfig);
         }catch (Exception e) {
             e.printStackTrace();
