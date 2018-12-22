@@ -17,6 +17,7 @@ public class Data {
     private String playAddress = "";
     private List<Member> members;
     private List<Member> onLookers;
+    private String creater = "";
     public void setRoomId(long roomId) {
          this.roomId = roomId;
      }
@@ -91,5 +92,13 @@ public class Data {
 
     public void setOnLookers(List<Member> onLookers) {
         this.onLookers = onLookers;
+    }
+
+    public String getCreater() {
+        return creater;
+    }
+
+    public void setCreater(String creater) {
+        this.creater = creater;
     }
 }

@@ -47,7 +47,7 @@ public interface RequestApi {
     Observable<JMChartResp> exitChartRoom(@QueryMap Map<String, Object> map);
 
     @GET("JMessage/deleteChartRoom")
-    Observable<JMChartResp> deleteChartRoom(@Query("roomId") long roomId);
+    Observable<JMChartResp> deleteChartRoom(@QueryMap Map<String, Object> map);
 
     @GET("JMessage/joinChartRoom")
     Observable<JMChartResp> joinChartRoom(@QueryMap Map<String, Object> map);
