@@ -23,7 +23,7 @@ public class StatusLadyFirstQuestionBean extends BaseStatus {
 
     @Override
     public int getLiveTimeCount() {
-        return 180;
+        return 90;
     }
 
     @Override
@@ -71,7 +71,7 @@ public class StatusLadyFirstQuestionBean extends BaseStatus {
             }
             sendBean.setMsg("请女" + nextIndex + "回答");
         }else if (messageType == MessageType.TYPE_RESPONSE) {
-            sendBean.setMsg(mUserInfo.getUser_name() + "玩家开始");
+            sendBean.setMsg(mUserInfo.getUser_name() + "嘉宾开始");
         }
         sendBean.setProcessStatus(getStatus());
         sendBean.setMessageType(messageType);

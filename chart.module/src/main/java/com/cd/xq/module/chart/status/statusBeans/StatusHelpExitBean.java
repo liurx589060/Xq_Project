@@ -59,7 +59,7 @@ public class StatusHelpExitBean extends BaseStatus {
     @Override
     public JMChartRoomSendBean getChartSendBeanWillSend(JMChartRoomSendBean receiveBean, MessageType messageType) {
         JMChartRoomSendBean sendBean = createBaseChartRoomSendBean();
-        sendBean.setMsg("玩家"+ mUserInfo.getUser_name() +"离开房间");
+        sendBean.setMsg("嘉宾"+ mUserInfo.getUser_name() +"离开房间");
         sendBean.setProcessStatus(getStatus());
         sendBean.setMessageType(messageType);
         sendBean.setUpdateMembers(true);
@@ -70,5 +70,10 @@ public class StatusHelpExitBean extends BaseStatus {
     public void onPostHandler(StatusResp resp, JMChartRoomSendBean receiveBean) {
         resp.setResetLive(false);
         resp.setStopTiming(false);
+    }
+
+    @Override
+    protected boolean checkIsRepeatOrReturn(JMChartRoomSendBean receiveBean) {
+        return false;
     }
 }

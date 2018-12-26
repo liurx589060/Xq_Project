@@ -3,11 +3,13 @@ package com.cd.xq.module.chart.manager;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Color;
 import android.graphics.Rect;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
+import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
@@ -26,6 +28,7 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.cd.xq.module.chart.ChartRoomActivity;
+import com.cd.xq.module.chart.DoubleRoomActivity;
 import com.cd.xq.module.chart.status.statusBeans.StatusAngelChartBean;
 import com.cd.xq.module.chart.status.statusBeans.StatusChartFinalBean;
 import com.cd.xq.module.chart.status.statusBeans.StatusHelpChangeLiveTypeBean;
@@ -154,9 +157,10 @@ public class XqStatusChartUIViewMg extends AbsChartView implements IHandleListen
     private int mPreManSelectedIndex = -1;
     private HeadInfoViewMg mHeadInfoViewMg;
     private View mHeadInfoBgRelayout;
-    private boolean mIsOnLookerRecCurrentStatus;
+    private boolean mIsOnLookerRecCurrentStatus = false;  //是否接受过围观者当前
     private boolean mIsRoomMatchSuccess = false;  //是否匹配成功
     private boolean mIsSelefMatchSuccess = false;  //是否自己匹配成功
+    private boolean mIsGoToDouble = false;  //是否接受过进入双人聊天室
 
     @Override
     public View getView() {
@@ -354,58 +358,66 @@ public class XqStatusChartUIViewMg extends AbsChartView implements IHandleListen
             }
         }
 
-        final UserInfoBean angelBean = mAngelMembersMap.get(0);
+        UserInfoBean angelBean = mAngelMembersMap.get(0);
         mAngelViewInstance.textIndex.setVisibility(View.GONE);
         mAngelViewInstance.imageIndex.setVisibility(View.VISIBLE);
-        if(angelBean != null) {
+        if(angelBean == null) {
+            angelBean = new UserInfoBean();
+        }
+        final UserInfoBean angelBeanResult = angelBean;
+        if(angelBeanResult != null) {
             String text = "爱";
-            if(angelBean.getNick_name().equals(DataManager.getInstance().getUserInfo().getNick_name())) {
+            if(angelBeanResult.getNick_name().equals(DataManager.getInstance().getUserInfo().getNick_name())) {
                 mAngelViewInstance.textIndex.setTextColor(Color.RED);
             }
             mAngelViewInstance.textIndex.setText(text);
-            if(angelBean.getGender().equals(Constant.GENDER_LADY)) {
+            if(angelBeanResult.getGender().equals(Constant.GENDER_LADY)) {
                 mAngelViewInstance.imageGender.setImageResource(R.drawable.chart_room_gender_lady);
             }else {
                 mAngelViewInstance.imageGender.setImageResource(R.drawable.chart_room_gender_man);
             }
             mAngelViewInstance.imageGender.setVisibility(View.VISIBLE);
             Glide.with(mXqActivity)
-                    .load(angelBean.getHead_image())
+                    .load(angelBeanResult.getHead_image())
                     .placeholder(R.drawable.chart_room_default_head)
                     .bitmapTransform(new GlideCircleTransform(mXqActivity))
                     .into(mAngelViewInstance.imageHead);
             mAngelViewInstance.imageHead.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    setHeadInfoData(angelBean);
+                    setHeadInfoData(angelBeanResult);
                 }
             });
         }
 
-        final UserInfoBean manBean = mManMembersMap.get(0);
+        UserInfoBean manBean = mManMembersMap.get(0);
         mManViewInstance.textIndex.setTextColor(Color.parseColor("#0000ff"));
         mManViewInstance.textIndex.setText("男");
-        if(manBean != null) {
+        if(manBean == null) {
+            manBean = new UserInfoBean();
+        }
+        final UserInfoBean manBeanResult = manBean;
+        if(manBeanResult != null) {
             String text = "男";
-            if(manBean.getNick_name().equals(DataManager.getInstance().getUserInfo().getNick_name())) {
+            if(manBeanResult.getNick_name().equals(DataManager.getInstance().getUserInfo().getNick_name())) {
                 mManViewInstance.textIndex.setTextColor(Color.RED);
             }
             mManViewInstance.textIndex.setText(text);
-            if(manBean.getGender().equals(Constant.GENDER_LADY)) {
+            if(manBeanResult.getGender().equals(Constant.GENDER_LADY)) {
                 mManViewInstance.imageGender.setImageResource(R.drawable.chart_room_gender_lady);
             }else {
                 mManViewInstance.imageGender.setImageResource(R.drawable.chart_room_gender_man);
             }
             mManViewInstance.imageGender.setVisibility(View.VISIBLE);
             Glide.with(mXqActivity)
-                    .load(manBean.getHead_image())
+                    .load(manBeanResult.getHead_image())
                     .placeholder(R.drawable.chart_room_default_head)
                     .bitmapTransform(new GlideCircleTransform(mXqActivity))
                     .into(mManViewInstance.imageHead);
             mManViewInstance.imageHead.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    setHeadInfoData(manBean);
+                    setHeadInfoData(manBeanResult);
                 }
             });
         }
@@ -609,7 +621,6 @@ public class XqStatusChartUIViewMg extends AbsChartView implements IHandleListen
                             return;
                         }
 
-                        //通知聊天室的其他人,是创建者
                         int progressStatus = 0;
                         if(DataManager.getInstance().getSelfMember().getUserInfo().getRole_type().equals(Constant.ROLETYPE_GUEST)) {
                             progressStatus = JMChartRoomSendBean.CHART_HELP_STATUS_CHART_EXIT_ROOM;
@@ -744,6 +755,10 @@ public class XqStatusChartUIViewMg extends AbsChartView implements IHandleListen
                         }
                         break;
                     case HANDLE_FINISH:
+                        sendDoubleRoom();
+                        Tools.toast(mXqActivity,sendBean.getMsg(),true);
+                        //显示离开按钮
+                        mBtnExit.setVisibility(View.VISIBLE);
                         break;
                     case HANDLE_HELP_QUEST_DISTURB:
                         isTipUpdate = false;
@@ -867,6 +882,40 @@ public class XqStatusChartUIViewMg extends AbsChartView implements IHandleListen
         }
     }
 
+    private void sendDoubleRoom() {
+        if(mIsRoomMatchSuccess && mIsSelefMatchSuccess) {
+            String pushAddress;
+            String playAddress;
+            UserInfoBean targetBean;
+            pushAddress = NetWorkMg.getCameraUrl() + "_" + DataManager.getInstance().getUserInfo().getUser_id();
+            if(DataManager.getInstance().getUserInfo().getGender().equals(Constant.GENDER_MAN)) {
+                String finalSelectLady = String.valueOf(((StatusManFinalSelectBean)mOrderStatusMap
+                        .get(JMChartRoomSendBean.CHART_STATUS_MAN_SELECT_FINAL)).getSelectLadyIndex());
+                targetBean = mLadyMembersMap.get(Integer.parseInt(finalSelectLady));
+            }else {
+                targetBean = mManMembersMap.get(0);
+            }
+            playAddress = NetWorkMg.getCameraUrl() + "_" + targetBean.getUser_id();
+
+            JMNormalSendBean sendBean1 = new JMNormalSendBean();
+            sendBean1.setCode(JMChartRoomSendBean.CHART_GOTO_DOUBLE_ROOM);
+            String extraStr = "";
+            try {
+                JSONObject object = new JSONObject();
+                object.put("push",pushAddress);
+                object.put("play",playAddress);
+                object.put("target",new Gson().toJson(DataManager.getInstance().getUserInfo()));
+                extraStr = object.toString();
+            }catch (Exception e) {
+
+            }
+            sendBean1.setRoomId(DataManager.getInstance().getChartData().getRoomId());
+            sendBean1.setTargetUserName(targetBean.getUser_name());
+            sendBean1.setExtra(extraStr);
+            JMsgSender.sendNomalMessage(sendBean1);
+        }
+    }
+
     private class MemberRecyclerdapter extends RecyclerView.Adapter<MemberViewHolder> {
         private EnumMemberStatus mMemberStatus = STATUS_NORMAL;
         private int mCurrentIndex = -1;
@@ -979,6 +1028,10 @@ public class XqStatusChartUIViewMg extends AbsChartView implements IHandleListen
                         viewInstance.setNormalStatus();
                     }
                     break;
+            }
+
+            if(DataManager.getInstance().getSelfMember().getRoomRoleType() == Constant.ROOM_ROLETYPE_ONLOOKER) {
+                viewInstance.setLightLabelStatus(false);
             }
 
             viewInstance.imageBtnLight.setOnClickListener(new View.OnClickListener() {
@@ -1152,10 +1205,6 @@ public class XqStatusChartUIViewMg extends AbsChartView implements IHandleListen
                     nextStatus = mOrderStatusMap.get(baseStatus.getmOrder());
                 }
                 if(nextStatus != null) {
-                    JMChartRoomSendBean bean = nextStatus.getChartSendBeanWillSend(sendBean, BaseStatus.MessageType.TYPE_SEND);
-                    if(bean == null) return;
-                    bean.setMessageType(BaseStatus.MessageType.TYPE_SEND);
-
                     int startIndex = nextStatus.getStartIndex();
                     int nextIndex = nextStatus.getNextIndex(sendBean);
 
@@ -1167,6 +1216,7 @@ public class XqStatusChartUIViewMg extends AbsChartView implements IHandleListen
                             || sendBean.getProcessStatus() == JMChartRoomSendBean.CHART_STATUS_CHAT_QUESTION_MAN_SECOND) {
                         if(statusResp.isLast()) {
                             startIndex = firstLadyIndex;
+                            nextStatus.setStartIndex(startIndex);
                         }
                     }
 
@@ -1176,6 +1226,11 @@ public class XqStatusChartUIViewMg extends AbsChartView implements IHandleListen
                             nextIndex = secondLadyIndex;
                         }
                     }
+
+                    JMChartRoomSendBean bean = nextStatus.getChartSendBeanWillSend(sendBean, BaseStatus.MessageType.TYPE_SEND);
+                    if(bean == null) return;
+                    bean.setMessageType(BaseStatus.MessageType.TYPE_SEND);
+
                     if(statusResp.isLast()) {
                         bean.setIndexNext(startIndex);
                     }else {
@@ -1279,16 +1334,20 @@ public class XqStatusChartUIViewMg extends AbsChartView implements IHandleListen
         if(mLadySelectedResultList.contains(finalSelectLady)) {
             text = "恭喜匹配成功";
             mIsRoomMatchSuccess = true;
-            if(Integer.parseInt(finalSelectLady) == DataManager.getInstance().getSelfMember().getIndex()
-                    && DataManager.getInstance().getUserInfo().getGender().equals(Constant.GENDER_LADY)) {
+            if (DataManager.getInstance().getSelfMember().getRoomRoleType() == Constant.ROOM_ROLETYPE_PARTICIPANTS
+                    && DataManager.getInstance().getUserInfo().getGender().equals(Constant.GENDER_LADY)
+                    && Integer.parseInt(finalSelectLady) == DataManager.getInstance().getSelfMember().getIndex()) {
+                mIsSelefMatchSuccess = true;
+            }
+
+            if (DataManager.getInstance().getSelfMember().getRoomRoleType() == Constant.ROOM_ROLETYPE_PARTICIPANTS
+                    && DataManager.getInstance().getUserInfo().getGender().equals(Constant.GENDER_MAN)) {
+                //男生
                 mIsSelefMatchSuccess = true;
             }
             //更新
             mMemberAdapter.notifyDataSetChanged();
         }
-        Tools.toast(mXqActivity,text,true);
-        //显示离开按钮
-        mBtnExit.setVisibility(View.VISIBLE);
         //显示在系统事件中
         JMChartRoomSendBean bean = mOrderStatusMap.get(JMChartRoomSendBean.CHART_STATUS_CHAT_FINAL)
                 .getChartSendBeanWillSend(null, BaseStatus.MessageType.TYPE_SEND);
@@ -1526,7 +1585,6 @@ public class XqStatusChartUIViewMg extends AbsChartView implements IHandleListen
             }
 
             if(chartRoomSendBean.getProcessStatus() < mStartStatusRoomSendBean.getProcessStatus()) {
-                int i = 6;
                 return;
             }
             handleStatusBean(chartRoomSendBean);
@@ -1563,6 +1621,7 @@ public class XqStatusChartUIViewMg extends AbsChartView implements IHandleListen
                 || normalSendBean.getCode() == JMChartRoomSendBean.CHART_ONLOOKER_EXIT) {
             BaseStatus status = mHelpStatusMap.get(normalSendBean.getCode());
             JMChartRoomSendBean sendBean = status.getChartSendBeanWillSend(null, BaseStatus.MessageType.TYPE_SEND);
+            sendBean.setMsg(normalSendBean.getMsg());
             status.handlerRoomChart(sendBean);
         }else if(normalSendBean.getCode() == JMChartRoomSendBean.CHART_ONLOOKER_ENTER_STATUS) {
             //围观者进入时的当前房间状态
@@ -1599,6 +1658,25 @@ public class XqStatusChartUIViewMg extends AbsChartView implements IHandleListen
                 }catch (Exception e) {
                     com.cd.xq.module.util.tools.Log.e("onEventMainThread--" + e.toString());
                 }
+            }
+        }else if(normalSendBean.getCode() == JMChartRoomSendBean.CHART_GOTO_DOUBLE_ROOM) {
+            if(mIsGoToDouble) return;
+            try {
+                mIsGoToDouble = true;
+                JSONObject object = new JSONObject(normalSendBean.getExtra());
+                String pushAddress = object.getString("push");
+                String playAddress = object.getString("play");
+                String target = object.getString("target");
+                Intent intent = new Intent(mXqActivity, DoubleRoomActivity.class);
+                Bundle bundle = new Bundle();
+                bundle.putString("push",pushAddress);
+                bundle.putString("play",playAddress);
+                bundle.putString("target",target);
+                intent.putExtras(bundle);
+                mXqActivity.startActivity(intent);
+                exit();
+            }catch (Exception e) {
+
             }
         }
     }

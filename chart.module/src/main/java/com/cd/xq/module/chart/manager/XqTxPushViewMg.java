@@ -147,7 +147,7 @@ public class XqTxPushViewMg extends AbsChartView {
                 }else if (event == TXLiveConstants.PUSH_WARNING_NET_BUSY) {
                     ++mNetBusyCount;
                     Log.e(prefixStr + "net busy. count=" + mNetBusyCount);
-                    Tools.toast(mActivity.getApplication(), param.getString(TXLiveConstants.EVT_DESCRIPTION), true);
+                    //Tools.toast(mActivity.getApplication(), param.getString(TXLiveConstants.EVT_DESCRIPTION), true);
                 }
             }
 

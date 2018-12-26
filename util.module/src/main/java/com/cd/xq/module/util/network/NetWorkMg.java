@@ -39,7 +39,6 @@ public class NetWorkMg {
 
     public static String getCameraUrl() {
         return "rtmp://" + NetWorkMg.IP_ADDRESS + "/live/stream1";
-        //return "rtmp://" + "192.168.1.101" + "/live/stream1";
     }
 
     public static String getAudioUrl_Guest() {

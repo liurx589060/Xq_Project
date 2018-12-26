@@ -68,7 +68,7 @@ public class StatusAngelChartBean extends BaseStatus {
             }else {
                 nextIndex = getNextIndex(receiveBean) + 1;
             }
-            sendBean.setMsg("请爱心大使" + nextIndex + "玩家发言");
+            sendBean.setMsg("请爱心大使" + nextIndex + "发言");
         }else if (messageType == MessageType.TYPE_RESPONSE) {
             sendBean.setMsg(mUserInfo.getUser_name() + "爱心大使开始介绍");
         }

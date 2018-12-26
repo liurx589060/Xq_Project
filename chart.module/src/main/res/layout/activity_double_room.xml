@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent" android:layout_height="match_parent">
 
     <com.tencent.rtmp.ui.TXCloudVideoView
@@ -11,6 +12,7 @@
     </com.tencent.rtmp.ui.TXCloudVideoView>
 
     <RelativeLayout
+        android:id="@+id/relayout_play"
         android:layout_width="@dimen/dp_90"
         android:layout_height="@dimen/dp_160"
         android:layout_alignParentRight="true"
@@ -38,5 +40,47 @@
         android:layout_marginTop="@dimen/dp_10"
         android:scaleType="fitXY"
         android:background="@drawable/chart_room_exit"/>
+
+    <RelativeLayout
+        android:id="@+id/double_room_activity_relayout_headInfo"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:background="#dddddd"
+            android:id="@+id/linearLayout">
+
+            <include
+                android:id="@+id/double_room_activity_headInfo"
+                layout="@layout/layout_head_info"
+                android:layout_width="@dimen/dp_180"
+                android:layout_height="@dimen/dp_300"
+                />
+
+        </LinearLayout>
+    </RelativeLayout>
+
+    <ImageView
+        android:id="@+id/double_room_activity_headInfo_self"
+        android:layout_width="@dimen/dp_60"
+        android:layout_height="@dimen/dp_60"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_marginTop="@dimen/dp_60"
+        android:layout_marginLeft="@dimen/dp_20"
+        app:srcCompat="@drawable/chart_room_default_head" />
+
+    <ImageView
+        android:id="@+id/double_room_activity_headInfo_target"
+        android:layout_width="@dimen/dp_60"
+        android:layout_height="@dimen/dp_60"
+        android:layout_toLeftOf="@+id/relayout_play"
+        android:layout_alignTop="@+id/relayout_play"
+        android:layout_marginTop="@dimen/dp_5"
+        android:layout_marginRight="@dimen/dp_5"
+        app:srcCompat="@drawable/chart_room_default_head" />
 
 </RelativeLayout>

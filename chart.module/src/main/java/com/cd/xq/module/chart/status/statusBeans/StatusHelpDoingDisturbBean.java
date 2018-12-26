@@ -60,7 +60,7 @@ public class StatusHelpDoingDisturbBean extends BaseStatus {
         JMChartRoomSendBean sendBean = createBaseChartRoomSendBean();
         if(messageType == MessageType.TYPE_SEND) {
             int nextIndex = getNextIndex(receiveBean) + 1;
-            sendBean.setMsg("请爱心大使" + nextIndex + "玩家插话");
+            sendBean.setMsg("请爱心大使" + nextIndex + "嘉宾插话");
         }else if (messageType == MessageType.TYPE_RESPONSE) {
             sendBean.setMsg(mUserInfo.getUser_name() + "爱心大使开始插话");
         }

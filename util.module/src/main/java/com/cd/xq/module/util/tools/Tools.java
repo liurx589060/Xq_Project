@@ -1,5 +1,6 @@
 package com.cd.xq.module.util.tools;
 
+import android.app.Activity;
 import android.content.Context;
 import android.widget.Toast;
 
@@ -13,6 +14,12 @@ import java.util.Locale;
 
 public class Tools {
     public static void toast(Context context,String text,boolean isLong) {
+        if(context == null) return;
+        if(context instanceof Activity) {
+            if(((Activity)context).isFinishing()) {
+                return;
+            }
+        }
         Toast.makeText(context,text,isLong?Toast.LENGTH_LONG:Toast.LENGTH_SHORT).show();
     }
 
