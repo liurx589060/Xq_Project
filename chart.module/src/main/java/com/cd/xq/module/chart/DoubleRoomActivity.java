@@ -1,7 +1,10 @@
 package com.cd.xq.module.chart;
 
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v7.app.AlertDialog;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.ImageView;
 
@@ -182,9 +185,11 @@ public class DoubleRoomActivity extends BaseActivity {
         mLivePusher = new TXLivePusher(this);
         TXLivePushConfig mLivePushConfig = new TXLivePushConfig();
         mLivePushConfig.enableAEC(true);
+        mLivePushConfig.setAutoAdjustBitrate(true);
         mPushTxVideoView.setMirror(true);
         mLivePusher.startCameraPreview(mPushTxVideoView);
         mLivePusher.setMirror(true);
+        mLivePusher.setVideoQuality(TXLiveConstants.VIDEO_QUALITY_STANDARD_DEFINITION,true,true);
 
         mLivePusher.setPushListener(new ITXLivePushListener() {
             @Override
@@ -342,5 +347,34 @@ public class DoubleRoomActivity extends BaseActivity {
                 .append("职业： ").append(bean.getProfessional()).append("\n\n")
                 .append("工作地点： ").append(bean.getJob_address()).append("\n\n");
         mHeadInfoViewMg.setContent(builder.toString());
+    }
+
+    public void showExitDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setIcon(R.drawable.chart_room_exit)
+                .setTitle("退出")
+                .setMessage("确认退出?")
+                .setPositiveButton("确认", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        exitRoom();
+                    }
+                })
+                .setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                }).create()
+                .show();
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if(keyCode == KeyEvent.KEYCODE_BACK) {
+            showExitDialog();
+            return true;
+        }
+        return super.onKeyDown(keyCode, event);
     }
 }

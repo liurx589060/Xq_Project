@@ -7,6 +7,8 @@ import com.cd.xq.module.util.beans.user.UserInfoBean;
 import com.cd.xq.module.util.manager.DataManager;
 import com.cd.xq.module.util.tools.Tools;
 
+import java.util.ArrayList;
+
 /**
  * Created by Administrator on 2018/9/23.
  */
@@ -58,12 +60,14 @@ public abstract class BaseStatus {
     protected Member mSelfMember;
     private int mOrder = -1;//流程序号
     private int mStartIndex = 0;//轮转的开始索引
-    protected int mCurrentIndex = -1;
+    protected ArrayList<Integer> mHandledIndexList;
 
     public BaseStatus() {
         mData = DataManager.getInstance().getChartData();
         mUserInfo = DataManager.getInstance().getUserInfo();
         mSelfMember = DataManager.getInstance().getSelfMember();
+
+        mHandledIndexList = new ArrayList<>();
     }
 
     /**
@@ -162,12 +166,12 @@ public abstract class BaseStatus {
         boolean isReturn = false;
         if(receiveBean.getProcessStatus() == getStatus()
                 && receiveBean.getMessageType() == MessageType.TYPE_SEND
-                && mCurrentIndex == receiveBean.getIndexNext()) {
+                && mHandledIndexList.contains(receiveBean.getIndexNext())) {
             isReturn = true;
         }
 
         if(receiveBean.getMessageType() == MessageType.TYPE_SEND) {
-            mCurrentIndex = receiveBean.getIndexNext();
+            mHandledIndexList.add(receiveBean.getIndexNext());
         }
         return isReturn;
     }
@@ -198,7 +202,7 @@ public abstract class BaseStatus {
 
         //重置屏蔽消息的index
         if(receiveBean.isRestCurrentIndex()) {
-            mCurrentIndex = -1;
+            mHandledIndexList.clear();
         }
 
         if(checkIsRepeatOrReturn(receiveBean)) {
@@ -222,7 +226,6 @@ public abstract class BaseStatus {
         resp.setLast(last);
         if(last) {
             mCompleteCount = 0;
-//            mCurrentIndex = -1;
         }
         onPostHandler(resp,receiveBean);
         if(mListener != null) {
@@ -263,5 +266,12 @@ public abstract class BaseStatus {
             isSelf = true;
         }
         return isSelf;
+    }
+
+    /**
+     * 本次状态处理结束
+     */
+    public void handleEnd() {
+
     }
 }

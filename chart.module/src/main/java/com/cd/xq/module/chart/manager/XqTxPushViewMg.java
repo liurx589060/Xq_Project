@@ -118,11 +118,13 @@ public class XqTxPushViewMg extends AbsChartView {
         mLivePusher = new TXLivePusher(mActivity);
 
         mLivePushConfig = new TXLivePushConfig();
+        mLivePushConfig.setAutoAdjustBitrate(true);
         mLivePushConfig.enableAEC(true);
         mVideoView = (TXCloudVideoView) mRootView.findViewById(R.id.tx_push_videoview);
         mVideoView.setMirror(true);
         mLivePusher.startCameraPreview(mVideoView);
         mLivePusher.setMirror(true);
+        mLivePusher.setVideoQuality(TXLiveConstants.VIDEO_QUALITY_STANDARD_DEFINITION,true,true);
 
         mLivePusher.setPushListener(new ITXLivePushListener() {
             @Override
