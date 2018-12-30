@@ -85,6 +85,7 @@ public class DoubleRoomActivity extends BaseActivity {
 
         init();
 
+
         startPush(mPushAddress);
         startPlay(mPlayAddress);
     }

@@ -8,7 +8,9 @@ import android.widget.FrameLayout;
 
 import com.cd.xq.module.chart.manager.XqStatusChartUIViewMg;
 import com.cd.xq.module.util.base.BaseActivity;
+import com.cd.xq.module.util.manager.DataManager;
 import com.cd.xq_chart.module.R;
+import com.hc.lib.msc.MscDefaultSpeech;
 
 /**
  * Created by Administrator on 2018/11/14.
@@ -30,6 +32,10 @@ public class ChartRoomActivity extends BaseActivity {
     protected void onDestroy() {
         super.onDestroy();
         mXqStatusChartUIViewMg.onDestroy();
+
+        //重置roomId
+        DataManager.getInstance().getChartData().setRoomId(0);
+        MscDefaultSpeech.getInstance().destroy();
     }
 
     @Override

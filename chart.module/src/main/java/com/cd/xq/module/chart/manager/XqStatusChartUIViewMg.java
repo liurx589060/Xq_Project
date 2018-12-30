@@ -231,9 +231,6 @@ public class XqStatusChartUIViewMg extends AbsChartView implements IHandleListen
                 viewMg.onDestroy();
             }
         }
-        //重置roomId
-        DataManager.getInstance().getChartData().setRoomId(0);
-        MscDefaultSpeech.getInstance().destroy();
     }
 
     @Override
@@ -847,7 +844,10 @@ public class XqStatusChartUIViewMg extends AbsChartView implements IHandleListen
                         mTextTip.setText(statusInstance.getPublicString());
                     }
                     mTextTip.setVisibility(View.VISIBLE);
-                    if(mStartStatusRoomSendBean.getProcessStatus() != sendBean.getProcessStatus()) {
+//                    if(mStartStatusRoomSendBean.getProcessStatus() != sendBean.getProcessStatus()) {
+//                        Tools.toast(mXqActivity,statusInstance.getPublicString(),false);
+//                    }
+                    if(mStartStatusRoomSendBean.getProcessStatus() == JMChartRoomSendBean.CHART_STATUS_CHAT_FINAL) {
                         Tools.toast(mXqActivity,statusInstance.getPublicString(),false);
                     }
                 }
@@ -1755,6 +1755,8 @@ public class XqStatusChartUIViewMg extends AbsChartView implements IHandleListen
             if(mIsGoToDouble) return;
             try {
                 mIsGoToDouble = true;
+                this.onDestroy();
+
                 JSONObject object = new JSONObject(normalSendBean.getExtra());
                 String pushAddress = object.getString("push");
                 String playAddress = object.getString("play");
