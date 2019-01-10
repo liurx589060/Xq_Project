@@ -9,7 +9,7 @@ import com.cd.xq.module.util.status.StatusResp;
  * Created by Administrator on 2018/9/27.
  */
 
-public class StatusManIntroBean extends BaseStatus {
+public class StatusManIntroBean extends ChatBaseStatus {
     @Override
     public String getTypesWithString() {
         return "Intro_Man_Status";
@@ -78,13 +78,48 @@ public class StatusManIntroBean extends BaseStatus {
     }
 
     @Override
-    public void onPostHandler(StatusResp resp, JMChartRoomSendBean receiveBean) {
-        if(receiveBean.getMessageType() == MessageType.TYPE_SEND) {
-            resp.setResetLive(true);
-            resp.setStopTiming(true);
-        }else if(receiveBean.getMessageType() == MessageType.TYPE_RESPONSE) {
-            resp.setResetLive(false);
-            resp.setStopTiming(false);
+    public void onStartTime() {
+
+    }
+
+    @Override
+    public void onStopTime() {
+
+    }
+
+    @Override
+    public void onEnd() {
+        if(statusManager.getCurrentStatusResp().isLast()) {
+            JMChartRoomSendBean bean = getNextStatus().getChartSendBeanWillSend(statusManager.getCurrentSendBean(),MessageType.TYPE_SEND);
+            bean.setIndexNext(getNextStatus().getStartIndex());
+            statusManager.sendRoomMessage(bean);
+        }else {
+            JMChartRoomSendBean bean = getChartSendBeanWillSend(statusManager.getCurrentSendBean(),MessageType.TYPE_SEND);
+            bean.setIndexNext(getNextIndex(statusManager.getCurrentSendBean()));
+            statusManager.sendRoomMessage(bean);
         }
+    }
+
+    @Override
+    public void handleSend(StatusResp statusResp, JMChartRoomSendBean sendBean) {
+        chartUIViewMg.stopTiming();
+        chartUIViewMg.resetLiveStatus();
+
+        chartUIViewMg.setTipText(getPublicString());
+        chartUIViewMg.addSystemEventAndRefresh(sendBean);
+        chartUIViewMg.speech(sendBean.getMsg());
+        chartUIViewMg.startTiming(this,sendBean,statusResp);
+        if(statusResp.isSelf()) {
+            chartUIViewMg.setBtnEndVisible(true);
+            //发送回复
+            JMChartRoomSendBean bean = getChartSendBeanWillSend(sendBean,MessageType.TYPE_RESPONSE);
+            statusManager.sendRoomMessage(bean);
+        }
+        chartUIViewMg.setLiveStatus(sendBean,statusResp.isSelf());
+    }
+
+    @Override
+    public void handleResponse(StatusResp statusResp, JMChartRoomSendBean sendBean) {
+        chartUIViewMg.addSystemEventAndRefresh(sendBean);
     }
 }

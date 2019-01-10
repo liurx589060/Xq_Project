@@ -9,7 +9,7 @@ import com.cd.xq.module.util.status.StatusResp;
  * Created by Administrator on 2018/10/13.
  */
 
-public class StatusHelpDoingDisturbBean extends BaseStatus {
+public class StatusHelpDoingDisturbBean extends ChatBaseStatus {
     @Override
     public String getTypesWithString() {
         return "Angel_Doing_disturb";
@@ -70,19 +70,63 @@ public class StatusHelpDoingDisturbBean extends BaseStatus {
     }
 
     @Override
-    public void onPostHandler(StatusResp resp, JMChartRoomSendBean receiveBean) {
-        if(receiveBean.getMessageType() == MessageType.TYPE_SEND) {
-            resp.setResetLive(true);
-            resp.setStopTiming(true);
-        }else if(receiveBean.getMessageType() == MessageType.TYPE_RESPONSE) {
-            resp.setResetLive(false);
-            resp.setStopTiming(false);
-        }
+    public void onStartTime() {
+
     }
 
     @Override
-    public void handleEnd() {
-        super.handleEnd();
-        mHandledIndexList.clear();
+    public void onStopTime() {
+
+    }
+
+    @Override
+    public boolean isHandleSelf() {
+        return statusManager.isDisturbing();
+    }
+
+    @Override
+    public void onEnd() {
+        if(statusManager.getCurrentStatusResp().isLast()) {
+            JMChartRoomSendBean bean = getNextStatus().getNextStatus().getChartSendBeanWillSend(statusManager.getCurrentSendBean(),MessageType.TYPE_SEND);
+            bean.setIndexNext(getNextStatus().getNextStatus().getStartIndex());
+            statusManager.sendRoomMessage(bean);
+        }else {
+            JMChartRoomSendBean bean = getNextStatus().getChartSendBeanWillSend(statusManager.getCurrentSendBean(),MessageType.TYPE_SEND);
+            bean.setIndexNext(getNextStatus().getNextIndex(statusManager.getCurrentSendBean()));
+            statusManager.sendRoomMessage(bean);
+        }
+
+        statusManager.setDisturbAngelIndex(-1);
+        statusManager.setQuestDisturb(false);
+        statusManager.setDisturbing(false);
+    }
+
+    @Override
+    protected void onPostHandler(StatusResp resp, JMChartRoomSendBean receiveBean) {
+        this.setNextStatus(statusManager.getCurrentStatus());
+    }
+
+    @Override
+    public void handleSend(StatusResp statusResp, JMChartRoomSendBean sendBean) {
+        chartUIViewMg.stopTiming();
+        chartUIViewMg.resetLiveStatus();
+
+        chartUIViewMg.setTipText(getPublicString());
+        chartUIViewMg.addSystemEventAndRefresh(sendBean);
+        chartUIViewMg.speech(sendBean.getMsg());
+        chartUIViewMg.startTiming(this,sendBean,statusResp);
+        statusManager.setDisturbing(true);
+        if(statusResp.isSelf()) {
+            chartUIViewMg.setBtnEndVisible(true);
+            //发送回复
+            JMChartRoomSendBean bean = getChartSendBeanWillSend(sendBean,MessageType.TYPE_RESPONSE);
+            statusManager.sendRoomMessage(bean);
+        }
+        chartUIViewMg.setLiveStatus(sendBean,statusResp.isSelf());
+    }
+
+    @Override
+    public void handleResponse(StatusResp statusResp, JMChartRoomSendBean sendBean) {
+        chartUIViewMg.addSystemEventAndRefresh(sendBean);
     }
 }

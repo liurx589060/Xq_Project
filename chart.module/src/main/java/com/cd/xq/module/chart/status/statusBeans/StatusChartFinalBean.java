@@ -5,12 +5,13 @@ import com.cd.xq.module.util.Constant;
 import com.cd.xq.module.util.beans.jmessage.JMChartRoomSendBean;
 import com.cd.xq.module.util.status.BaseStatus;
 import com.cd.xq.module.util.status.StatusResp;
+import com.cd.xq.module.util.tools.Tools;
 
 /**
  * Created by Administrator on 2018/9/27.
  */
 
-public class StatusChartFinalBean extends BaseStatus {
+public class StatusChartFinalBean extends ChatBaseStatus {
     @Override
     public String getTypesWithString() {
         return "Chart_Final_Status";
@@ -66,11 +67,35 @@ public class StatusChartFinalBean extends BaseStatus {
     }
 
     @Override
-    public void onPostHandler(StatusResp resp, JMChartRoomSendBean receiveBean) {
-        resp.setManSelect(true);
+    public void onStartTime() {
 
-        resp.setResetLive(true);
-        resp.setStopTiming(true);
+    }
+
+    @Override
+    public void onStopTime() {
+
+    }
+
+    @Override
+    public void onEnd() {
+
+    }
+
+    @Override
+    public void handleSend(StatusResp statusResp, JMChartRoomSendBean sendBean) {
+        chartUIViewMg.stopTiming();
+        chartUIViewMg.resetLiveStatus();
+
+        chartUIViewMg.addSystemEventAndRefresh(sendBean);
+        chartUIViewMg.setTipText(getPublicString());
+        chartUIViewMg.speech(sendBean.getMsg());
+        chartUIViewMg.sendDoubleRoom();
+        Tools.toast(activity.getApplication(),sendBean.getMsg(),false);
+    }
+
+    @Override
+    public void handleResponse(StatusResp statusResp, JMChartRoomSendBean sendBean) {
+
     }
 
     @Override

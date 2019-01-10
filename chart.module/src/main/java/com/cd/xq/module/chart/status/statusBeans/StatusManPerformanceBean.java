@@ -9,7 +9,7 @@ import com.cd.xq.module.util.status.StatusResp;
  * Created by Administrator on 2018/9/27.
  */
 
-public class StatusManPerformanceBean extends BaseStatus {
+public class StatusManPerformanceBean extends StatusManIntroBean {
     @Override
     public String getTypesWithString() {
         return "Man_Performance_Status";
@@ -31,34 +31,6 @@ public class StatusManPerformanceBean extends BaseStatus {
     }
 
     @Override
-    public int getNextIndex(JMChartRoomSendBean receiveBean) {
-        int index = (receiveBean.getIndexNext() + 1)%mData.getLimitMan();
-        return index;
-    }
-
-    @Override
-    public String getRequestGender() {
-        return Constant.GENDER_MAN;
-    }
-
-    @Override
-    public String getRequestRoleType() {
-        return Constant.ROLETYPE_GUEST;
-    }
-
-    @Override
-    public HandleType getHandleType() {
-        return HandleType.HANDLE_TIME;
-    }
-
-    @Override
-    public boolean isLast(int completeCount, JMChartRoomSendBean receiveBean) {
-        int allCount = mData.getLimitMan();
-        boolean isLast = completeCount>=allCount?true:false;
-        return isLast;
-    }
-
-    @Override
     public JMChartRoomSendBean getChartSendBeanWillSend(JMChartRoomSendBean receiveBean,MessageType messageType) {
         JMChartRoomSendBean sendBean = createBaseChartRoomSendBean();
         if(messageType == MessageType.TYPE_SEND) {
@@ -75,16 +47,5 @@ public class StatusManPerformanceBean extends BaseStatus {
         sendBean.setProcessStatus(getStatus());
         sendBean.setMessageType(messageType);
         return sendBean;
-    }
-
-    @Override
-    public void onPostHandler(StatusResp resp, JMChartRoomSendBean receiveBean) {
-        if(receiveBean.getMessageType() == MessageType.TYPE_SEND) {
-            resp.setResetLive(true);
-            resp.setStopTiming(true);
-        }else if(receiveBean.getMessageType() == MessageType.TYPE_RESPONSE) {
-            resp.setResetLive(false);
-            resp.setStopTiming(false);
-        }
     }
 }

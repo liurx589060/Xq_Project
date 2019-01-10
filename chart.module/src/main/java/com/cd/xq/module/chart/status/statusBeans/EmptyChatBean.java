@@ -1,24 +1,22 @@
 package com.cd.xq.module.chart.status.statusBeans;
 
-
-import com.cd.xq.module.util.Constant;
 import com.cd.xq.module.util.beans.jmessage.JMChartRoomSendBean;
 import com.cd.xq.module.util.status.BaseStatus;
 import com.cd.xq.module.util.status.StatusResp;
 
 /**
- * Created by Administrator on 2018/10/13.
+ * Created by Administrator on 2019/1/3.
  */
 
-public class StatusHelpExitBean extends ChatBaseStatus {
+public class EmptyChatBean extends ChatBaseStatus {
     @Override
     public String getTypesWithString() {
-        return "Help_Exit";
+        return null;
     }
 
     @Override
     public String getPublicString() {
-        return "离开房间";
+        return null;
     }
 
     @Override
@@ -28,7 +26,7 @@ public class StatusHelpExitBean extends ChatBaseStatus {
 
     @Override
     public int getStatus() {
-        return JMChartRoomSendBean.CHART_HELP_STATUS_CHART_EXIT_ROOM;
+        return 0;
     }
 
     @Override
@@ -38,17 +36,17 @@ public class StatusHelpExitBean extends ChatBaseStatus {
 
     @Override
     public String getRequestGender() {
-        return Constant.GENDER_ALL;
+        return null;
     }
 
     @Override
     public String getRequestRoleType() {
-        return Constant.ROLETYPE_ALL;
+        return null;
     }
 
     @Override
     public HandleType getHandleType() {
-        return HandleType.HANDLE_HELP_EXIT;
+        return null;
     }
 
     @Override
@@ -58,21 +56,7 @@ public class StatusHelpExitBean extends ChatBaseStatus {
 
     @Override
     public JMChartRoomSendBean getChartSendBeanWillSend(JMChartRoomSendBean receiveBean, MessageType messageType) {
-        JMChartRoomSendBean sendBean = createBaseChartRoomSendBean();
-        sendBean.setMsg("嘉宾"+ mUserInfo.getUser_name() +"离开房间");
-        sendBean.setProcessStatus(getStatus());
-        sendBean.setMessageType(messageType);
-        sendBean.setUpdateMembers(true);
-        return sendBean;
-    }
-
-    @Override
-    protected boolean checkIsRepeatOrReturn(JMChartRoomSendBean receiveBean) {
-        return false;
-    }
-
-    @Override
-    protected void onPostHandler(StatusResp resp, JMChartRoomSendBean receiveBean) {
+        return null;
     }
 
     @Override
@@ -92,8 +76,7 @@ public class StatusHelpExitBean extends ChatBaseStatus {
 
     @Override
     public void handleSend(StatusResp statusResp, JMChartRoomSendBean sendBean) {
-        chartUIViewMg.addSystemEventAndRefresh(sendBean);
-        chartUIViewMg.updateChatRoomMembersList();
+
     }
 
     @Override

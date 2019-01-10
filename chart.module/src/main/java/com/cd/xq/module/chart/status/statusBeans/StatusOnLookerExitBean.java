@@ -13,7 +13,7 @@ import static com.cd.xq.module.util.status.BaseStatus.HandleType.HANDLE_NONE;
  * Created by Administrator on 2018/9/26.
  */
 
-public class StatusOnLookerExitBean extends BaseStatus {
+public class StatusOnLookerExitBean extends ChatBaseStatus {
     @Override
     public String getTypesWithString() {
         return "OnLooker_Exit_Status";
@@ -70,14 +70,37 @@ public class StatusOnLookerExitBean extends BaseStatus {
     }
 
     @Override
-
-    public void onPostHandler(StatusResp resp, JMChartRoomSendBean receiveBean) {
-        resp.setResetLive(false);
-        resp.setStopTiming(false);
+    protected boolean checkIsRepeatOrReturn(JMChartRoomSendBean receiveBean) {
+        return false;
     }
 
     @Override
-    protected boolean checkIsRepeatOrReturn(JMChartRoomSendBean receiveBean) {
-        return false;
+    public void onStartTime() {
+
+    }
+
+    @Override
+    public void onStopTime() {
+
+    }
+
+    @Override
+    public void onEnd() {
+
+    }
+
+    @Override
+    protected void onPostHandler(StatusResp resp, JMChartRoomSendBean receiveBean) {
+    }
+
+    @Override
+    public void handleSend(StatusResp statusResp, JMChartRoomSendBean sendBean) {
+        chartUIViewMg.addSystemEventAndRefresh(sendBean);
+        chartUIViewMg.updateOnLookerList();
+    }
+
+    @Override
+    public void handleResponse(StatusResp statusResp, JMChartRoomSendBean sendBean) {
+
     }
 }

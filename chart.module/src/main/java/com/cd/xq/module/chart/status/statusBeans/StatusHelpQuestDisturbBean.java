@@ -4,12 +4,13 @@ import com.cd.xq.module.util.Constant;
 import com.cd.xq.module.util.beans.jmessage.JMChartRoomSendBean;
 import com.cd.xq.module.util.status.BaseStatus;
 import com.cd.xq.module.util.status.StatusResp;
+import com.cd.xq.module.util.tools.Tools;
 
 /**
  * Created by Administrator on 2018/10/13.
  */
 
-public class StatusHelpQuestDisturbBean extends BaseStatus {
+public class StatusHelpQuestDisturbBean extends ChatBaseStatus {
 
     @Override
     public String getTypesWithString() {
@@ -66,12 +67,6 @@ public class StatusHelpQuestDisturbBean extends BaseStatus {
     }
 
     @Override
-    public void onPostHandler(StatusResp resp, JMChartRoomSendBean receiveBean) {
-        resp.setResetLive(false);
-        resp.setStopTiming(false);
-    }
-
-    @Override
     protected boolean checkIsRepeatOrReturn(JMChartRoomSendBean receiveBean) {
         return false;
     }
@@ -79,5 +74,37 @@ public class StatusHelpQuestDisturbBean extends BaseStatus {
     @Override
     protected boolean checkIsSelf(JMChartRoomSendBean bean) {
         return true;
+    }
+
+    @Override
+    protected void onPostHandler(StatusResp resp, JMChartRoomSendBean receiveBean) {
+    }
+
+    @Override
+    public void onStartTime() {
+
+    }
+
+    @Override
+    public void onStopTime() {
+
+    }
+
+    @Override
+    public void onEnd() {
+
+    }
+
+    @Override
+    public void handleSend(StatusResp statusResp, JMChartRoomSendBean sendBean) {
+        chartUIViewMg.addSystemEventAndRefresh(sendBean);
+        statusManager.setDisturbAngelIndex(sendBean.getIndexSelf());
+        statusManager.setDisturb(true);
+        Tools.toast(activity.getApplication(),sendBean.getMsg(),false);
+    }
+
+    @Override
+    public void handleResponse(StatusResp statusResp, JMChartRoomSendBean sendBean) {
+
     }
 }

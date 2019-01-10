@@ -5,13 +5,21 @@ import com.cd.xq.module.util.beans.jmessage.JMChartRoomSendBean;
 import com.cd.xq.module.util.status.BaseStatus;
 import com.cd.xq.module.util.status.StatusResp;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Created by Administrator on 2018/10/1.
  */
 
-public class StatusLadyFirstSelectBean extends BaseStatus {
+public class StatusLadyFirstSelectBean extends ChatBaseStatus {
     private int mCompleteCount = 0;
-    private boolean isAccept = true;
+    private Map<Integer,Boolean> ladySelectedResultMap;
+
+    public StatusLadyFirstSelectBean() {
+        ladySelectedResultMap = new HashMap<>();
+    }
 
     @Override
     public String getTypesWithString() {
@@ -73,6 +81,7 @@ public class StatusLadyFirstSelectBean extends BaseStatus {
 
     @Override
     public void onPostHandler(StatusResp resp, JMChartRoomSendBean receiveBean) {
+        super.onPostHandler(resp,receiveBean);
         if(receiveBean.getMessageType() == MessageType.TYPE_RESPONSE) {
             mCompleteCount ++;
             int allCount = mData.getLimitLady();
@@ -82,15 +91,46 @@ public class StatusLadyFirstSelectBean extends BaseStatus {
                 mCompleteCount = 0;
             }
         }
+    }
 
-        resp.setLadySelect(true);
-        if(receiveBean.getMessageType() == MessageType.TYPE_SEND) {
-            resp.setResetLive(true);
-            resp.setStopTiming(true);
-        }else if(receiveBean.getMessageType() == MessageType.TYPE_RESPONSE) {
-            resp.setResetLive(false);
-            resp.setStopTiming(false);
-            isAccept = receiveBean.isLadySelected();
+    @Override
+    public void onStartTime() {
+
+    }
+
+    @Override
+    public void onStopTime() {
+
+    }
+
+    @Override
+    public void onEnd() {
+        if(statusManager.getCurrentStatusResp().isSelf()) {
+            JMChartRoomSendBean bean = getChartSendBeanWillSend(statusManager.getCurrentSendBean(),MessageType.TYPE_RESPONSE);
+            bean.setLadySelected(statusManager.isLadyAccept());
+            statusManager.sendRoomMessage(bean);
+        }
+    }
+
+    @Override
+    public void handleSend(StatusResp statusResp, JMChartRoomSendBean sendBean) {
+        chartUIViewMg.stopTiming();
+        chartUIViewMg.resetLiveStatus();
+
+        chartUIViewMg.addSystemEventAndRefresh(sendBean);
+        chartUIViewMg.setTipText(getPublicString());
+        chartUIViewMg.speech(sendBean.getMsg());
+        chartUIViewMg.operate_SelectLady(this,sendBean,statusResp);
+    }
+
+    @Override
+    public void handleResponse(StatusResp statusResp, JMChartRoomSendBean sendBean) {
+        chartUIViewMg.addSystemEventAndRefresh(sendBean);
+        ladySelectedResultMap.put(sendBean.getIndexSelf(),sendBean.isLadySelected());
+        if(statusResp.isLast()) {
+            JMChartRoomSendBean bean = getNextStatus().getChartSendBeanWillSend(sendBean,MessageType.TYPE_SEND);
+            bean.setIndexNext(getNextStatus().getStartIndex());
+            statusManager.sendRoomMessage(bean);
         }
     }
 
@@ -99,11 +139,7 @@ public class StatusLadyFirstSelectBean extends BaseStatus {
         return true;
     }
 
-    public boolean isIsAccept() {
-        return isAccept;
-    }
-
-    public void setIsAccept(boolean mIsAccept) {
-        this.isAccept = mIsAccept;
+    public Map<Integer, Boolean> getLadySelectedResultMap() {
+        return ladySelectedResultMap;
     }
 }

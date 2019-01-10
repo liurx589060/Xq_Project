@@ -56,7 +56,7 @@ public class JMChartRoomSendBean {
     private int liveType = LIVE_CAMERA;
     private BaseStatus.MessageType messageType = BaseStatus.MessageType.TYPE_SEND;
     private boolean isLadySelected;
-    private String manSelects = "";
+    private int manSelects = -1;
     private boolean isRestCurrentIndex = false;//是否重置拦截的index
 
     public int getProcessStatus() {
@@ -163,11 +163,11 @@ public class JMChartRoomSendBean {
         this.messageType = messageType;
     }
 
-    public String getManSelects() {
+    public int getManSelects() {
         return manSelects;
     }
 
-    public void setManSelects(String manSelects) {
+    public void setManSelects(int manSelects) {
         this.manSelects = manSelects;
     }
 

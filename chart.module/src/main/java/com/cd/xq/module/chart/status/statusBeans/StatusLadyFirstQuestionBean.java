@@ -9,7 +9,7 @@ import com.cd.xq.module.util.status.StatusResp;
  * Created by Administrator on 2018/9/27.
  */
 
-public class StatusLadyFirstQuestionBean extends BaseStatus {
+public class StatusLadyFirstQuestionBean extends StatusLadyChartFirstBean {
 
     @Override
     public String getTypesWithString() {
@@ -79,13 +79,16 @@ public class StatusLadyFirstQuestionBean extends BaseStatus {
     }
 
     @Override
-    public void onPostHandler(StatusResp resp, JMChartRoomSendBean receiveBean) {
-        if(receiveBean.getMessageType() == MessageType.TYPE_SEND) {
-            resp.setResetLive(true);
-            resp.setStopTiming(true);
-        }else if(receiveBean.getMessageType() == MessageType.TYPE_RESPONSE) {
-            resp.setResetLive(false);
-            resp.setStopTiming(false);
+    public void onEnd() {
+        if(statusManager.getCurrentStatusResp().isLast()) {
+            JMChartRoomSendBean bean = getNextStatus().getChartSendBeanWillSend(statusManager.getCurrentSendBean(),MessageType.TYPE_SEND);
+            bean.setIndexNext(getNextStatus().getStartIndex());
+            statusManager.sendRoomMessage(bean);
+        }else {
+            JMChartRoomSendBean bean = getChartSendBeanWillSend(statusManager.getCurrentSendBean(),MessageType.TYPE_SEND);
+            int startIndex = ((StatusManSecondSelectBean)statusManager.getStatus(JMChartRoomSendBean.CHART_STATUS_MAN_SELECT_SECOND)).getSelectLadyIndex();
+            bean.setIndexNext(startIndex);
+            statusManager.sendRoomMessage(bean);
         }
     }
 }

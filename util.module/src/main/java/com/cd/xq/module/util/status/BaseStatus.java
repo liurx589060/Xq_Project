@@ -14,6 +14,11 @@ import java.util.ArrayList;
  */
 
 public abstract class BaseStatus {
+    public static final int HANDLE_SUCCESS = 1;
+    public static final int HANDLE_NULL = 7000;  //参数为null
+    public static final int HANDLE_NOT_MATCH = 7001;  //不是自己的状态
+    public static final int HANDLE_REPEAT = 7002;  //重复
+
     public int getmOrder() {
         return mOrder;
     }
@@ -32,7 +37,8 @@ public abstract class BaseStatus {
 
     public enum MessageType {
         TYPE_SEND,
-        TYPE_RESPONSE
+        TYPE_RESPONSE,
+        TYPE_END
     }
 
     public enum HandleType {
@@ -54,13 +60,13 @@ public abstract class BaseStatus {
     }
 
     private int mCompleteCount = 0;
-    private IHandleListener mListener = null;
     protected Data mData ;
     protected UserInfoBean mUserInfo;
     protected Member mSelfMember;
     private int mOrder = -1;//流程序号
     private int mStartIndex = 0;//轮转的开始索引
     protected ArrayList<Integer> mHandledIndexList;
+    private BaseStatus mNextStatus;
 
     public BaseStatus() {
         mData = DataManager.getInstance().getChartData();
@@ -147,15 +153,7 @@ public abstract class BaseStatus {
      * @param resp
      * @param receiveBean
      */
-    public abstract void onPostHandler(StatusResp resp,JMChartRoomSendBean receiveBean);
-
-    /**
-     * 设置处理后的监听
-     * @param listener
-     */
-    public void setHandleListener(IHandleListener listener) {
-        mListener = listener;
-    }
+    protected void onPostHandler(StatusResp resp,JMChartRoomSendBean receiveBean) {}
 
     /**
      * 检查是否重复
@@ -180,24 +178,23 @@ public abstract class BaseStatus {
      * 处理信息前的事件
      * @param receiveBean
      */
-    protected void onPreHandle(JMChartRoomSendBean receiveBean) {
-
-    }
+    protected void onPreHandle(JMChartRoomSendBean receiveBean) { }
 
     /**
      * 处理信息
      * @param receiveBean
+     * @return 1:成功   7000:参数为null
      */
-    public void handlerRoomChart(JMChartRoomSendBean receiveBean) {
+    public int handlerRoomChart(JMChartRoomSendBean receiveBean) {
         onPreHandle(receiveBean);
 
         if(receiveBean == null) {
-            return;
+            return HANDLE_NULL;
         }
 
         if(getStatus() != receiveBean.getProcessStatus()) {
             //不处理其他的消息，只处理自己的消息
-            return;
+            return HANDLE_NOT_MATCH;
         }
 
         //重置屏蔽消息的index
@@ -206,7 +203,7 @@ public abstract class BaseStatus {
         }
 
         if(checkIsRepeatOrReturn(receiveBean)) {
-            return;
+            return HANDLE_REPEAT;
         }
 
 
@@ -220,17 +217,22 @@ public abstract class BaseStatus {
 
         resp.setSelf(checkIsSelf(receiveBean));
         resp.setHandleType(getHandleType());
-        resp.setTimeDownCount(getLiveTimeCount());
         resp.setPublicString(getPublicString());
         boolean last = isLast(mCompleteCount,receiveBean);
         resp.setLast(last);
         if(last) {
             mCompleteCount = 0;
         }
+
         onPostHandler(resp,receiveBean);
-        if(mListener != null) {
-            mListener.onHandleResp(this,resp,receiveBean);
+
+        if(receiveBean.getMessageType() == MessageType.TYPE_SEND) {
+            handleSend(resp,receiveBean);
+        }else if(receiveBean.getMessageType() == MessageType.TYPE_RESPONSE) {
+            handleResponse(resp,receiveBean);
         }
+
+        return HANDLE_SUCCESS;
     }
 
     /**
@@ -268,10 +270,17 @@ public abstract class BaseStatus {
         return isSelf;
     }
 
-    /**
-     * 本次状态处理结束
-     */
-    public void handleEnd() {
+    public abstract void onStartTime();
+    public abstract void onStopTime();
+    public abstract void onEnd();
+    public abstract void handleSend(StatusResp statusResp, JMChartRoomSendBean sendBean);
+    public abstract void handleResponse(StatusResp statusResp, JMChartRoomSendBean sendBean);
 
+    public void setNextStatus(BaseStatus baseStatus) {
+        mNextStatus = baseStatus;
+    }
+
+    public BaseStatus getNextStatus() {
+        return mNextStatus;
     }
 }

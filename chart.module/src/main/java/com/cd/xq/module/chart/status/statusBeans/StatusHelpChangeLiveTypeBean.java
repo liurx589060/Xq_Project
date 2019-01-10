@@ -9,7 +9,7 @@ import com.cd.xq.module.util.status.StatusResp;
  * Created by Administrator on 2018/10/13.
  */
 
-public class StatusHelpChangeLiveTypeBean extends BaseStatus {
+public class StatusHelpChangeLiveTypeBean extends ChatBaseStatus {
     @Override
     public String getTypesWithString() {
         return "Change_LiveType";
@@ -64,13 +64,39 @@ public class StatusHelpChangeLiveTypeBean extends BaseStatus {
     }
 
     @Override
-    public void onPostHandler(StatusResp resp, JMChartRoomSendBean receiveBean) {
-        resp.setResetLive(false);
-        resp.setStopTiming(false);
+    protected boolean checkIsRepeatOrReturn(JMChartRoomSendBean receiveBean) {
+        return false;
     }
 
     @Override
-    protected boolean checkIsRepeatOrReturn(JMChartRoomSendBean receiveBean) {
-        return false;
+    public void onStartTime() {
+
+    }
+
+    @Override
+    public void onStopTime() {
+
+    }
+
+    @Override
+    public void onEnd() {
+
+    }
+
+    @Override
+    protected void onPostHandler(StatusResp resp, JMChartRoomSendBean receiveBean) {
+    }
+
+    @Override
+    public void handleSend(StatusResp statusResp, JMChartRoomSendBean sendBean) {
+        chartUIViewMg.setTipText(sendBean.getMsg());
+        chartUIViewMg.speech(sendBean.getMsg());
+        chartUIViewMg.addSystemEventAndRefresh(sendBean);
+        chartUIViewMg.operate_LiveType(this,sendBean,statusResp);
+    }
+
+    @Override
+    public void handleResponse(StatusResp statusResp, JMChartRoomSendBean sendBean) {
+
     }
 }

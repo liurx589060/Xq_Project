@@ -9,9 +9,9 @@ import com.cd.xq.module.util.status.StatusResp;
  * Created by Administrator on 2018/10/1.
  */
 
-public class StatusManFirstSelectBean extends BaseStatus {
+public class StatusManFirstSelectBean extends ChatBaseStatus {
     private int mCompleteCount = 0;
-    private int mSelectLadyIndex = -1;
+    protected int mSelectLadyIndex = -1;
 
     @Override
     public String getTypesWithString() {
@@ -73,6 +73,7 @@ public class StatusManFirstSelectBean extends BaseStatus {
 
     @Override
     public void onPostHandler(StatusResp resp, JMChartRoomSendBean receiveBean) {
+        super.onPostHandler(resp,receiveBean);
         if(receiveBean.getMessageType() == MessageType.TYPE_RESPONSE) {
             mCompleteCount ++;
             int allCount = mData.getLimitMan();
@@ -82,19 +83,51 @@ public class StatusManFirstSelectBean extends BaseStatus {
                 mCompleteCount = 0;
             }
         }
+    }
 
-        resp.setManSelect(true);
-        if(receiveBean.getMessageType() == MessageType.TYPE_SEND) {
-            resp.setResetLive(true);
-            resp.setStopTiming(true);
-        }else if(receiveBean.getMessageType() == MessageType.TYPE_RESPONSE) {
-            resp.setResetLive(false);
-            resp.setStopTiming(false);
-            try {
-                mSelectLadyIndex = Integer.parseInt(receiveBean.getManSelects());
-            }catch (Exception e) {
-                mSelectLadyIndex = -1;
-            }
+    @Override
+    public void onStartTime() {
+
+    }
+
+    @Override
+    public void onStopTime() {
+
+    }
+
+    @Override
+    public void onEnd() {
+        if(statusManager.getCurrentStatusResp().isSelf()) {
+            JMChartRoomSendBean bean = getChartSendBeanWillSend(statusManager.getCurrentSendBean(),MessageType.TYPE_RESPONSE);
+            bean.setManSelects(statusManager.getManSelected());
+            statusManager.sendRoomMessage(bean);
+        }
+        statusManager.setManSelected(-1);
+    }
+
+    @Override
+    public void handleSend(StatusResp statusResp, JMChartRoomSendBean sendBean) {
+        chartUIViewMg.stopTiming();
+        chartUIViewMg.resetLiveStatus();
+
+        chartUIViewMg.addSystemEventAndRefresh(sendBean);
+        chartUIViewMg.setTipText(getPublicString());
+        chartUIViewMg.speech(sendBean.getMsg());
+        chartUIViewMg.operate_SelectMan(this,sendBean,statusResp);
+    }
+
+    @Override
+    public void handleResponse(StatusResp statusResp, JMChartRoomSendBean sendBean) {
+        chartUIViewMg.addSystemEventAndRefresh(sendBean);
+        if(sendBean.getManSelects() == -1) {
+            mSelectLadyIndex = 0;
+        }else {
+            mSelectLadyIndex = sendBean.getManSelects();
+        }
+        if(statusResp.isLast()) {
+            JMChartRoomSendBean bean = getNextStatus().getChartSendBeanWillSend(sendBean,MessageType.TYPE_SEND);
+            bean.setIndexNext(getNextStatus().getStartIndex());
+            statusManager.sendRoomMessage(bean);
         }
     }
 

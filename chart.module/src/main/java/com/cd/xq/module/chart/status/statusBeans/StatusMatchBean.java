@@ -13,7 +13,7 @@ import static com.cd.xq.module.util.status.BaseStatus.HandleType.HANDLE_MATCH;
  * Created by Administrator on 2018/9/26.
  */
 
-public class StatusMatchBean extends BaseStatus {
+public class StatusMatchBean extends ChatBaseStatus {
     @Override
     public String getTypesWithString() {
         return "Match_Status";
@@ -73,13 +73,44 @@ public class StatusMatchBean extends BaseStatus {
     }
 
     @Override
+    protected boolean checkIsRepeatOrReturn(JMChartRoomSendBean receiveBean) {
+        return false;
+    }
 
-    public void onPostHandler(StatusResp resp, JMChartRoomSendBean receiveBean) {
+    @Override
+    public void onStartTime() {
 
     }
 
     @Override
-    protected boolean checkIsRepeatOrReturn(JMChartRoomSendBean receiveBean) {
-        return false;
+    public void onStopTime() {
+
+    }
+
+    @Override
+    public void onEnd() {
+
+    }
+
+    @Override
+    public void handleSend(StatusResp statusResp, JMChartRoomSendBean sendBean) {
+        chartUIViewMg.stopTiming();
+        chartUIViewMg.resetLiveStatus();
+
+        chartUIViewMg.updateChatRoomMembersList();
+        chartUIViewMg.setTipText(getPublicString());
+        chartUIViewMg.addSystemEventAndRefresh(sendBean);
+        chartUIViewMg.speech(sendBean.getMsg());
+
+        if(statusResp.isLast()) {
+            JMChartRoomSendBean bean = getNextStatus().getChartSendBeanWillSend(sendBean,MessageType.TYPE_SEND);
+            bean.setIndexNext(getNextStatus().getStartIndex());
+            statusManager.sendRoomMessage(bean);
+        }
+    }
+
+    @Override
+    public void handleResponse(StatusResp statusResp, JMChartRoomSendBean sendBean) {
+
     }
 }
