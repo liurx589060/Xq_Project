@@ -65,7 +65,6 @@ public class StatusOnLookerExitBean extends ChatBaseStatus {
         sendBean.setMsg("观众"+ mUserInfo.getUser_name() +"离开房间");
         sendBean.setProcessStatus(getStatus());
         sendBean.setMessageType(messageType);
-        sendBean.setUpdateMembers(true);
         return sendBean;
     }
 

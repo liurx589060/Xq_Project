@@ -1,6 +1,5 @@
 package com.cd.xq.module.util.beans.jmessage;
 
-import com.cd.xq.module.util.Constant;
 import com.cd.xq.module.util.status.BaseStatus;
 
 /**
@@ -51,13 +50,10 @@ public class JMChartRoomSendBean {
     private String msg = "";
     private long roomId;
     private String time = "";
-    private int limitCount;
-    private boolean isUpdateMembers = false;
     private int liveType = LIVE_CAMERA;
     private BaseStatus.MessageType messageType = BaseStatus.MessageType.TYPE_SEND;
     private boolean isLadySelected;
     private int manSelects = -1;
-    private boolean isRestCurrentIndex = false;//是否重置拦截的index
 
     public int getProcessStatus() {
         return processStatus;
@@ -123,22 +119,6 @@ public class JMChartRoomSendBean {
         this.time = time;
     }
 
-    public int getLimitCount() {
-        return limitCount;
-    }
-
-    public void setLimitCount(int limitCount) {
-        this.limitCount = limitCount;
-    }
-
-    public boolean isUpdateMembers() {
-        return isUpdateMembers;
-    }
-
-    public void setUpdateMembers(boolean updateMembers) {
-        isUpdateMembers = updateMembers;
-    }
-
     public int getIndexNext() {
         return indexNext;
     }
@@ -177,13 +157,5 @@ public class JMChartRoomSendBean {
 
     public void setLadySelected(boolean ladySelected) {
         isLadySelected = ladySelected;
-    }
-
-    public boolean isRestCurrentIndex() {
-        return isRestCurrentIndex;
-    }
-
-    public void setRestCurrentIndex(boolean restCurrentIndex) {
-        isRestCurrentIndex = restCurrentIndex;
     }
 }

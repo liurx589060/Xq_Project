@@ -67,7 +67,6 @@ public class StatusMatchBean extends ChatBaseStatus {
         sendBean.setMsg("嘉宾"+ mUserInfo.getUser_name() +"进入房间");
         sendBean.setProcessStatus(getStatus());
         sendBean.setMessageType(messageType);
-        sendBean.setUpdateMembers(true);
 
         return sendBean;
     }

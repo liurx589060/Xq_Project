@@ -38,7 +38,6 @@ public abstract class BaseStatus {
     public enum MessageType {
         TYPE_SEND,
         TYPE_RESPONSE,
-        TYPE_END
     }
 
     public enum HandleType {
@@ -197,11 +196,6 @@ public abstract class BaseStatus {
             return HANDLE_NOT_MATCH;
         }
 
-        //重置屏蔽消息的index
-        if(receiveBean.isRestCurrentIndex()) {
-            mHandledIndexList.clear();
-        }
-
         if(checkIsRepeatOrReturn(receiveBean)) {
             return HANDLE_REPEAT;
         }
@@ -245,7 +239,6 @@ public abstract class BaseStatus {
         UserInfoBean selfInfo = DataManager.getInstance().getUserInfo();
         bean.setGender(selfInfo.getGender());
         bean.setCurrentCount(data.getMembers().size());
-        bean.setLimitCount(data.getLimitAngel() + data.getLimitMan() + data.getLimitLady());
         bean.setIndexSelf(DataManager.getInstance().getSelfMember().getIndex());
         bean.setRoomId(data.getRoomId());
         bean.setTime(Tools.getCurrentDateTime());

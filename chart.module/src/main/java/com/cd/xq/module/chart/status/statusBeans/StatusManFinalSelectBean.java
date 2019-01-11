@@ -65,14 +65,14 @@ public class StatusManFinalSelectBean extends StatusManFirstSelectBean {
                 mIsSelfMatchSuccess = true;
             }
             //更新
-            chartUIViewMg.updateMember();
+            chartUIViewMg.updateChatRoomMembersList();
         }
 
         statusManager.setRoomMatchSuccess(mIsRoomMatchSuccess);
         statusManager.setSelfMatchSuccess(mIsSelfMatchSuccess);
         //显示在系统事件中
         JMChartRoomSendBean bean = getNextStatus().getChartSendBeanWillSend(null, BaseStatus.MessageType.TYPE_SEND);
-        bean.setMsg(text + "，流程已结束，可自行离开");
+        bean.setMsg(text);
         statusManager.handlerRoomChart(bean);
     }
 }

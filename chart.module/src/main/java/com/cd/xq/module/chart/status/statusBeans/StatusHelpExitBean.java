@@ -62,7 +62,6 @@ public class StatusHelpExitBean extends ChatBaseStatus {
         sendBean.setMsg("嘉宾"+ mUserInfo.getUser_name() +"离开房间");
         sendBean.setProcessStatus(getStatus());
         sendBean.setMessageType(messageType);
-        sendBean.setUpdateMembers(true);
         return sendBean;
     }
 

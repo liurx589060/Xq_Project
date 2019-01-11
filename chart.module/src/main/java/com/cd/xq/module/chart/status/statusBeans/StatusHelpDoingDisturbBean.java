@@ -10,6 +10,8 @@ import com.cd.xq.module.util.status.StatusResp;
  */
 
 public class StatusHelpDoingDisturbBean extends ChatBaseStatus {
+    private boolean isSelfDisturbing;
+
     @Override
     public String getTypesWithString() {
         return "Angel_Doing_disturb";
@@ -76,12 +78,14 @@ public class StatusHelpDoingDisturbBean extends ChatBaseStatus {
 
     @Override
     public void onStopTime() {
-
+        if(isSelfDisturbing) {
+            mHandledIndexList.clear();
+        }
     }
 
     @Override
     public boolean isHandleSelf() {
-        return statusManager.isDisturbing();
+        return (statusManager.isDisturbing() && isSelfDisturbing);
     }
 
     @Override
@@ -95,10 +99,7 @@ public class StatusHelpDoingDisturbBean extends ChatBaseStatus {
             bean.setIndexNext(getNextStatus().getNextIndex(statusManager.getCurrentSendBean()));
             statusManager.sendRoomMessage(bean);
         }
-
-        statusManager.setDisturbAngelIndex(-1);
-        statusManager.setQuestDisturb(false);
-        statusManager.setDisturbing(false);
+        isSelfDisturbing = false;
     }
 
     @Override
@@ -123,6 +124,7 @@ public class StatusHelpDoingDisturbBean extends ChatBaseStatus {
             statusManager.sendRoomMessage(bean);
         }
         chartUIViewMg.setLiveStatus(sendBean,statusResp.isSelf());
+        isSelfDisturbing = true;
     }
 
     @Override

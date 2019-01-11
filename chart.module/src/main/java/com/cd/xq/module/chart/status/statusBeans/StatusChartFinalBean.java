@@ -87,8 +87,10 @@ public class StatusChartFinalBean extends ChatBaseStatus {
         chartUIViewMg.resetLiveStatus();
 
         chartUIViewMg.addSystemEventAndRefresh(sendBean);
-        chartUIViewMg.setTipText(getPublicString());
-        chartUIViewMg.speech(sendBean.getMsg());
+        String text = sendBean.getMsg() + ",流程已结束";
+        chartUIViewMg.setTipText(text);
+        text += ",可自行离开";
+        chartUIViewMg.speech(text);
         chartUIViewMg.sendDoubleRoom();
         Tools.toast(activity.getApplication(),sendBean.getMsg(),false);
     }

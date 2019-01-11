@@ -96,6 +96,11 @@ public class StatusAngelChartBean extends ChatBaseStatus {
 
     @Override
     public void handleSend(StatusResp statusResp, JMChartRoomSendBean sendBean) {
+        //清空插话状态
+        statusManager.setDisturbAngelIndex(-1);
+        statusManager.setQuestDisturb(false);
+        statusManager.setDisturbing(false);
+
         chartUIViewMg.stopTiming();
         chartUIViewMg.resetLiveStatus();
 

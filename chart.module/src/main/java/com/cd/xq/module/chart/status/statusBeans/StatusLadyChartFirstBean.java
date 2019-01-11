@@ -115,6 +115,14 @@ public class StatusLadyChartFirstBean extends ChatBaseStatus {
 
     @Override
     public void handleSend(StatusResp statusResp, JMChartRoomSendBean sendBean) {
+        //清空插话状态
+        statusManager.setDisturbAngelIndex(-1);
+        statusManager.setQuestDisturb(false);
+        statusManager.setDisturbing(false);
+        if(mHandledIndexList.size() == 1) {
+            chartUIViewMg.resetQuestDisturbCount();
+        }
+
         chartUIViewMg.stopTiming();
         chartUIViewMg.resetLiveStatus();
 

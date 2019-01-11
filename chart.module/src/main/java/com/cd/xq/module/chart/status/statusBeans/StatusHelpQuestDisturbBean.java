@@ -99,8 +99,8 @@ public class StatusHelpQuestDisturbBean extends ChatBaseStatus {
     public void handleSend(StatusResp statusResp, JMChartRoomSendBean sendBean) {
         chartUIViewMg.addSystemEventAndRefresh(sendBean);
         statusManager.setDisturbAngelIndex(sendBean.getIndexSelf());
-        statusManager.setDisturb(true);
         Tools.toast(activity.getApplication(),sendBean.getMsg(),false);
+        statusManager.setQuestDisturb(true);
     }
 
     @Override

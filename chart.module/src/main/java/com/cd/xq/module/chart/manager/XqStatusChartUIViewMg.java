@@ -482,9 +482,9 @@ public class XqStatusChartUIViewMg extends AbsChartView{
         getChartRoomMembersList(DataManager.getInstance().getChartData().getRoomId());
     }
 
-    public void updateMember() {
-        upDataMembers();
-    }
+//    public void updateMember() {
+//        upDataMembers();
+//    }
 
     public void updateOnLookerList() {
 
@@ -1128,6 +1128,10 @@ public class XqStatusChartUIViewMg extends AbsChartView{
         mXqCameraViewMg.setVisible(false);
         mXqPlayerViewMg.stop();
         mXqPlayerViewMg.setVisible(false);
+    }
+
+    public void resetQuestDisturbCount() {
+        mCurrentQuestDisturbCount = 0;
     }
 
     /**
