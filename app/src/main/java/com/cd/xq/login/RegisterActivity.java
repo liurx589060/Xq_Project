@@ -4,6 +4,7 @@ import android.annotation.TargetApi;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -21,6 +22,7 @@ import com.cd.xq.frame.MainActivity;
 import com.cd.xq.module.util.base.BaseActivity;
 import com.cd.xq.module.util.beans.user.UserInfoBean;
 import com.cd.xq.module.util.beans.user.UserResp;
+import com.cd.xq.module.util.glide.GlideCircleBorderTransform;
 import com.cd.xq.module.util.glide.GlideCircleTransform;
 import com.cd.xq.module.util.manager.DataManager;
 import com.cd.xq.module.util.network.NetWorkMg;
@@ -122,7 +124,7 @@ public class RegisterActivity extends BaseActivity {
             mFrom = getIntent().getExtras().getInt("from", FROM_LOGIN);
         }
 
-        if (mFrom == FROM_LEAK_INFO) {
+        if (mFrom == FROM_LEAK_INFO || mFrom == FROM_LOGIN) {
             registerBtnClose.setVisibility(View.INVISIBLE);
         }
         init();
@@ -146,8 +148,9 @@ public class RegisterActivity extends BaseActivity {
 
         Glide.with(this)
                 .load(userInfo.getHead_image())
+                .placeholder(R.drawable.chart_room_default_head)
+                .dontAnimate()
                 .centerCrop()
-                .bitmapTransform(new GlideCircleTransform(this))
                 .into(registerImgHead);
         registerTextGender.setText(userInfo.getGender() + SUFFIX);
         registerTextAge.setText(String.valueOf(userInfo.getAge()) + SUFFIX);

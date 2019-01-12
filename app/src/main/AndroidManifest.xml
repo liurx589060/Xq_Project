@@ -67,6 +67,13 @@
             android:configChanges="orientation|keyboard|keyboardHidden|navigation"
             android:name=".login.RegisterActivity"/>
 
+        <activity
+            android:screenOrientation="portrait"
+            android:configChanges="orientation|keyboard|keyboardHidden|navigation"
+            android:name=".login.ResetPasswordActivity"/>
+
+
+
         <!--图片选择器-->
         <activity
             android:name="cn.finalteam.rxgalleryfinal.ui.activity.MediaActivity"

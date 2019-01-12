@@ -1,78 +1,72 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <Button
-        android:id="@+id/btn_angel"
+    <com.scwang.smartrefresh.layout.SmartRefreshLayout
+        android:id="@+id/home_refresh_layout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="创建" />
+        android:layout_height="match_parent"
+        >
 
-    <Button
-        android:id="@+id/btn_guest"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="加入" />
+        <android.support.design.widget.CoordinatorLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#ffffff"
+            >
 
-    <EditText
-        android:id="@+id/edit_limitLady"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="参与的女嘉宾总数"/>
+            <android.support.design.widget.AppBarLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="#ffffff"
+                >
 
-    <RadioGroup
-        android:id="@+id/radioGroup_1"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:orientation="horizontal"
-        android:layout_marginTop="20dp"
-        android:visibility="gone">
+                <com.stx.xhb.xbanner.XBanner
+                    android:id="@+id/home_xbanner"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/dp_150"
+                    app:pointsContainerBackground="#44aaaaaa"
+                    app:pointsPosition="CENTER"
+                    app:isShowNumberIndicator="true"
+                    app:isShowIndicatorOnlyOne="true"
+                    app:pageChangeDuration="800"
+                    app:layout_scrollFlags="scroll">
+                </com.stx.xhb.xbanner.XBanner>
 
-        <RadioButton
-            android:id="@+id/radio_local"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="本地"
-            android:checked="true"/>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
 
-        <RadioButton
-            android:id="@+id/radio_tx"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="腾讯云" />
-    </RadioGroup>
+                    <Button
+                        android:id="@+id/btn_angel"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="创建(爱心大使)" />
 
-    <RadioGroup
-        android:id="@+id/radioGroup_Public"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:orientation="horizontal"
-        android:layout_marginTop="20dp"
-        android:visibility="gone">
+                    <Button
+                        android:id="@+id/btn_guest"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="加入" />
 
-        <RadioButton
-            android:id="@+id/radio_public"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="公开"
-            android:checked="true"/>
+                </LinearLayout>
 
-        <RadioButton
-            android:id="@+id/radio_unPublic"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="非公开" />
-    </RadioGroup>
+            </android.support.design.widget.AppBarLayout>
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/home_onLooker_RecyclerView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/home_onLooker_RecyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-    </android.support.v7.widget.RecyclerView>
+            </android.support.v7.widget.RecyclerView>
+
+        </android.support.design.widget.CoordinatorLayout>
+
+    </com.scwang.smartrefresh.layout.SmartRefreshLayout>
 </LinearLayout>

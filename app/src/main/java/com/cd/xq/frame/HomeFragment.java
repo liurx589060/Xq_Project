@@ -6,6 +6,8 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.content.ContextCompat;
+import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Base64;
@@ -13,16 +15,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.EditText;
-import android.widget.RadioGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.cd.xq.AppConstant;
 import com.cd.xq.R;
 import com.cd.xq.beans.BGetArrays;
-import com.cd.xq.beans.NetResult;
 import com.cd.xq.module.chart.ChartRoomActivity;
-import com.cd.xq.module.chart.DoubleRoomActivity;
 import com.cd.xq.module.chart.status.statusBeans.StatusMatchBean;
 import com.cd.xq.module.chart.status.statusBeans.StatusOnLookerEnterBean;
 import com.cd.xq.module.util.Constant;
@@ -31,6 +31,7 @@ import com.cd.xq.module.util.beans.jmessage.Data;
 import com.cd.xq.module.util.beans.jmessage.JMChartResp;
 import com.cd.xq.module.util.beans.jmessage.JMChartRoomSendBean;
 import com.cd.xq.module.util.beans.user.UserInfoBean;
+import com.cd.xq.module.util.common.MultiItemDivider;
 import com.cd.xq.module.util.jmessage.JMsgSender;
 import com.cd.xq.module.util.manager.DataManager;
 import com.cd.xq.module.util.network.NetWorkMg;
@@ -43,6 +44,11 @@ import com.cd.xq.network.XqRequestApi;
 import com.hjq.permissions.OnPermission;
 import com.hjq.permissions.Permission;
 import com.hjq.permissions.XXPermissions;
+import com.scwang.smartrefresh.header.BezierCircleHeader;
+import com.scwang.smartrefresh.layout.SmartRefreshLayout;
+import com.scwang.smartrefresh.layout.constant.SpinnerStyle;
+import com.scwang.smartrefresh.layout.footer.BallPulseFooter;
+import com.stx.xhb.xbanner.XBanner;
 
 import org.json.JSONObject;
 
@@ -72,15 +78,13 @@ public class HomeFragment extends BaseFragment {
     Button mBtnAngel;
     @BindView(R.id.btn_guest)
     Button mBtnGuest;
-    @BindView(R.id.edit_limitLady)
-    EditText mEditLimitLady;
-    @BindView(R.id.radioGroup_1)
-    RadioGroup mRadioGroup;
     Unbinder unbinder;
     @BindView(R.id.home_onLooker_RecyclerView)
     RecyclerView homeOnLookerRecyclerView;
-    @BindView(R.id.radioGroup_Public)
-    RadioGroup radioGroupPublic;
+    @BindView(R.id.home_xbanner)
+    XBanner homeXbanner;
+    @BindView(R.id.home_refresh_layout)
+    SmartRefreshLayout homeRefreshLayout;
 
     private RequestApi mApi;
     private XqRequestApi mXqApi;
@@ -105,7 +109,7 @@ public class HomeFragment extends BaseFragment {
         IntentFilter filter = new IntentFilter();
         filter.addAction(AppConstant.BROADCAST_JPUSH_MESSAGE_ACTION);
         mReceiver = new JPushMessageReceiver();
-        getActivity().registerReceiver(mReceiver,filter);
+        getActivity().registerReceiver(mReceiver, filter);
         return mRootView;
     }
 
@@ -116,17 +120,14 @@ public class HomeFragment extends BaseFragment {
         mOnLookerAdapter = new OnLookerRecyclerViewAdapter();
         homeOnLookerRecyclerView.setAdapter(mOnLookerAdapter);
         homeOnLookerRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        MultiItemDivider divider = new MultiItemDivider(getActivity(),DividerItemDecoration.VERTICAL,
+                ContextCompat.getDrawable(getActivity(),R.drawable.shape_home_recycler_divider));
+        divider.setDividerMode(MultiItemDivider.INSIDE);
+        homeOnLookerRecyclerView.addItemDecoration(divider);
 
         mBtnAngel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                Intent intent = new Intent(getActivity(), DoubleRoomActivity.class);
-//                Bundle bundle = new Bundle();
-//                bundle.putString("push","rtmp://192.168.1.101/live/stream_1");
-//                bundle.putString("play","rtmp://192.168.1.101/live/stream_2");
-//                intent.putExtras(bundle);
-//                getActivity().startActivity(intent);
-
                 requestPermission(new OnPermission() {
                     @Override
                     public void hasPermission(List<String> granted, boolean isAll) {
@@ -147,12 +148,7 @@ public class HomeFragment extends BaseFragment {
                         bean.setRole_type(DataManager.getInstance().getUserInfo().getRole_type());
                         bean.setGender(DataManager.getInstance().getUserInfo().getGender());
                         bean.setLevel(DataManager.getInstance().getUserInfo().getLevel());
-                        try {
-                            bean.setLimitLady(Integer.valueOf(mEditLimitLady.getText().toString()));
-                        } catch (Exception e) {
-                            Log.e(e.toString());
-                            bean.setLimitLady(10);
-                        }
+                        bean.setLimitLady(AppConstant.CHATROOM_LIMIT_LADY_COUNT);
                         bean.setLimitLevel(-1);
                         createChartRoom(bean);
                     }
@@ -168,13 +164,6 @@ public class HomeFragment extends BaseFragment {
         mBtnGuest.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                Intent intent = new Intent(getActivity(), DoubleRoomActivity.class);
-//                Bundle bundle = new Bundle();
-//                bundle.putString("push","rtmp://192.168.1.101/live/stream_2");
-//                bundle.putString("play","rtmp://192.168.1.101/live/stream_1");
-//                intent.putExtras(bundle);
-//                getActivity().startActivity(intent);
-
                 requestPermission(new OnPermission() {
                     @Override
                     public void hasPermission(List<String> granted, boolean isAll) {
@@ -195,7 +184,7 @@ public class HomeFragment extends BaseFragment {
                             return;
                         }
 
-                        joinChartRoom(Constant.ROOM_ROLETYPE_PARTICIPANTS,-1);
+                        joinChartRoom(Constant.ROOM_ROLETYPE_PARTICIPANTS, -1);
                     }
 
                     @Override
@@ -206,38 +195,9 @@ public class HomeFragment extends BaseFragment {
             }
         });
 
-        mRadioGroup.check(R.id.radio_local);
-        mRadioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(RadioGroup group, int checkedId) {
-                if (checkedId == R.id.radio_local) {
-                    mPushAddressType = 0;
-                } else if (checkedId == R.id.radio_tx) {
-                    mPushAddressType = 1;
-                }
-            }
-        });
-
-        radioGroupPublic.check(R.id.radio_public);
-        radioGroupPublic.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(RadioGroup group, int checkedId) {
-                if (checkedId == R.id.radio_public) {
-                    mPublic = 1;
-                } else if (checkedId == R.id.radio_unPublic) {
-                    mPublic = 0;
-                }
-            }
-        });
-
-        if (DataManager.getInstance().getUserInfo() != null) {
-            if (DataManager.getInstance().getUserInfo().getRole_type().equals(Constant.ROLRTYPE_ANGEL)) {
-                mRadioGroup.setVisibility(View.VISIBLE);
-                radioGroupPublic.setVisibility(View.VISIBLE);
-            }
-        }
-
         setOnLookerRecyclerView();
+        initXBanner();
+        initSmartRefreshLayout();
     }
 
     private void createChartRoom(UserInfoBean userInfo) {
@@ -262,8 +222,8 @@ public class HomeFragment extends BaseFragment {
         params.put("limitAngel", userInfo.getLimitAngel());
         params.put("pushAddress", Base64.encodeToString(mTXPushAddress.getBytes(), Base64.DEFAULT));
         params.put("playAddress", Base64.encodeToString(mTXPlayerAddress.getBytes(), Base64.DEFAULT));
-        params.put("public",mPublic);
-        params.put("describe","一起来相亲吧");
+        params.put("public", mPublic);
+        params.put("describe", "一起来相亲吧");
 
         if (userInfo.getLimitLady() % 2 != 0) {
             Tools.toast(getActivity(), "请输入偶数", true);
@@ -299,7 +259,7 @@ public class HomeFragment extends BaseFragment {
                 });
     }
 
-    private void joinChartRoom(int roomRoleType,long roomId) {
+    private void joinChartRoom(int roomRoleType, long roomId) {
         UserInfoBean userInfo = DataManager.getInstance().getUserInfo();
 
         Map<String, Object> params = new HashMap<>();
@@ -308,8 +268,8 @@ public class HomeFragment extends BaseFragment {
         params.put("level", userInfo.getLevel());
         params.put("roleType", userInfo.getRole_type());
         params.put("roomRoleType", roomRoleType);
-        if((Integer)params.get("roomRoleType") == Constant.ROOM_ROLETYPE_ONLOOKER) {
-            params.put("roomId",roomId);
+        if ((Integer) params.get("roomRoleType") == Constant.ROOM_ROLETYPE_ONLOOKER) {
+            params.put("roomId", roomId);
         }
         mApi.joinChartRoom(params)
                 .subscribeOn(Schedulers.io())
@@ -340,6 +300,49 @@ public class HomeFragment extends BaseFragment {
                         Tools.toast(getActivity(), throwable.toString(), true);
                     }
                 });
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        homeXbanner.startAutoPlay();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        homeXbanner.stopAutoPlay();
+    }
+
+    private void initSmartRefreshLayout() {
+        homeRefreshLayout.setRefreshHeader(new BezierCircleHeader(getActivity()));
+        //设置 Footer 为 球脉冲 样式
+        homeRefreshLayout.setRefreshFooter(new BallPulseFooter(getActivity()).setSpinnerStyle(SpinnerStyle.Scale));
+    }
+
+    private void initXBanner() {
+        ArrayList<String> images;
+        ArrayList<String> titles;
+        images = new ArrayList<>();
+        titles = new ArrayList<>();
+        images.add("https://gss1.bdstatic.com/9vo3dSag_xI4khGkpoWK1HF6hhy/baike/w%3D268%3Bg%3D0/sign=e9449e382d9759ee4a5067cd8ac0242b/94cad1c8a786c9179e80a80cc23d70cf3bc75700.jpg");
+        titles.add("这是第1张图片");
+        images.add("http://img.ivsky.com/img/bizhi/co/201711/27/nissan_vmotion2_0-001.jpg");
+        titles.add("这是第2张图片");
+        images.add("http://img.ivsky.com/img/tupian/co/201709/18/zise_huaduo.jpg");
+        titles.add("这是第3张图片");
+        images.add("http://img.ivsky.com/img/tupian/co/201709/16/dahailidehaiguitupian.jpg");
+        titles.add("这是第4张图片");
+
+        homeXbanner.setData(images, titles);
+        homeXbanner.loadImage(new XBanner.XBannerAdapter() {
+            @Override
+            public void loadBanner(XBanner banner, Object model, View view, int position) {
+                Glide.with(getActivity())
+                        .load(model)
+                        .into((ImageView) view);
+            }
+        });
     }
 
     private void sendChartRoomMessage(boolean isUpdateMembers) {
@@ -431,13 +434,6 @@ public class HomeFragment extends BaseFragment {
     @Override
     public void onLogin() {
         super.onLogin();
-        if (DataManager.getInstance().getUserInfo().getRole_type().equals(Constant.ROLRTYPE_ANGEL)) {
-            mRadioGroup.setVisibility(View.VISIBLE);
-            radioGroupPublic.setVisibility(View.VISIBLE);
-        } else {
-            mRadioGroup.setVisibility(View.GONE);
-            radioGroupPublic.setVisibility(View.GONE);
-        }
         setOnLookerRecyclerView();
     }
 
@@ -453,8 +449,22 @@ public class HomeFragment extends BaseFragment {
     }
 
     private void setOnLookerRecyclerView() {
+        m_roomList.clear();
+        for(int i = 0 ; i < 100 ; i++) {
+            BGetArrays bean = new BGetArrays();
+            bean.setCreater("wys30201");
+            if(i % 5 == 0) {
+                bean.setDescribe("我的得分热热热斯蒂芬大师傅大师傅大师傅大师傅大师傅大师傅但是但是但是犯得上犯得上犯得上犯得上犯得上");
+            }else {
+                bean.setDescribe("欢迎回来");
+            }
+            bean.setRoomId(i);
+            m_roomList.add(bean);
+        }
+        mOnLookerAdapter.notifyDataSetChanged();
+
         //只获取公开的
-        mXqApi.getArrays(1)
+        /*mXqApi.getArrays(1)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Consumer<NetResult<List<BGetArrays>>>() {
@@ -468,7 +478,7 @@ public class HomeFragment extends BaseFragment {
                         }
 
                         m_roomList.clear();
-                        if(bGetArraysNetResult.getData() != null) {
+                        if (bGetArraysNetResult.getData() != null) {
                             m_roomList.addAll(bGetArraysNetResult.getData());
                         }
                         mOnLookerAdapter.notifyDataSetChanged();
@@ -477,9 +487,9 @@ public class HomeFragment extends BaseFragment {
                     @Override
                     public void accept(Throwable throwable) throws Exception {
                         Log.e("setOnLookerRecyclerView--" + throwable.toString());
-                        Tools.toast(getActivity(),throwable.toString(),false);
+                        Tools.toast(getActivity(), throwable.toString(), false);
                     }
-                });
+                });*/
     }
 
     private class OnLookerViewHolder extends RecyclerView.ViewHolder {
@@ -533,7 +543,7 @@ public class HomeFragment extends BaseFragment {
                                 return;
                             }
 
-                            joinChartRoom(Constant.ROOM_ROLETYPE_ONLOOKER,info.getRoomId());
+                            joinChartRoom(Constant.ROOM_ROLETYPE_ONLOOKER, info.getRoomId());
                         }
 
                         @Override
@@ -556,16 +566,16 @@ public class HomeFragment extends BaseFragment {
         @Override
         public void onReceive(Context context, Intent intent) {
             Bundle bundle = intent.getExtras();
-            if(bundle != null) {
+            if (bundle != null) {
                 String message = bundle.getString("message");
                 try {
                     JSONObject object = new JSONObject(message);
-                    if(object.getInt("type") == AppConstant.JPUSH_TYPE_CHAT_CREATE
+                    if (object.getInt("type") == AppConstant.JPUSH_TYPE_CHAT_CREATE
                             || object.getInt("type") == AppConstant.JPUSH_TYPE_CHAT_DELETE) {
                         //更新聊天室列表
                         setOnLookerRecyclerView();
                     }
-                }catch (Exception e) {
+                } catch (Exception e) {
                     Log.e("JPushMessageReceiver--" + e.toString());
                 }
             }

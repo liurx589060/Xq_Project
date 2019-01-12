@@ -18,7 +18,8 @@ public class XqErrorCode {
 
     public static int ERROR_USER_REGIST = 7100;//注册失败
     public static int ERROR_USER_REGIST_EXIST = 7101;//已经存在账户
-    public static int ERROR_USER_REGIST_UNEXIST = 7102;//更新时不存在账户
+    public static int ERROR_USER_NOT_EXIST = 7102;//账号不存在
     public static int ERROR_USER_UPLOAD = 7103;//上传文件出错
     public static int ERROR_USER_PASSWORD_WRONG = 7104;//密码错误
+    public static int ERROR_USER_PASSWORD_CHANGE = 7105;//修改密码出错
 }

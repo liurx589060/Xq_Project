@@ -6,4 +6,5 @@
 
     <color name="tab_background">#ffa07a</color>
     <color name="register_edit_ps_border">#666666</color>
+    <color name="shape_home_recycler_divider">#eeeeee</color>
 </resources>

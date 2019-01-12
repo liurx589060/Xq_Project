@@ -39,7 +39,7 @@ import com.cd.xq.module.util.beans.jmessage.JMChartResp;
 import com.cd.xq.module.util.beans.jmessage.JMChartRoomSendBean;
 import com.cd.xq.module.util.beans.jmessage.Member;
 import com.cd.xq.module.util.beans.user.UserInfoBean;
-import com.cd.xq.module.util.glide.GlideCircleTransform;
+import com.cd.xq.module.util.glide.GlideCircleBorderTransform;
 import com.cd.xq.module.util.jmessage.JMsgSender;
 import com.cd.xq.module.util.manager.DataManager;
 import com.cd.xq.module.util.network.NetWorkMg;
@@ -363,11 +363,7 @@ public class XqStatusChartUIViewMg extends AbsChartView{
                 mAngelViewInstance.imageGender.setImageResource(R.drawable.chart_room_gender_man);
             }
             mAngelViewInstance.imageGender.setVisibility(View.VISIBLE);
-            Glide.with(mXqActivity)
-                    .load(angelBeanResult.getHead_image())
-                    .placeholder(R.drawable.chart_room_default_head)
-                    .bitmapTransform(new GlideCircleTransform(mXqActivity))
-                    .into(mAngelViewInstance.imageHead);
+            loadImage(angelBeanResult.getHead_image(),mAngelViewInstance.imageHead);
             mAngelViewInstance.imageHead.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -395,11 +391,7 @@ public class XqStatusChartUIViewMg extends AbsChartView{
                 mManViewInstance.imageGender.setImageResource(R.drawable.chart_room_gender_man);
             }
             mManViewInstance.imageGender.setVisibility(View.VISIBLE);
-            Glide.with(mXqActivity)
-                    .load(manBeanResult.getHead_image())
-                    .placeholder(R.drawable.chart_room_default_head)
-                    .bitmapTransform(new GlideCircleTransform(mXqActivity))
-                    .into(mManViewInstance.imageHead);
+            loadImage(manBeanResult.getHead_image(),mManViewInstance.imageHead);
             mManViewInstance.imageHead.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -688,10 +680,7 @@ public class XqStatusChartUIViewMg extends AbsChartView{
             viewInstance.index = index;
             if(bean == null) {
                 viewInstance.textIndex.setText(String.valueOf(index+1));
-                Glide.with(mXqActivity)
-                        .load(R.drawable.chart_room_default_head)
-                        .bitmapTransform(new GlideCircleTransform(mXqActivity))
-                        .into(viewInstance.imageHead);
+                loadImage(R.drawable.chart_room_default_head,viewInstance.imageHead);
                 return;
             }
 
@@ -705,11 +694,7 @@ public class XqStatusChartUIViewMg extends AbsChartView{
                 viewInstance.imageGender.setImageResource(R.drawable.chart_room_gender_man);
             }
             viewInstance.imageGender.setVisibility(View.VISIBLE);
-            Glide.with(mXqActivity)
-                    .load(bean.getHead_image())
-                    .placeholder(R.drawable.chart_room_default_head)
-                    .bitmapTransform(new GlideCircleTransform(mXqActivity))
-                    .into(viewInstance.imageHead);
+            loadImage(bean.getHead_image(),viewInstance.imageHead);
             viewInstance.imageHead.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -823,6 +808,22 @@ public class XqStatusChartUIViewMg extends AbsChartView{
             mCurrentIndex = index;
             changeStatus(STATUS_CHART);
         }
+    }
+
+    private void loadImage(String imageUrl,ImageView imageView) {
+        Glide.with(mXqActivity)
+                .load(imageUrl)
+                .placeholder(R.drawable.chart_room_default_head)
+                .dontAnimate()
+                .into(imageView);
+    }
+
+    private void loadImage(int imageId,ImageView imageView) {
+        Glide.with(mXqActivity)
+                .load(imageId)
+                .placeholder(R.drawable.chart_room_default_head)
+                .dontAnimate()
+                .into(imageView);
     }
 
     private class SystemRecyclerdapter extends RecyclerView.Adapter<SystemRecyclerdapter.SystemViewHolder> {
@@ -1359,15 +1360,8 @@ public class XqStatusChartUIViewMg extends AbsChartView{
             viewHolderRight.imageGender = itemView.findViewById(R.id.chart_room_img_label_gender_right);
             viewHolderRight.imageIndex = itemView.findViewById(R.id.chart_room_image_index_right);
 
-            Glide.with(mXqActivity)
-                    .load(R.drawable.chart_room_default_head)
-                    .bitmapTransform(new GlideCircleTransform(mXqActivity))
-                    .into(viewHolderRight.imageHead);
-
-            Glide.with(mXqActivity)
-                    .load(R.drawable.chart_room_default_head)
-                    .bitmapTransform(new GlideCircleTransform(mXqActivity))
-                    .into(viewHolderLeft.imageHead);
+            loadImage(R.drawable.chart_room_default_head,viewHolderRight.imageHead);
+            loadImage(R.drawable.chart_room_default_head,viewHolderLeft.imageHead);
 
             viewHolderLeft.setNormalStatus();
             viewHolderRight.setNormalStatus();

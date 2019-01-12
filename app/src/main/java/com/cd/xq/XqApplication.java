@@ -7,6 +7,7 @@ import android.util.ArraySet;
 
 import com.cd.xq.module.util.tools.Log;
 import com.hc.lib.msc.MscManager;
+import com.mob.MobSDK;
 import com.tencent.bugly.crashreport.CrashReport;
 import com.tencent.rtmp.TXLiveBase;
 
@@ -28,6 +29,7 @@ public class XqApplication extends Application {
         //极光IM
         JMessageClient.setDebugMode(true);
         JMessageClient.init(this);
+        MobSDK.init(this);
 
         //极光推送
         JPushInterface.setDebugMode(true);

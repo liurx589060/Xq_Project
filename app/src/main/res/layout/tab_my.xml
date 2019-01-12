@@ -9,7 +9,7 @@
         android:layout_width="match_parent"
         android:layout_height="@dimen/dp_160">
 
-        <ImageView
+        <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/my_img_head"
             android:layout_width="@dimen/dp_100"
             android:layout_height="@dimen/dp_100"
@@ -17,7 +17,9 @@
             android:layout_alignParentTop="true"
             android:layout_marginLeft="@dimen/dp_14"
             android:layout_marginTop="@dimen/dp_45"
-            app:srcCompat="@mipmap/ic_launcher_round" />
+            app:srcCompat="@mipmap/ic_launcher_round"
+            app:civ_border_width="@dimen/dp_0"
+            app:civ_border_color="#000000"/>
 
         <TextView
             android:id="@+id/my_text_edit"

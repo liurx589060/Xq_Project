@@ -3,6 +3,7 @@ package com.cd.xq.frame;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
@@ -23,9 +24,11 @@ import com.cd.xq.login.RegisterActivity;
 import com.cd.xq.module.util.Constant;
 import com.cd.xq.module.util.base.BaseFragment;
 import com.cd.xq.module.util.beans.user.UserInfoBean;
+import com.cd.xq.module.util.glide.GlideCircleBorderTransform;
 import com.cd.xq.module.util.glide.GlideCircleTransform;
 import com.cd.xq.module.util.manager.DataManager;
 import com.cd.xq.module.util.network.NetWorkMg;
+import com.cd.xq.module.util.tools.Tools;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -105,8 +108,9 @@ public class MyFragment extends BaseFragment {
 
         Glide.with(this)
                 .load(userInfo.getHead_image())
+                .placeholder(R.drawable.chart_room_default_head)
+                .dontAnimate()
                 .centerCrop()
-                .bitmapTransform(new GlideCircleTransform(getActivity()))
                 .into(myImgHead);
         myImgGender.setImageResource(userInfo.getGender().equals(Constant.GENDER_LADY) ? R.drawable.my_gender_lady : R.drawable.my_gender_man);
         myTextAge.setText(String.valueOf(userInfo.getAge()));

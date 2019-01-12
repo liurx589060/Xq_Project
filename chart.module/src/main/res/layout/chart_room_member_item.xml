@@ -16,14 +16,16 @@
             android:layout_alignParentLeft="true"
             android:layout_alignParentTop="true">
 
-            <ImageView
+            <de.hdodenhof.circleimageview.CircleImageView
                 android:id="@+id/chart_room_img_head_left"
                 android:layout_width="@dimen/dp_50"
                 android:layout_height="@dimen/dp_50"
                 app:srcCompat="@drawable/chart_room_default_head"
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentTop="true"
-                android:scaleType="centerCrop"/>
+                android:scaleType="centerCrop"
+                app:civ_border_width="@dimen/dp_3"
+                app:civ_border_color="#887aff"/>
 
             <ImageView
                 android:id="@+id/chart_room_img_label_light_left"
@@ -100,14 +102,16 @@
             android:layout_alignParentRight="true"
             android:layout_alignParentTop="true">
 
-            <ImageView
+            <de.hdodenhof.circleimageview.CircleImageView
                 android:id="@+id/chart_room_img_head_right"
                 android:layout_width="@dimen/dp_50"
                 android:layout_height="@dimen/dp_50"
                 app:srcCompat="@drawable/chart_room_default_head"
                 android:layout_alignParentRight="true"
                 android:layout_alignParentTop="true"
-                android:scaleType="centerCrop"/>
+                android:scaleType="centerCrop"
+                app:civ_border_width="@dimen/dp_3"
+                app:civ_border_color="#887aff"/>
 
             <ImageView
                 android:id="@+id/chart_room_img_label_light_right"

@@ -56,10 +56,13 @@ dependencies {
     compile 'com.tencent.bugly:crashreport:latest.release'
     api 'com.android.support:exifinterface:26.1.0'
     api 'com.android.support:recyclerview-v7:26.1.0'
-
-    compile "com.android.support:design:26.1.0"
+    compile 'com.android.support:design:26.1.0'
     //权限
     api 'com.hjq:xxpermissions:5.2'
+    api 'com.android.support:design:26.0.0'
+
+    //CircleImageView
+    api 'de.hdodenhof:circleimageview:3.0.0'
 }
 
 //configurations.all {

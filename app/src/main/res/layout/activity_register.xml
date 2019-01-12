@@ -38,7 +38,7 @@
             android:layout_marginTop="@dimen/dp_14"
             android:background="@drawable/login_close"/>
 
-        <ImageView
+        <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/register_img_head"
             android:layout_width="@dimen/dp_80"
             android:layout_height="@dimen/dp_80"
@@ -46,7 +46,9 @@
             android:layout_marginLeft="@dimen/dp_20"
             android:layout_alignParentTop="true"
             android:layout_marginTop="@dimen/dp_60"
-            android:src="@drawable/chart_room_default_head" />
+            android:src="@drawable/chart_room_default_head"
+            app:civ_border_width="@dimen/dp_0"
+            app:civ_border_color="#000000"/>
 
         <EditText
             android:id="@+id/register_edit_ps"

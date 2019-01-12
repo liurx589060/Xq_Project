@@ -116,7 +116,7 @@ public class MainActivity extends BaseActivity {
                             }
                         }else if(userResp.getStatus() == XqErrorCode.ERROR_USER_PASSWORD_WRONG) {
                             Tools.toast(getApplicationContext(),"密码错误",true);
-                        }else if(userResp.getStatus() == XqErrorCode.ERROR_USER_REGIST_UNEXIST) {
+                        }else if(userResp.getStatus() == XqErrorCode.ERROR_USER_NOT_EXIST) {
                             Tools.toast(getApplicationContext(),"用户不存在",true);
                         }
                     }

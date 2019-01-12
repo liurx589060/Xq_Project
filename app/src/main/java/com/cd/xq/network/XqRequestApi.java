@@ -16,4 +16,7 @@ import retrofit2.http.Query;
 public interface XqRequestApi {
     @GET("JMessage/getArrays")
     Observable<NetResult<List<BGetArrays>>> getArrays(@Query("public") int isPublic);
+
+    @GET("JMessage/changePassword")
+    Observable<NetResult<String>> changePassword(@Query("userName") String userName,@Query("password") String password);
 }
