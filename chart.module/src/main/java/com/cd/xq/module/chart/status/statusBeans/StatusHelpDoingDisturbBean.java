@@ -2,7 +2,6 @@ package com.cd.xq.module.chart.status.statusBeans;
 
 import com.cd.xq.module.util.Constant;
 import com.cd.xq.module.util.beans.jmessage.JMChartRoomSendBean;
-import com.cd.xq.module.util.status.BaseStatus;
 import com.cd.xq.module.util.status.StatusResp;
 
 /**
@@ -78,9 +77,6 @@ public class StatusHelpDoingDisturbBean extends ChatBaseStatus {
 
     @Override
     public void onStopTime() {
-        if(isSelfDisturbing) {
-            mHandledIndexList.clear();
-        }
     }
 
     @Override
@@ -90,6 +86,12 @@ public class StatusHelpDoingDisturbBean extends ChatBaseStatus {
 
     @Override
     public void onEnd() {
+        resetHandleCount();
+        isSelfDisturbing = false;
+        statusManager.setDisturbAngelIndex(-1);
+        statusManager.setQuestDisturb(false);
+        statusManager.setDisturbing(false);
+
         if(statusManager.getCurrentStatusResp().isLast()) {
             JMChartRoomSendBean bean = getNextStatus().getNextStatus().getChartSendBeanWillSend(statusManager.getCurrentSendBean(),MessageType.TYPE_SEND);
             bean.setIndexNext(getNextStatus().getNextStatus().getStartIndex());
@@ -99,7 +101,6 @@ public class StatusHelpDoingDisturbBean extends ChatBaseStatus {
             bean.setIndexNext(getNextStatus().getNextIndex(statusManager.getCurrentSendBean()));
             statusManager.sendRoomMessage(bean);
         }
-        isSelfDisturbing = false;
     }
 
     @Override
@@ -130,5 +131,11 @@ public class StatusHelpDoingDisturbBean extends ChatBaseStatus {
     @Override
     public void handleResponse(StatusResp statusResp, JMChartRoomSendBean sendBean) {
         chartUIViewMg.addSystemEventAndRefresh(sendBean);
+    }
+
+    public void resetHandleCount() {
+        if(isSelfDisturbing) {
+            mHandledIndexList.clear();
+        }
     }
 }

@@ -122,6 +122,8 @@ public class StatusLadyChartFirstBean extends ChatBaseStatus {
         if(mHandledIndexList.size() == 1) {
             chartUIViewMg.resetQuestDisturbCount();
         }
+        ((StatusHelpDoingDisturbBean)statusManager.getStatus(JMChartRoomSendBean.CHART_HELP_STATUS_ANGEL_DISTURBING))
+                .resetHandleCount();
 
         chartUIViewMg.stopTiming();
         chartUIViewMg.resetLiveStatus();

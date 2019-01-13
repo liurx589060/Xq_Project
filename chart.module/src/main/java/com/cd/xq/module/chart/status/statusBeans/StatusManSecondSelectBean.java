@@ -32,7 +32,7 @@ public class StatusManSecondSelectBean extends StatusManFirstSelectBean {
     public void handleResponse(StatusResp statusResp, JMChartRoomSendBean sendBean) {
         chartUIViewMg.addSystemEventAndRefresh(sendBean);
         if(sendBean.getManSelects() == -1) {
-            mSelectLadyIndex = ((StatusManFirstSelectBean)statusManager.getStatus(JMChartRoomSendBean.CHART_STATUS_LADY_SELECT_FIRST))
+            mSelectLadyIndex = ((StatusManFirstSelectBean)statusManager.getStatus(JMChartRoomSendBean.CHART_STATUS_MAN_SELECT_FIRST))
                     .getSelectLadyIndex() + 1;
         }else {
             mSelectLadyIndex = sendBean.getManSelects();

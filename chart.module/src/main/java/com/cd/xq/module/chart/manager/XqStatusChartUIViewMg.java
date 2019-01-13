@@ -923,6 +923,9 @@ public class XqStatusChartUIViewMg extends AbsChartView{
     private void onOperateEnd() {
         stopTiming();
         mStatusManager.onEnd();
+        if(mLadySelectDialog != null && mLadySelectDialog.isShowing()) {
+            mLadySelectDialog.dismiss();
+        }
     }
 
 

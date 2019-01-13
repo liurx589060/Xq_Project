@@ -100,6 +100,9 @@ public class StatusAngelChartBean extends ChatBaseStatus {
         statusManager.setDisturbAngelIndex(-1);
         statusManager.setQuestDisturb(false);
         statusManager.setDisturbing(false);
+        chartUIViewMg.resetQuestDisturbCount();
+        ((StatusHelpDoingDisturbBean)statusManager.getStatus(JMChartRoomSendBean.CHART_HELP_STATUS_ANGEL_DISTURBING))
+                .resetHandleCount();
 
         chartUIViewMg.stopTiming();
         chartUIViewMg.resetLiveStatus();

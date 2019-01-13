@@ -54,6 +54,6 @@ public abstract class ChatBaseStatus extends BaseStatus {
     }
 
     public boolean isHandleSelf() {
-        return (this == statusManager.getCurrentStatus());
+        return (this == statusManager.getCurrentStatus() && !statusManager.isDisturbing());
     }
 }

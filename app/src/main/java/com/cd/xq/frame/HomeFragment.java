@@ -22,6 +22,7 @@ import com.bumptech.glide.Glide;
 import com.cd.xq.AppConstant;
 import com.cd.xq.R;
 import com.cd.xq.beans.BGetArrays;
+import com.cd.xq.beans.NetResult;
 import com.cd.xq.module.chart.ChartRoomActivity;
 import com.cd.xq.module.chart.status.statusBeans.StatusMatchBean;
 import com.cd.xq.module.chart.status.statusBeans.StatusOnLookerEnterBean;
@@ -449,7 +450,7 @@ public class HomeFragment extends BaseFragment {
     }
 
     private void setOnLookerRecyclerView() {
-        m_roomList.clear();
+        /*m_roomList.clear();
         for(int i = 0 ; i < 100 ; i++) {
             BGetArrays bean = new BGetArrays();
             bean.setCreater("wys30201");
@@ -461,10 +462,10 @@ public class HomeFragment extends BaseFragment {
             bean.setRoomId(i);
             m_roomList.add(bean);
         }
-        mOnLookerAdapter.notifyDataSetChanged();
+        mOnLookerAdapter.notifyDataSetChanged();*/
 
         //只获取公开的
-        /*mXqApi.getArrays(1)
+        mXqApi.getArrays(1)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Consumer<NetResult<List<BGetArrays>>>() {
@@ -489,7 +490,7 @@ public class HomeFragment extends BaseFragment {
                         Log.e("setOnLookerRecyclerView--" + throwable.toString());
                         Tools.toast(getActivity(), throwable.toString(), false);
                     }
-                });*/
+                });
     }
 
     private class OnLookerViewHolder extends RecyclerView.ViewHolder {
