@@ -1,5 +1,6 @@
 package com.cd.xq.frame;
 
+import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -22,7 +23,9 @@ import com.bumptech.glide.Glide;
 import com.cd.xq.AppConstant;
 import com.cd.xq.R;
 import com.cd.xq.beans.BGetArrays;
-import com.cd.xq.beans.NetResult;
+import com.cd.xq.login.BlackCheckListener;
+import com.cd.xq.login.LoginActivity;
+import com.cd.xq.module.util.beans.NetResult;
 import com.cd.xq.module.chart.ChartRoomActivity;
 import com.cd.xq.module.chart.status.statusBeans.StatusMatchBean;
 import com.cd.xq.module.chart.status.statusBeans.StatusOnLookerEnterBean;
@@ -31,8 +34,10 @@ import com.cd.xq.module.util.base.BaseFragment;
 import com.cd.xq.module.util.beans.jmessage.Data;
 import com.cd.xq.module.util.beans.jmessage.JMChartResp;
 import com.cd.xq.module.util.beans.jmessage.JMChartRoomSendBean;
+import com.cd.xq.module.util.beans.user.BBlackUser;
 import com.cd.xq.module.util.beans.user.UserInfoBean;
 import com.cd.xq.module.util.common.MultiItemDivider;
+import com.cd.xq.module.util.interfaces.ICheckBlackListener;
 import com.cd.xq.module.util.jmessage.JMsgSender;
 import com.cd.xq.module.util.manager.DataManager;
 import com.cd.xq.module.util.network.NetWorkMg;
@@ -69,11 +74,14 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 
+import static android.app.Activity.RESULT_OK;
+
 /**
  * Created by Administrator on 2018/11/11.
  */
 
 public class HomeFragment extends BaseFragment {
+    public static final int AC_CHATROOM_REQUEST_CODE = 1000;
 
     @BindView(R.id.btn_angel)
     Button mBtnAngel;
@@ -249,7 +257,7 @@ public class HomeFragment extends BaseFragment {
                         }
                         DataManager.getInstance().setChartData(jmChartResp.getData());
                         Intent intent = new Intent(getActivity(), ChartRoomActivity.class);
-                        getActivity().startActivity(intent);
+                        getActivity().startActivityForResult(intent,AC_CHATROOM_REQUEST_CODE);
                     }
                 }, new Consumer<Throwable>() {
                     @Override
@@ -290,7 +298,11 @@ public class HomeFragment extends BaseFragment {
                         }
                         DataManager.getInstance().setChartData(jmChartResp.getData());
                         Intent intent = new Intent(getActivity(), ChartRoomActivity.class);
-                        getActivity().startActivity(intent);
+                        if(DataManager.getInstance().getSelfMember().getRoomRoleType() == Constant.ROOM_ROLETYPE_PARTICIPANTS) {
+                            getActivity().startActivityForResult(intent,AC_CHATROOM_REQUEST_CODE);
+                        }else {
+                            getActivity().startActivity(intent);
+                        }
                         //发送聊天室信息
                         sendChartRoomMessage(true);
                     }
@@ -491,6 +503,18 @@ public class HomeFragment extends BaseFragment {
                         Tools.toast(getActivity(), throwable.toString(), false);
                     }
                 });
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(requestCode == AC_CHATROOM_REQUEST_CODE && resultCode == RESULT_OK) {
+            Tools.checkUserOrBlack(getActivity(), DataManager.getInstance().getUserInfo().getUser_name(),new BlackCheckListener() {
+                @Override
+                public void onResult(boolean isBlack) {
+                }
+            });
+        }
     }
 
     private class OnLookerViewHolder extends RecyclerView.ViewHolder {

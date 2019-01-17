@@ -19,15 +19,19 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.cd.xq.module.chart.ChartRoomActivity;
 import com.cd.xq.module.chart.DoubleRoomActivity;
+import com.cd.xq.module.chart.beans.BGetReportItem;
+import com.cd.xq.module.chart.network.ChatRequestApi;
 import com.cd.xq.module.chart.status.statusBeans.StatusHelpChangeLiveTypeBean;
 import com.cd.xq.module.chart.status.statusBeans.StatusHelpQuestDisturbBean;
 import com.cd.xq.module.chart.status.statusBeans.StatusManFinalSelectBean;
@@ -35,6 +39,7 @@ import com.cd.xq.module.chart.status.statusBeans.StatusManFirstSelectBean;
 import com.cd.xq.module.chart.status.statusBeans.StatusManSecondSelectBean;
 import com.cd.xq.module.util.Constant;
 import com.cd.xq.module.util.beans.JMNormalSendBean;
+import com.cd.xq.module.util.beans.NetResult;
 import com.cd.xq.module.util.beans.jmessage.JMChartResp;
 import com.cd.xq.module.util.beans.jmessage.JMChartRoomSendBean;
 import com.cd.xq.module.util.beans.jmessage.Member;
@@ -90,6 +95,7 @@ public class XqStatusChartUIViewMg extends AbsChartView{
 
     private View mRootView;
     private RequestApi mApi;
+    private ChatRequestApi mChatApi;
 
     private ChartRoomActivity mXqActivity;
     private Map<Integer,UserInfoBean> mAngelMembersMap;
@@ -129,6 +135,8 @@ public class XqStatusChartUIViewMg extends AbsChartView{
     private boolean mIsRoomMatchSuccess = false;  //是否匹配成功
     private boolean mIsSelefMatchSuccess = false;  //是否自己匹配成功
     private boolean mIsGoToDouble = false;  //是否接受过进入双人聊天室
+
+    private ArrayList<BGetReportItem> mReportItemList;
 
     private ISpeechListener mSpeechListener = new ISpeechListener() {
         @Override
@@ -203,10 +211,12 @@ public class XqStatusChartUIViewMg extends AbsChartView{
         MscDefaultSpeech.getInstance().getMscParams().setEngineType(HCMscParams.CLOUND);
         MscDefaultSpeech.getInstance().setmSpeechListener(mSpeechListener);
         mApi = NetWorkMg.newRetrofit().create(RequestApi.class);
+        mChatApi = NetWorkMg.newRetrofit().create(ChatRequestApi.class);
         mAngelMembersMap = new HashMap<>();
         mManMembersMap = new HashMap<>();
         mLadyMembersMap = new HashMap<>();
         mSystemEventList = new ArrayList<>();
+        mReportItemList = new ArrayList<>();
         mCheckChangedListener = new LiveTypeRadioChangeListener();
 
         mHandler = new Handler();
@@ -275,6 +285,7 @@ public class XqStatusChartUIViewMg extends AbsChartView{
         mRadioGroupLiveType.setOnCheckedChangeListener(mCheckChangedListener);
         mHeadInfoViewMg = new HeadInfoViewMg(mXqActivity,mRootView.findViewById(R.id.chart_room_activity_headInfo));
         mHeadInfoBgRelayout = mRootView.findViewById(R.id.chart_room_activity_relayout_headInfo);
+        mHeadInfoViewMg.getReportBtn().setVisibility(View.VISIBLE);
         mHeadInfoBgRelayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -296,6 +307,9 @@ public class XqStatusChartUIViewMg extends AbsChartView{
         mHeadInfoBgRelayout.setVisibility(View.GONE);
 
         mTextTip.setText(mStatusManager.getStatus(JMChartRoomSendBean.CHART_STATUS_MATCHING).getPublicString());
+
+        //获取举报项目
+        getReportItems();
     }
 
     private void initAngelManViewInstance() {
@@ -322,6 +336,34 @@ public class XqStatusChartUIViewMg extends AbsChartView{
             super.getItemOffsets(outRect, view, parent, state);
             outRect.top = (int)mXqActivity.getResources().getDimension(R.dimen.dp_8);
         }
+    }
+
+    private void toReportUser(UserInfoBean reportUserInfo,String reportMsg,int reportType) {
+        HashMap<String,Object> params = new HashMap<>();
+        params.put("userName",reportUserInfo.getUser_name());
+        params.put("reportType",reportType);
+        params.put("reportMsg",reportMsg);
+        params.put("roomId",DataManager.getInstance().getChartData().getRoomId());
+        mChatApi.reportUser(params)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Consumer<NetResult<String>>() {
+                    @Override
+                    public void accept(NetResult<String> stringNetResult) throws Exception {
+                        if(stringNetResult.getStatus() != XqErrorCode.SUCCESS) {
+                            Tools.toast(mXqActivity,stringNetResult.getMsg(),false);
+                            return;
+                        }
+
+                        Tools.toast(mXqActivity,"举报成功",false);
+                    }
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Exception {
+                        Tools.toast(mXqActivity,"举报失败",false);
+                        com.cd.xq.module.util.tools.Log.e("toReportUser--" + throwable.toString());
+                    }
+                });
     }
 
     private void upDataMembers() {
@@ -523,6 +565,7 @@ public class XqStatusChartUIViewMg extends AbsChartView{
     private void deleteChartRoom() {
         HashMap<String,Object> params = new HashMap<>();
         params.put("roomId",DataManager.getInstance().getChartData().getRoomId());
+        params.put("userName",DataManager.getInstance().getUserInfo().getUser_name());
         params.put("status",mIsRoomMatchSuccess?1:0);
         mApi.deleteChartRoom(params)
                 .subscribeOn(Schedulers.io())
@@ -695,12 +738,14 @@ public class XqStatusChartUIViewMg extends AbsChartView{
             }
             viewInstance.imageGender.setVisibility(View.VISIBLE);
             loadImage(bean.getHead_image(),viewInstance.imageHead);
-            viewInstance.imageHead.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    setHeadInfoData(bean);
-                }
-            });
+            if(DataManager.getInstance().getSelfMember().getRoomRoleType() != Constant.ROOM_ROLETYPE_ONLOOKER) {
+                viewInstance.imageHead.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        setHeadInfoData(bean);
+                    }
+                });
+            }
 
             final ArrayList<String> manSelectedResultList = new ArrayList<>();
             if(mStatusManager.getCurrentSendBean().getProcessStatus() == JMChartRoomSendBean.CHART_STATUS_MAN_SELECT_FINAL
@@ -1395,7 +1440,7 @@ public class XqStatusChartUIViewMg extends AbsChartView{
                 .show();
     }
 
-    private void setHeadInfoData(UserInfoBean bean) {
+    private void setHeadInfoData(final UserInfoBean bean) {
         mHeadInfoBgRelayout.setVisibility(View.VISIBLE);
         mHeadInfoViewMg.setImgHead(bean.getHead_image());
         mHeadInfoViewMg.setSpecialInfo(bean.getSpecial_info());
@@ -1410,5 +1455,83 @@ public class XqStatusChartUIViewMg extends AbsChartView{
                 .append("职业： ").append(bean.getProfessional()).append("\n\n")
                 .append("工作地点： ").append(bean.getJob_address()).append("\n\n");
         mHeadInfoViewMg.setContent(builder.toString());
+
+        mHeadInfoViewMg.getReportBtn().setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mHeadInfoBgRelayout.setVisibility(View.GONE);
+
+                final int[] reportType = {-1};
+                View contentView = LayoutInflater.from(mXqActivity).inflate(R.layout.layout_report,null);
+                RadioGroup radioGroup = contentView.findViewById(R.id.report_radioGroup);
+                final int radioBtnIds[] = {R.id.report_radioButton_1,R.id.report_radioButton_2,R.id.report_radioButton_3,
+                        R.id.report_radioButton_4,R.id.report_radioButton_5,R.id.report_radioButton_6};
+                for(int i = 0 ; i < radioBtnIds.length ; i ++) {
+                    RadioButton radioButton = contentView.findViewById(radioBtnIds[i]);
+                    if(mReportItemList.size() > i) {
+                        radioButton.setText(mReportItemList.get(i).getItem());
+                        radioButton.setVisibility(View.VISIBLE);
+                        radioButton.setTag(mReportItemList.get(i).getId());
+                    }else {
+                        radioButton.setVisibility(View.GONE);
+                    }
+                }
+                radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+                    @Override
+                    public void onCheckedChanged(RadioGroup group, int checkedId) {
+                        RadioButton radioButton = group.findViewById(checkedId);
+                        int index = (int) radioButton.getTag();
+                        reportType[0] = index;
+                    }
+                });
+
+                final EditText editText = contentView.findViewById(R.id.report_edit_ps);
+
+                final AlertDialog dialog = new AlertDialog.Builder(mXqActivity)
+                        .setTitle("请选择举报项")
+                        .setIcon(R.drawable.btn_report)
+                        .setPositiveButton("确定", null)
+                        .setView(contentView)
+                        .setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                            }
+                        })
+                        .create();
+
+                dialog.show();
+                dialog.getButton(DialogInterface.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        int index = reportType[0];
+                        if(index == -1) {
+                            Tools.toast(mXqActivity,"请选择举报项",false);
+                            return;
+                        }
+                        dialog.dismiss();
+                        toReportUser(bean,editText.getText().toString(),index);
+                    }
+                });
+            }
+        });
+    }
+
+    private void getReportItems() {
+        mChatApi.getReportItems()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Consumer<NetResult<List<BGetReportItem>>>() {
+                    @Override
+                    public void accept(NetResult<List<BGetReportItem>> listNetResult) throws Exception {
+                        if(listNetResult.getStatus() == XqErrorCode.SUCCESS && listNetResult.getData() != null) {
+                            mReportItemList.addAll(listNetResult.getData());
+                        }
+                    }
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Exception {
+                        com.cd.xq.module.util.tools.Log.e("getReportItems--" + throwable.toString());
+                    }
+                });
     }
 }

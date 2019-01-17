@@ -1,7 +1,7 @@
 package com.cd.xq.network;
 
 import com.cd.xq.beans.BGetArrays;
-import com.cd.xq.beans.NetResult;
+import com.cd.xq.module.util.beans.NetResult;
 
 import java.util.List;
 

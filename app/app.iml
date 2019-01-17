@@ -118,6 +118,7 @@
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/instant-run-support" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/javaPrecompile" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/jniLibs" />
+      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/lint" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/manifests" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/multi-dex" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/prebuild" />
@@ -150,7 +151,6 @@
     <orderEntry type="library" name="com.scwang.smartrefresh:SmartRefreshLayout-1.1.0-alpha-18" level="project" />
     <orderEntry type="library" name="com.squareup.okio:okio:1.11.0@jar" level="project" />
     <orderEntry type="library" name="com.android.support:appcompat-v7-26.1.0" level="project" />
-    <orderEntry type="library" name="com.mob:MobCommons:2019.0109.1644@jar" level="project" />
     <orderEntry type="library" name="com.android.support:support-annotations:26.1.0@jar" level="project" />
     <orderEntry type="library" name="com.android.support:support-core-ui-26.1.0" level="project" />
     <orderEntry type="library" name="msclib-release:@aar" level="project" />
@@ -167,6 +167,7 @@
     <orderEntry type="library" name="com.android.support:transition-26.1.0" level="project" />
     <orderEntry type="library" name="com.scwang.smartrefresh:SmartRefreshHeader-1.1.0-alpha-18" level="project" />
     <orderEntry type="library" name="com.android.support:design-26.1.0" level="project" />
+    <orderEntry type="library" name="com.mob:MobCommons:2019.0114.1454@jar" level="project" />
     <orderEntry type="library" name="LiteAVSDK_Smart_5.1.5293:@aar" level="project" />
     <orderEntry type="library" name="cn.smssdk:ShortMessageSDKGUI-3.3.0" level="project" />
     <orderEntry type="library" name="com.trello.rxlifecycle2:rxlifecycle-components-2.1.0" level="project" />

@@ -1,15 +1,28 @@
 package com.cd.xq.module.util.tools;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.Context;
 import android.text.TextUtils;
 import android.widget.Toast;
+
+import com.cd.xq.module.util.beans.NetResult;
+import com.cd.xq.module.util.beans.user.BBlackUser;
+import com.cd.xq.module.util.interfaces.ICheckBlackListener;
+import com.cd.xq.module.util.manager.DataManager;
+import com.cd.xq.module.util.network.NetWorkMg;
+import com.cd.xq.module.util.network.RequestApi;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Locale;
+
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
 
 /**
  * Created by Administrator on 2018/5/15.
@@ -84,5 +97,45 @@ public class Tools {
             e.printStackTrace();
         }
         return "";
+    }
+
+    public static void checkUserOrBlack(final Activity activity, String userName,final ICheckBlackListener listener) {
+        RequestApi api = NetWorkMg.newRetrofit().create(RequestApi.class);
+        HashMap<String,Object> params = new HashMap<>();
+        params.put("userName", userName);
+        params.put("status",1);
+        api.getBlackUserByName(params)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Consumer<NetResult<BBlackUser>>() {
+                    @Override
+                    public void accept(NetResult<BBlackUser> bBlackUserNetResult) throws Exception {
+                        if(bBlackUserNetResult.getStatus() == XqErrorCode.SUCCESS) {
+                            String report_msg = bBlackUserNetResult.getData().getReport_msg();
+                            String startData = DateUtils.timeStampToStr(bBlackUserNetResult.getData().getStart_time(),"yyyy-MM-dd HH:mm:ss");
+                            String endData = DateUtils.timeStampToStr(bBlackUserNetResult.getData().getEnd_time(),"yyyy-MM-dd HH:mm:ss");
+                            String content = "您因违法以下条款：\n" + report_msg + "\n" + "将从" + startData + "到" + endData + "被禁止登录使用";
+                            Dialog dialog = DialogFactory.createBlackDialog(activity, content,listener);
+                            dialog.show();
+
+                            if(listener != null) {
+                                listener.onResult(true);
+                            }
+                            return;
+                        }
+
+                        if(listener != null) {
+                            listener.onResult(false);
+                        }
+                    }
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Exception {
+                        Log.e("checkUserOrBlack--" + throwable.toString());
+                        if(listener != null) {
+                            listener.onResult(false);
+                        }
+                    }
+                });
     }
 }

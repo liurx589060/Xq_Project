@@ -17,6 +17,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.cd.xq.R;
+import com.cd.xq.login.BlackCheckListener;
 import com.cd.xq.login.RegisterActivity;
 import com.cd.xq.module.util.Constant;
 import com.cd.xq.module.util.base.BaseActivity;
@@ -79,19 +80,30 @@ public class MainActivity extends BaseActivity {
         if(userInfo != null) {
             //自动登陆
             DataManager.getInstance().setJmUserName(userInfo.getUserName());
-            autoLogin();
+            toAutoLogin();
         }
         init();
+    }
+
+    private void toAutoLogin() {
+        SharedPreferences sp = getSharedPreferences(Constant.SP_NAME, Context.MODE_PRIVATE);
+        final String userName = sp.getString("userName","");
+        final String password = sp.getString("password","");
+        Tools.checkUserOrBlack(this, userName,new BlackCheckListener() {
+            @Override
+            public void onResult(boolean isBlack) {
+                if(!isBlack) {
+                    autoLogin(userName,password);
+                }
+            }
+        });
     }
 
     /**
      * 自动登陆自己的服务器
      */
     @SuppressLint("CheckResult")
-    private void autoLogin() {
-        SharedPreferences sp = getSharedPreferences(Constant.SP_NAME, Context.MODE_PRIVATE);
-        final String userName = sp.getString("userName","");
-        final String password = sp.getString("password","");
+    private void autoLogin(String userName,String password) {
         mApi.login(userName,password)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -239,13 +251,4 @@ public class MainActivity extends BaseActivity {
         SharedPreferences sp = getSharedPreferences(Constant.SP_NAME, Activity.MODE_PRIVATE);
         return sp.getBoolean("isRemote",false);
     }
-
-//    @Override
-//    public boolean onKeyDown(int keyCode, KeyEvent event) {
-//        if(keyCode == KeyEvent.KEYCODE_BACK) {
-//            System.exit(0);
-//            return true;
-//        }
-//        return super.onKeyDown(keyCode, event);
-//    }
 }

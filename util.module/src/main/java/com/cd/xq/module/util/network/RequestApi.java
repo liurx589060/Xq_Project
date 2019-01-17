@@ -1,6 +1,9 @@
 package com.cd.xq.module.util.network;
 
+import com.cd.xq.module.util.beans.BaseResp;
+import com.cd.xq.module.util.beans.NetResult;
 import com.cd.xq.module.util.beans.jmessage.JMChartResp;
+import com.cd.xq.module.util.beans.user.BBlackUser;
 import com.cd.xq.module.util.beans.user.UserResp;
 
 import java.util.Map;
@@ -32,7 +35,7 @@ public interface RequestApi {
     Observable<UserResp> updateUserInfo(@QueryMap Map<String, Object> map);
 
     @GET("User/checkUserExist")
-    Observable<UserResp> checkUserExist(@Query("userName") String userName);
+    Observable<BaseResp> checkUserExist(@Query("userName") String userName);
 
     @GET("JMessage/getChartRoomMemeberList")
     Observable<JMChartResp> getChartRoomMemeberList(@Query("roomId") long roomId);
@@ -51,6 +54,9 @@ public interface RequestApi {
 
     @GET("JMessage/joinChartRoom")
     Observable<JMChartResp> joinChartRoom(@QueryMap Map<String, Object> map);
+
+    @GET("User/getBlackUserByName")
+    Observable<NetResult<BBlackUser>> getBlackUserByName(@QueryMap Map<String, Object> map);
 
     @Multipart
     @POST("User/uploadHeadImage")

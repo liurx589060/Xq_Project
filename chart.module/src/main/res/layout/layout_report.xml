@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <RadioGroup
+        android:id="@+id/report_radioGroup"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginLeft="@dimen/dp_20"
+        android:layout_marginTop="@dimen/dp_20">
+
+        <RadioButton
+            android:id="@+id/report_radioButton_1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="注册信息违规"
+            android:textSize="@dimen/sp_18"
+            android:textColor="#000000"
+            android:paddingLeft="@dimen/dp_20"/>
+
+        <RadioButton
+            android:id="@+id/report_radioButton_2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="言语或视频违背伦理"
+            android:textSize="@dimen/sp_18"
+            android:textColor="#000000"
+            android:paddingLeft="@dimen/dp_20"
+            android:layout_marginTop="@dimen/dp_10"/>
+
+        <RadioButton
+            android:id="@+id/report_radioButton_3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="故意长时间挂机或离线"
+            android:textSize="@dimen/sp_18"
+            android:textColor="#000000"
+            android:paddingLeft="@dimen/dp_20"
+            android:layout_marginTop="@dimen/dp_10"/>
+
+        <RadioButton
+            android:id="@+id/report_radioButton_4"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="故意长时间挂机或离线"
+            android:textSize="@dimen/sp_18"
+            android:textColor="#000000"
+            android:paddingLeft="@dimen/dp_20"
+            android:layout_marginTop="@dimen/dp_10"
+            android:visibility="gone"/>
+
+        <RadioButton
+            android:id="@+id/report_radioButton_5"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="故意长时间挂机或离线"
+            android:textSize="@dimen/sp_18"
+            android:textColor="#000000"
+            android:paddingLeft="@dimen/dp_20"
+            android:layout_marginTop="@dimen/dp_10"
+            android:visibility="gone"/>
+
+        <RadioButton
+            android:id="@+id/report_radioButton_6"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="故意长时间挂机或离线"
+            android:textSize="@dimen/sp_18"
+            android:textColor="#000000"
+            android:paddingLeft="@dimen/dp_20"
+            android:layout_marginTop="@dimen/dp_10"
+            android:visibility="gone"/>
+
+    </RadioGroup>
+
+    <EditText
+        android:id="@+id/report_edit_ps"
+        android:layout_toRightOf="@+id/report_radioGroup"
+        android:layout_marginRight="@dimen/dp_20"
+        android:layout_marginLeft="@dimen/dp_20"
+        android:layout_marginTop="@dimen/dp_20"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp_50"
+        android:hint="举报理由（选填，不超过20个字）"
+        android:textSize="@dimen/sp_10"
+        android:textColor="#333333"
+        android:gravity="top"
+        android:padding="@dimen/dp_6"
+        android:background="@drawable/shape_report_text_ps_bg"
+        />
+
+</LinearLayout>

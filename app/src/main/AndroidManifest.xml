@@ -72,6 +72,11 @@
             android:configChanges="orientation|keyboard|keyboardHidden|navigation"
             android:name=".login.ResetPasswordActivity"/>
 
+        <activity
+            android:screenOrientation="portrait"
+            android:configChanges="orientation|keyboard|keyboardHidden|navigation"
+            android:name=".login.ProtocolActivity"/>
+
 
 
         <!--图片选择器-->

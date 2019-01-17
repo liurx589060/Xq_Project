@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -18,6 +19,7 @@ import com.cd.xq.R;
 import com.cd.xq.frame.MainActivity;
 import com.cd.xq.module.util.Constant;
 import com.cd.xq.module.util.base.BaseActivity;
+import com.cd.xq.module.util.beans.BaseResp;
 import com.cd.xq.module.util.beans.user.UserResp;
 import com.cd.xq.module.util.manager.DataManager;
 import com.cd.xq.module.util.network.NetWorkMg;
@@ -97,6 +99,13 @@ public class LoginActivity extends BaseActivity {
     }
 
     private void init() {
+        loginTextPrivacy.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(LoginActivity.this,ProtocolActivity.class);
+                startActivity(intent);
+            }
+        });
     }
 
     @OnClick({R.id.login_btn_close, R.id.login_edit_userName, R.id.login_edit_password, R.id.login_btn_login, R.id.login_btn_register, R.id.login_text_fpassword})
@@ -111,17 +120,61 @@ public class LoginActivity extends BaseActivity {
             case R.id.login_edit_password:
                 break;
             case R.id.login_btn_login:
-                login(loginEditUserName.getText().toString(), loginEditPassword.getText().toString());
+                if(checkEdit()) {
+                    toLogin();
+                }
                 break;
             case R.id.login_btn_register:
-                regist(loginEditUserName.getText().toString(), loginEditPassword.getText().toString());
+                if(checkEdit()) {
+                    toRegist();
+                }
                 break;
             case R.id.login_text_fpassword:
 //                Intent intent3 = new Intent(this, MainActivity.class);
 //                startActivity(intent3);
-                sendSMSCode(this);
+                sendSMSCode(this,1);
                 break;
         }
+    }
+
+    private void toRegist() {
+        mLoadingDialog.show();
+        mApi.checkUserExist(loginEditUserName.getText().toString())
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Consumer<BaseResp>() {
+                    @Override
+                    public void accept(BaseResp baseResp) throws Exception {
+                        mLoadingDialog.dismiss();
+                        if(baseResp.getStatus() == XqErrorCode.ERROR_USER_NOT_EXIST) {
+                            sendSMSCode(LoginActivity.this,2);
+                        }else if(baseResp.getStatus() == XqErrorCode.SUCCESS){
+                            Tools.toast(getApplicationContext(),"用户已存在",false);
+                        }
+                    }
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Exception {
+                        mLoadingDialog.dismiss();
+                        Log.e("toRegist--" + throwable.toString());
+                    }
+                });
+    }
+
+    private void toLogin() {
+        mLoadingDialog.show();
+        final String userName = loginEditUserName.getText().toString();
+        final String password = loginEditPassword.getText().toString();
+        Tools.checkUserOrBlack(this,userName, new BlackCheckListener() {
+            @Override
+            public void onResult(boolean isBlack) {
+                mLoadingDialog.dismiss();
+
+                if(!isBlack) {
+                    login(userName,password );
+                }
+            }
+        });
     }
 
     @SuppressLint("CheckResult")
@@ -254,7 +307,7 @@ public class LoginActivity extends BaseActivity {
                 .apply();
     }
 
-    private void sendSMSCode(Context context) {
+    private void sendSMSCode(Context context, final int typeForm) {
         RegisterPage page = new RegisterPage();
         //如果使用我们的ui，没有申请模板编号的情况下需传null
         page.setTempCode(null);
@@ -266,8 +319,14 @@ public class LoginActivity extends BaseActivity {
                     String country = (String) phoneMap.get("country"); // 国家代码，如“86”
                     String phone = (String) phoneMap.get("phone"); // 手机号码，如“13800138000”
                     // TODO 利用国家代码和手机号码进行后续的操作
-                    Intent intent = new Intent(LoginActivity.this,ResetPasswordActivity.class);
-                    startActivity(intent);
+                    if(typeForm == 1) {
+                        //忘记密码
+                        Intent intent = new Intent(LoginActivity.this,ResetPasswordActivity.class);
+                        startActivity(intent);
+                    }else if(typeForm == 2){
+                        //注册
+                        regist(loginEditUserName.getText().toString(),loginEditPassword.getText().toString());
+                    }
                 } else{
                     // TODO 处理错误的结果
                     Tools.toast(getApplicationContext(),"验证失败--" + result,false);
@@ -276,5 +335,13 @@ public class LoginActivity extends BaseActivity {
             }
         });
         page.show(context);
+    }
+
+    private boolean checkEdit() {
+        if(TextUtils.isEmpty(loginEditUserName.getText().toString()) || TextUtils.isEmpty(loginEditPassword.getText().toString())) {
+            Tools.toast(getApplicationContext(),"用户名和密码不能为空",false);
+            return false;
+        }
+        return true;
     }
 }

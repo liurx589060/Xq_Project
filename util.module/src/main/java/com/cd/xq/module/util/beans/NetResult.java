@@ -1,4 +1,4 @@
-package com.cd.xq.beans;
+package com.cd.xq.module.util.beans;
 
 /**
  * Created by Administrator on 2018/12/9.

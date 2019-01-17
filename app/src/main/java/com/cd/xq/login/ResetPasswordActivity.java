@@ -10,7 +10,7 @@ import android.widget.EditText;
 
 import com.cd.xq.AppConstant;
 import com.cd.xq.R;
-import com.cd.xq.beans.NetResult;
+import com.cd.xq.module.util.beans.NetResult;
 import com.cd.xq.module.util.base.BaseActivity;
 import com.cd.xq.module.util.network.NetWorkMg;
 import com.cd.xq.module.util.tools.DialogFactory;
