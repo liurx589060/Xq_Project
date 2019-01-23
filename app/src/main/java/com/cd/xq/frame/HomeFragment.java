@@ -1,6 +1,5 @@
 package com.cd.xq.frame;
 
-import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -23,21 +22,19 @@ import com.bumptech.glide.Glide;
 import com.cd.xq.AppConstant;
 import com.cd.xq.R;
 import com.cd.xq.beans.BGetArrays;
+import com.cd.xq.friend.FriendActivity;
 import com.cd.xq.login.BlackCheckListener;
-import com.cd.xq.login.LoginActivity;
-import com.cd.xq.module.util.beans.NetResult;
 import com.cd.xq.module.chart.ChartRoomActivity;
 import com.cd.xq.module.chart.status.statusBeans.StatusMatchBean;
 import com.cd.xq.module.chart.status.statusBeans.StatusOnLookerEnterBean;
 import com.cd.xq.module.util.Constant;
 import com.cd.xq.module.util.base.BaseFragment;
+import com.cd.xq.module.util.beans.NetResult;
 import com.cd.xq.module.util.beans.jmessage.Data;
 import com.cd.xq.module.util.beans.jmessage.JMChartResp;
 import com.cd.xq.module.util.beans.jmessage.JMChartRoomSendBean;
-import com.cd.xq.module.util.beans.user.BBlackUser;
 import com.cd.xq.module.util.beans.user.UserInfoBean;
 import com.cd.xq.module.util.common.MultiItemDivider;
-import com.cd.xq.module.util.interfaces.ICheckBlackListener;
 import com.cd.xq.module.util.jmessage.JMsgSender;
 import com.cd.xq.module.util.manager.DataManager;
 import com.cd.xq.module.util.network.NetWorkMg;
@@ -94,6 +91,8 @@ public class HomeFragment extends BaseFragment {
     XBanner homeXbanner;
     @BindView(R.id.home_refresh_layout)
     SmartRefreshLayout homeRefreshLayout;
+    @BindView(R.id.home_btn_friend)
+    Button homeBtnFriend;
 
     private RequestApi mApi;
     private XqRequestApi mXqApi;
@@ -109,7 +108,8 @@ public class HomeFragment extends BaseFragment {
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable
+            Bundle savedInstanceState) {
         mRootView = inflater.inflate(R.layout.tab_home, null);
         unbinder = ButterKnife.bind(this, mRootView);
 
@@ -129,10 +129,19 @@ public class HomeFragment extends BaseFragment {
         mOnLookerAdapter = new OnLookerRecyclerViewAdapter();
         homeOnLookerRecyclerView.setAdapter(mOnLookerAdapter);
         homeOnLookerRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        MultiItemDivider divider = new MultiItemDivider(getActivity(),DividerItemDecoration.VERTICAL,
-                ContextCompat.getDrawable(getActivity(),R.drawable.shape_home_recycler_divider));
+        MultiItemDivider divider = new MultiItemDivider(getActivity(), DividerItemDecoration
+                .VERTICAL,
+                ContextCompat.getDrawable(getActivity(), R.drawable.shape_home_recycler_divider));
         divider.setDividerMode(MultiItemDivider.INSIDE);
         homeOnLookerRecyclerView.addItemDecoration(divider);
+
+        homeBtnFriend.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getActivity(), FriendActivity.class);
+                getActivity().startActivity(intent);
+            }
+        });
 
         mBtnAngel.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -230,7 +239,8 @@ public class HomeFragment extends BaseFragment {
         params.put("limitMan", userInfo.getLimitMan());
         params.put("limitAngel", userInfo.getLimitAngel());
         params.put("pushAddress", Base64.encodeToString(mTXPushAddress.getBytes(), Base64.DEFAULT));
-        params.put("playAddress", Base64.encodeToString(mTXPlayerAddress.getBytes(), Base64.DEFAULT));
+        params.put("playAddress", Base64.encodeToString(mTXPlayerAddress.getBytes(),
+                Base64.DEFAULT));
         params.put("public", mPublic);
         params.put("describe", "一起来相亲吧");
 
@@ -257,7 +267,7 @@ public class HomeFragment extends BaseFragment {
                         }
                         DataManager.getInstance().setChartData(jmChartResp.getData());
                         Intent intent = new Intent(getActivity(), ChartRoomActivity.class);
-                        getActivity().startActivityForResult(intent,AC_CHATROOM_REQUEST_CODE);
+                        getActivity().startActivityForResult(intent, AC_CHATROOM_REQUEST_CODE);
                     }
                 }, new Consumer<Throwable>() {
                     @Override
@@ -298,9 +308,10 @@ public class HomeFragment extends BaseFragment {
                         }
                         DataManager.getInstance().setChartData(jmChartResp.getData());
                         Intent intent = new Intent(getActivity(), ChartRoomActivity.class);
-                        if(DataManager.getInstance().getSelfMember().getRoomRoleType() == Constant.ROOM_ROLETYPE_PARTICIPANTS) {
-                            getActivity().startActivityForResult(intent,AC_CHATROOM_REQUEST_CODE);
-                        }else {
+                        if (DataManager.getInstance().getSelfMember().getRoomRoleType() ==
+                                Constant.ROOM_ROLETYPE_PARTICIPANTS) {
+                            getActivity().startActivityForResult(intent, AC_CHATROOM_REQUEST_CODE);
+                        } else {
                             getActivity().startActivity(intent);
                         }
                         //发送聊天室信息
@@ -330,7 +341,8 @@ public class HomeFragment extends BaseFragment {
     private void initSmartRefreshLayout() {
         homeRefreshLayout.setRefreshHeader(new BezierCircleHeader(getActivity()));
         //设置 Footer 为 球脉冲 样式
-        homeRefreshLayout.setRefreshFooter(new BallPulseFooter(getActivity()).setSpinnerStyle(SpinnerStyle.Scale));
+        homeRefreshLayout.setRefreshFooter(new BallPulseFooter(getActivity()).setSpinnerStyle
+                (SpinnerStyle.Scale));
     }
 
     private void initXBanner() {
@@ -338,7 +350,9 @@ public class HomeFragment extends BaseFragment {
         ArrayList<String> titles;
         images = new ArrayList<>();
         titles = new ArrayList<>();
-        images.add("https://gss1.bdstatic.com/9vo3dSag_xI4khGkpoWK1HF6hhy/baike/w%3D268%3Bg%3D0/sign=e9449e382d9759ee4a5067cd8ac0242b/94cad1c8a786c9179e80a80cc23d70cf3bc75700.jpg");
+        images.add("https://gss1.bdstatic" +
+                ".com/9vo3dSag_xI4khGkpoWK1HF6hhy/baike/w%3D268%3Bg%3D0/sign" +
+                "=e9449e382d9759ee4a5067cd8ac0242b/94cad1c8a786c9179e80a80cc23d70cf3bc75700.jpg");
         titles.add("这是第1张图片");
         images.add("http://img.ivsky.com/img/bizhi/co/201711/27/nissan_vmotion2_0-001.jpg");
         titles.add("这是第2张图片");
@@ -363,10 +377,14 @@ public class HomeFragment extends BaseFragment {
         Data data = DataManager.getInstance().getChartData();
         UserInfoBean selfInfo = DataManager.getInstance().getUserInfo();
         JMChartRoomSendBean bean = null;
-        if (DataManager.getInstance().getSelfMember().getRoomRoleType() == Constant.ROOM_ROLETYPE_PARTICIPANTS) {
-            bean = new StatusMatchBean().getChartSendBeanWillSend(null, BaseStatus.MessageType.TYPE_SEND);
-        } else if (DataManager.getInstance().getSelfMember().getRoomRoleType() == Constant.ROOM_ROLETYPE_ONLOOKER) {
-            bean = new StatusOnLookerEnterBean().getChartSendBeanWillSend(null, BaseStatus.MessageType.TYPE_SEND);
+        if (DataManager.getInstance().getSelfMember().getRoomRoleType() == Constant
+                .ROOM_ROLETYPE_PARTICIPANTS) {
+            bean = new StatusMatchBean().getChartSendBeanWillSend(null, BaseStatus.MessageType
+                    .TYPE_SEND);
+        } else if (DataManager.getInstance().getSelfMember().getRoomRoleType() == Constant
+                .ROOM_ROLETYPE_ONLOOKER) {
+            bean = new StatusOnLookerEnterBean().getChartSendBeanWillSend(null, BaseStatus
+                    .MessageType.TYPE_SEND);
         }
         bean.setCurrentCount(data.getMembers().size());
         bean.setIndexNext(DataManager.getInstance().getSelfMember().getIndex());
@@ -407,10 +425,12 @@ public class HomeFragment extends BaseFragment {
             }
 
             mTXPlayerAddress = "rtmp://" + Constant.TX_LIVE_BIZID + ".liveplay.myqcloud.com/live/"
-                    + Constant.TX_LIVE_BIZID + "_" + DataManager.getInstance().getUserInfo().getUser_id();
+                    + Constant.TX_LIVE_BIZID + "_" + DataManager.getInstance().getUserInfo()
+                    .getUser_id();
 
             String ip = "rtmp://" + Constant.TX_LIVE_BIZID + ".livepush.myqcloud.com/live/"
-                    + Constant.TX_LIVE_BIZID + "_" + DataManager.getInstance().getUserInfo().getUser_id()
+                    + Constant.TX_LIVE_BIZID + "_" + DataManager.getInstance().getUserInfo()
+                    .getUser_id()
                     + "?bizid=" + Constant.TX_LIVE_BIZID;
             mTXPushAddress = new StringBuilder().
                     append(ip).
@@ -427,7 +447,8 @@ public class HomeFragment extends BaseFragment {
     }
 
     private String byteArrayToHexString(byte[] data) {
-        char[] DIGITS_LOWER = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
+        char[] DIGITS_LOWER = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c',
+                'd', 'e', 'f'};
         char[] out = new char[data.length << 1];
 
         for (int i = 0, j = 0; i < data.length; i++) {
@@ -456,7 +477,8 @@ public class HomeFragment extends BaseFragment {
         }
         XXPermissions.with(getActivity())
                 .constantRequest() //可设置被拒绝后继续申请，直到用户授权或者永久拒绝
-                //.permission(Permission.SYSTEM_ALERT_WINDOW, Permission.REQUEST_INSTALL_PACKAGES) //支持请求6.0悬浮窗权限8.0请求安装权限
+                //.permission(Permission.SYSTEM_ALERT_WINDOW, Permission
+                // .REQUEST_INSTALL_PACKAGES) //支持请求6.0悬浮窗权限8.0请求安装权限
                 .permission(Permission.CAMERA, Permission.RECORD_AUDIO)
                 .request(onPermission);
     }
@@ -482,7 +504,8 @@ public class HomeFragment extends BaseFragment {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Consumer<NetResult<List<BGetArrays>>>() {
                     @Override
-                    public void accept(NetResult<List<BGetArrays>> bGetArraysNetResult) throws Exception {
+                    public void accept(NetResult<List<BGetArrays>> bGetArraysNetResult) throws
+                            Exception {
                         if (bGetArraysNetResult.getStatus() != XqErrorCode.SUCCESS
                                 && bGetArraysNetResult.getStatus() != XqErrorCode.ERROR_NO_DATA) {
                             Log.e(bGetArraysNetResult.getMsg());
@@ -508,8 +531,9 @@ public class HomeFragment extends BaseFragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode == AC_CHATROOM_REQUEST_CODE && resultCode == RESULT_OK) {
-            Tools.checkUserOrBlack(getActivity(), DataManager.getInstance().getUserInfo().getUser_name(),new BlackCheckListener() {
+        if (requestCode == AC_CHATROOM_REQUEST_CODE && resultCode == RESULT_OK) {
+            Tools.checkUserOrBlack(getActivity(), DataManager.getInstance().getUserInfo()
+                    .getUser_name(), new BlackCheckListener() {
                 @Override
                 public void onResult(boolean isBlack) {
                 }
@@ -539,7 +563,8 @@ public class HomeFragment extends BaseFragment {
     private class OnLookerRecyclerViewAdapter extends RecyclerView.Adapter<OnLookerViewHolder> {
         @Override
         public OnLookerViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            OnLookerViewHolder holder = new OnLookerViewHolder(LayoutInflater.from(getActivity()).inflate(
+            OnLookerViewHolder holder = new OnLookerViewHolder(LayoutInflater.from(getActivity())
+                    .inflate(
                     R.layout.layout_home_onlooker_recycler_item, null));
             return holder;
         }

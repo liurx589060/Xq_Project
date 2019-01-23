@@ -6,8 +6,38 @@
     android:layout_height="match_parent">
 
     <RelativeLayout
+        android:id="@+id/my_title_relayout"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/dp_160">
+        android:layout_height="@dimen/dp_40"
+        android:background="@drawable/activity_title_bg"
+        android:layout_alignParentTop="true">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="我的"
+            android:textColor="#000000"
+            android:textSize="@dimen/sp_20"
+            android:layout_centerInParent="true"/>
+
+        <TextView
+            android:id="@+id/my_text_edit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="@dimen/dp_20"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:background="@null"
+            android:text="编辑"
+            android:textColor="#333333"
+            android:textSize="@dimen/sp_18"
+            />
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp_140">
 
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/my_img_head"
@@ -16,29 +46,16 @@
             android:layout_alignParentLeft="true"
             android:layout_alignParentTop="true"
             android:layout_marginLeft="@dimen/dp_14"
-            android:layout_marginTop="@dimen/dp_45"
+            android:layout_marginTop="@dimen/dp_25"
             app:srcCompat="@mipmap/ic_launcher_round"
             app:civ_border_width="@dimen/dp_0"
             app:civ_border_color="#000000"/>
 
-        <TextView
-            android:id="@+id/my_text_edit"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentTop="true"
-            android:layout_marginRight="@dimen/dp_20"
-            android:layout_marginTop="@dimen/dp_20"
-            android:background="@null"
-            android:text="编辑"
-            android:textColor="#333333"
-            android:textSize="@dimen/sp_20"
-            android:textStyle="bold" />
-
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="@dimen/dp_100"
-            android:layout_alignRight="@+id/my_text_edit"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="@dimen/dp_20"
             android:layout_alignTop="@+id/my_img_head"
             android:layout_marginLeft="@dimen/dp_20"
             android:layout_toRightOf="@+id/my_img_head"

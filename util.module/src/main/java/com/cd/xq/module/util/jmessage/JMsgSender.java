@@ -1,11 +1,9 @@
 package com.cd.xq.module.util.jmessage;
 
-import android.content.Context;
-import android.util.Log;
-import android.widget.Toast;
-
 import com.cd.xq.module.util.beans.JMNormalSendBean;
 import com.cd.xq.module.util.beans.jmessage.JMChartRoomSendBean;
+import com.cd.xq.module.util.beans.jmessage.JMSendBean;
+import com.cd.xq.module.util.tools.Log;
 import com.google.gson.Gson;
 
 import cn.jpush.im.android.api.JMessageClient;
@@ -19,29 +17,27 @@ import cn.jpush.im.api.BasicCallback;
  */
 
 public class JMsgSender {
-    public static void sendMessage(Context context,int code, String str, String exinfo) {
-        String userName = null;
-        if(JMessageClient.getMyInfo().getUserName().equals("wys30201")) {
-            userName = "wys30202";
-        }else if (JMessageClient.getMyInfo().getUserName().equals("wys30202")){
-            userName = "wys30201";
-        }
-        if(userName == null) {
-            Toast.makeText(context.getApplicationContext(),"userName is null",Toast.LENGTH_SHORT).show();
+
+
+    /**
+     * 发送JMSendBean 的文本消息
+     * @param sendBean
+     */
+    public static void sendTextMessage(JMSendBean sendBean) {
+        if(sendBean == null || sendBean.getTargetUserName() == null || sendBean.getData() == null) {
             return;
         }
-        JMNormalSendBean bean = new JMNormalSendBean();
-        bean.setMsg(str);
-        bean.setCode(code);
-        Message message = JMessageClient.createSingleTextMessage(userName,new Gson().toJson(bean));
+
+        Message message = JMessageClient.createSingleTextMessage(sendBean.getTargetUserName(),
+                new Gson().toJson(sendBean));
         message.setOnSendCompleteCallback(new BasicCallback() {
             @Override
             public void gotResult(int i, String s) {
-//                if(i == 0) {
-//                    Toast.makeText(getApplicationContext(),"发送成功",Toast.LENGTH_SHORT).show();
-//                }else {
-//                    Toast.makeText(getApplicationContext(),"发送失败--" + s,Toast.LENGTH_SHORT).show();
-//                }
+                if (0 == i) {
+                    Log.e("sendTextMessage success --");
+                } else {
+                    Log.e("sendTextMessage failed --");
+                }
             }
         });
         MessageSendingOptions options = new MessageSendingOptions();

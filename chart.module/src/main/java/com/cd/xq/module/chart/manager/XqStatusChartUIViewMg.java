@@ -61,17 +61,26 @@ import com.hc.lib.msc.ISpeechListener;
 import com.hc.lib.msc.MscDefaultSpeech;
 import com.iflytek.cloud.SpeechError;
 import org.json.JSONObject;
+
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
+
 import cn.jpush.im.android.api.JMessageClient;
 import cn.jpush.im.android.api.event.ChatRoomMessageEvent;
 import cn.jpush.im.android.api.event.MessageEvent;
 import cn.jpush.im.android.api.model.Message;
+import io.reactivex.Observable;
+import io.reactivex.ObservableSource;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.functions.Consumer;
+import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
+import retrofit2.HttpException;
+
 import static com.cd.xq.module.chart.manager.XqStatusChartUIViewMg.EnumMemberStatus.STATUS_CHART;
 import static com.cd.xq.module.chart.manager.XqStatusChartUIViewMg.EnumMemberStatus.STATUS_NORMAL;
 import static com.cd.xq.module.chart.manager.XqStatusChartUIViewMg.EnumMemberStatus.STATUS_SELECT;
@@ -884,8 +893,8 @@ public class XqStatusChartUIViewMg extends AbsChartView{
             JMChartRoomSendBean bean = mSystemEventList.get(position);
             if(bean == null) return;
             holder.mTxvEventTime.setText(bean.getTime());
-            holder.mTxvEvent.setText(bean.getMsg() + "\n" + new Gson().toJson(bean) + "\n" + new Gson().toJson(mStatusManager.getCurrentSendBean()));
-            //holder.mTxvEvent.setText(bean.getMsg());
+            //holder.mTxvEvent.setText(bean.getMsg() + "\n" + new Gson().toJson(bean) + "\n" + new Gson().toJson(mStatusManager.getCurrentSendBean()));
+            holder.mTxvEvent.setText(bean.getMsg());
         }
 
         @Override
@@ -1519,6 +1528,21 @@ public class XqStatusChartUIViewMg extends AbsChartView{
     private void getReportItems() {
         mChatApi.getReportItems()
                 .subscribeOn(Schedulers.io())
+                .retryWhen(new Function<Observable<Throwable>, ObservableSource<?>>() {
+                    @Override
+                    public ObservableSource<?> apply(final Observable<Throwable> throwableObservable) throws Exception {
+                        return throwableObservable.flatMap(new Function<Throwable, ObservableSource<?>>() {
+                            @Override
+                            public ObservableSource<?> apply(Throwable throwable) throws Exception {
+                                if(throwable instanceof HttpException) {
+                                    com.cd.xq.module.util.tools.Log.e("yy",throwable.toString());
+                                    return Observable.timer(30, TimeUnit.SECONDS);
+                                }
+                                return Observable.error(throwable);
+                            }
+                        });
+                    }
+                })
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Consumer<NetResult<List<BGetReportItem>>>() {
                     @Override

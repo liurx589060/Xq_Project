@@ -77,6 +77,11 @@
             android:configChanges="orientation|keyboard|keyboardHidden|navigation"
             android:name=".login.ProtocolActivity"/>
 
+        <activity
+            android:screenOrientation="portrait"
+            android:configChanges="orientation|keyboard|keyboardHidden|navigation"
+            android:name=".friend.FriendActivity"/>
+
 
 
         <!--图片选择器-->

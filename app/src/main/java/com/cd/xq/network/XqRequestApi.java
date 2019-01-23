@@ -1,7 +1,9 @@
 package com.cd.xq.network;
 
 import com.cd.xq.beans.BGetArrays;
+import com.cd.xq.module.chart.beans.BGetReportItem;
 import com.cd.xq.module.util.beans.NetResult;
+import com.cd.xq.module.util.beans.user.UserInfoBean;
 
 import java.util.List;
 
@@ -19,4 +21,7 @@ public interface XqRequestApi {
 
     @GET("JMessage/changePassword")
     Observable<NetResult<String>> changePassword(@Query("userName") String userName,@Query("password") String password);
+
+    @GET("User/getFriendListByUser")
+    Observable<NetResult<List<UserInfoBean>>> getFriendListByUser(@Query("userName") String userName);
 }

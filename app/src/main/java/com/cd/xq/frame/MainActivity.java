@@ -106,6 +106,7 @@ public class MainActivity extends BaseActivity {
     private void autoLogin(String userName,String password) {
         mApi.login(userName,password)
                 .subscribeOn(Schedulers.io())
+                .retry(3)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Consumer<UserResp>() {
                     @Override
