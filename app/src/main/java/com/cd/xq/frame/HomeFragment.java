@@ -22,6 +22,7 @@ import com.bumptech.glide.Glide;
 import com.cd.xq.AppConstant;
 import com.cd.xq.R;
 import com.cd.xq.beans.BGetArrays;
+import com.cd.xq.beans.BusChatRoomParam;
 import com.cd.xq.friend.FriendActivity;
 import com.cd.xq.login.BlackCheckListener;
 import com.cd.xq.module.chart.ChartRoomActivity;
@@ -29,6 +30,7 @@ import com.cd.xq.module.chart.status.statusBeans.StatusMatchBean;
 import com.cd.xq.module.chart.status.statusBeans.StatusOnLookerEnterBean;
 import com.cd.xq.module.util.Constant;
 import com.cd.xq.module.util.base.BaseFragment;
+import com.cd.xq.module.util.beans.EventBusParam;
 import com.cd.xq.module.util.beans.NetResult;
 import com.cd.xq.module.util.beans.jmessage.Data;
 import com.cd.xq.module.util.beans.jmessage.JMChartResp;
@@ -53,6 +55,9 @@ import com.scwang.smartrefresh.layout.constant.SpinnerStyle;
 import com.scwang.smartrefresh.layout.footer.BallPulseFooter;
 import com.stx.xhb.xbanner.XBanner;
 
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
@@ -68,6 +73,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.functions.Action;
 import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 
@@ -101,7 +107,7 @@ public class HomeFragment extends BaseFragment {
     private String mTXPlayerAddress = "";
     private int mPushAddressType = 0;
     private int mPublic = 1;  // 1：公开    0：非公开
-    private JPushMessageReceiver mReceiver;
+    //private JPushMessageReceiver mReceiver;
 
     private ArrayList<BGetArrays> m_roomList;
     private OnLookerRecyclerViewAdapter mOnLookerAdapter;
@@ -112,13 +118,14 @@ public class HomeFragment extends BaseFragment {
             Bundle savedInstanceState) {
         mRootView = inflater.inflate(R.layout.tab_home, null);
         unbinder = ButterKnife.bind(this, mRootView);
+        EventBus.getDefault().register(this);
 
         init();
 
-        IntentFilter filter = new IntentFilter();
-        filter.addAction(AppConstant.BROADCAST_JPUSH_MESSAGE_ACTION);
-        mReceiver = new JPushMessageReceiver();
-        getActivity().registerReceiver(mReceiver, filter);
+//        IntentFilter filter = new IntentFilter();
+//        filter.addAction(AppConstant.BROADCAST_JPUSH_MESSAGE_ACTION);
+//        mReceiver = new JPushMessageReceiver();
+//        getActivity().registerReceiver(mReceiver, filter);
         return mRootView;
     }
 
@@ -218,6 +225,12 @@ public class HomeFragment extends BaseFragment {
         initSmartRefreshLayout();
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        EventBus.getDefault().unregister(this);
+    }
+
     private void createChartRoom(UserInfoBean userInfo) {
         if (userInfo == null) {
             Log.e("createChartRoom UserInfoBean=null");
@@ -251,6 +264,7 @@ public class HomeFragment extends BaseFragment {
 
         mApi.createChartRoom(params)
                 .subscribeOn(Schedulers.io())
+                .compose(this.<JMChartResp>bindToLifecycle())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Consumer<JMChartResp>() {
                     @Override
@@ -292,6 +306,7 @@ public class HomeFragment extends BaseFragment {
         }
         mApi.joinChartRoom(params)
                 .subscribeOn(Schedulers.io())
+                .compose(this.<JMChartResp>bindToLifecycle())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Consumer<JMChartResp>() {
                     @Override
@@ -462,7 +477,7 @@ public class HomeFragment extends BaseFragment {
     public void onDestroyView() {
         super.onDestroyView();
         unbinder.unbind();
-        getActivity().unregisterReceiver(mReceiver);
+        //getActivity().unregisterReceiver(mReceiver);
     }
 
     @Override
@@ -501,6 +516,7 @@ public class HomeFragment extends BaseFragment {
         //只获取公开的
         mXqApi.getArrays(1)
                 .subscribeOn(Schedulers.io())
+                .compose(this.<NetResult<List<BGetArrays>>>bindToLifecycle())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Consumer<NetResult<List<BGetArrays>>>() {
                     @Override
@@ -611,7 +627,7 @@ public class HomeFragment extends BaseFragment {
         }
     }
 
-    private class JPushMessageReceiver extends BroadcastReceiver {
+    /*private class JPushMessageReceiver extends BroadcastReceiver {
 
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -628,6 +644,22 @@ public class HomeFragment extends BaseFragment {
                 } catch (Exception e) {
                     Log.e("JPushMessageReceiver--" + e.toString());
                 }
+            }
+        }
+    }*/
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onChatRoomUpdate(EventBusParam<BusChatRoomParam> param) {
+        if(param.getEventBusCode() == EventBusParam.EVENT_BUS_UPDATE_CHATROOM) {
+            try {
+                JSONObject object = new JSONObject(param.getData().getMessage());
+                if (object.getInt("type") == AppConstant.JPUSH_TYPE_CHAT_CREATE
+                        || object.getInt("type") == AppConstant.JPUSH_TYPE_CHAT_DELETE) {
+                    //更新聊天室列表
+                    setOnLookerRecyclerView();
+                }
+            } catch (Exception e) {
+                Log.e("JPushMessageReceiver--" + e.toString());
             }
         }
     }

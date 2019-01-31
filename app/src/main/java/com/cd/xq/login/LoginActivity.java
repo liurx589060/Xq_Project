@@ -20,6 +20,7 @@ import com.cd.xq.frame.MainActivity;
 import com.cd.xq.module.util.Constant;
 import com.cd.xq.module.util.base.BaseActivity;
 import com.cd.xq.module.util.beans.BaseResp;
+import com.cd.xq.module.util.beans.EventBusParam;
 import com.cd.xq.module.util.beans.user.UserResp;
 import com.cd.xq.module.util.manager.DataManager;
 import com.cd.xq.module.util.network.NetWorkMg;
@@ -28,6 +29,8 @@ import com.cd.xq.module.util.tools.DialogFactory;
 import com.cd.xq.module.util.tools.Log;
 import com.cd.xq.module.util.tools.Tools;
 import com.cd.xq.module.util.tools.XqErrorCode;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.util.HashMap;
 
@@ -142,6 +145,7 @@ public class LoginActivity extends BaseActivity {
         mApi.checkUserExist(loginEditUserName.getText().toString())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
+                .compose(this.<BaseResp>bindToLifecycle())
                 .subscribe(new Consumer<BaseResp>() {
                     @Override
                     public void accept(BaseResp baseResp) throws Exception {
@@ -224,6 +228,12 @@ public class LoginActivity extends BaseActivity {
                                 Tools.toast(getApplicationContext(), "切换账号成功", false);
                                 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
                             }
+
+                            //通知获取好友列表
+                            EventBusParam param = new EventBusParam();
+                            param.setEventBusCode(EventBusParam.EVENT_BUS_UPDATE_FRIENDLIST);
+                            EventBus.getDefault().post(param);
+
                             startActivity(intent);
                             LoginActivity.this.finish();
                         } else if (userResp.getStatus() == XqErrorCode.ERROR_USER_PASSWORD_WRONG) {
@@ -271,6 +281,7 @@ public class LoginActivity extends BaseActivity {
             }
         }).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
+                .compose(this.<UserResp>bindToLifecycle())
                 .subscribe(new Consumer<UserResp>() {
                     @Override
                     public void accept(UserResp userResp) throws Exception {

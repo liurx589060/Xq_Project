@@ -12,6 +12,7 @@ import com.cd.xq.AppConstant;
 import com.cd.xq.R;
 import com.cd.xq.module.util.beans.NetResult;
 import com.cd.xq.module.util.base.BaseActivity;
+import com.cd.xq.module.util.beans.user.UserResp;
 import com.cd.xq.module.util.network.NetWorkMg;
 import com.cd.xq.module.util.tools.DialogFactory;
 import com.cd.xq.module.util.tools.Log;
@@ -84,6 +85,7 @@ public class ResetPasswordActivity extends BaseActivity {
         String password = Tools.MD5(AppConstant.MD5_PREFIX + password_1);
         mApi.changePassword(userName,password)
                 .subscribeOn(Schedulers.io())
+                .compose(this.<NetResult<String>>bindToLifecycle())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Consumer<NetResult<String>>() {
                     @Override

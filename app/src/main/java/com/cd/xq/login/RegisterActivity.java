@@ -319,6 +319,7 @@ public class RegisterActivity extends BaseActivity {
 
         mApi.updateUserInfo(params)
                 .subscribeOn(Schedulers.io())
+                .compose(this.<UserResp>bindToLifecycle())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Consumer<UserResp>() {
                     @Override

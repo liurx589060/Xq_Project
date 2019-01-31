@@ -1,9 +1,9 @@
 <component name="libraryTable">
   <library name="msclib-release:@aar">
     <CLASSES>
-      <root url="jar://$USER_HOME$/.gradle/caches/transforms-1/files-1.1/msclib-release.aar/4a09432ae58c11dbd719ddfe19165b1c/jars/libs/Msc.jar!/" />
-      <root url="file://$USER_HOME$/.gradle/caches/transforms-1/files-1.1/msclib-release.aar/4a09432ae58c11dbd719ddfe19165b1c/res" />
-      <root url="jar://$USER_HOME$/.gradle/caches/transforms-1/files-1.1/msclib-release.aar/4a09432ae58c11dbd719ddfe19165b1c/jars/classes.jar!/" />
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-1/files-1.1/msclib-release.aar/346c9d0df5e7fce62528c2dffff930b7/jars/libs/Msc.jar!/" />
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-1/files-1.1/msclib-release.aar/346c9d0df5e7fce62528c2dffff930b7/jars/classes.jar!/" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-1/files-1.1/msclib-release.aar/346c9d0df5e7fce62528c2dffff930b7/res" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />

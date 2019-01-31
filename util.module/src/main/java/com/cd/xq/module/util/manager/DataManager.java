@@ -21,15 +21,18 @@ public class DataManager {
     }
 
     public UserInfoBean getUserInfo() {
-//        if(userInfo == null) {
-//            userInfo = new UserInfoBean();
-//        }
+        if(userInfo == null) {
+            userInfo = new UserInfoBean();
+        }
         return userInfo;
     }
 
     public void setUserInfo(UserInfoBean userInfo) {
         this.userInfo = userInfo;
-        this.userInfo.setUser_name(this.jmUserName);
+        if(userInfo != null) {
+            this.userInfo.setUser_name(this.jmUserName);
+            DataManager.getInstance().getUserInfo().setOnLine(true);
+        }
     }
 
     public Data getChartData() {

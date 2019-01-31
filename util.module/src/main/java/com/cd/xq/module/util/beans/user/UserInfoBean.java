@@ -36,6 +36,7 @@ public class UserInfoBean implements Serializable{
     private int limitLady = 10;
     private int limitMan = 1;
     private int limitAngel = 1;
+    private boolean isOnLine = false;
 
 
 
@@ -237,5 +238,13 @@ public class UserInfoBean implements Serializable{
 
     public void setSpecial_info(String special_info) {
         this.special_info = special_info;
+    }
+
+    public boolean isOnLine() {
+        return isOnLine;
+    }
+
+    public void setOnLine(boolean onLine) {
+        isOnLine = onLine;
     }
 }

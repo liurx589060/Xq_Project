@@ -9,12 +9,15 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 
 import com.cd.xq.module.util.tools.StatusBarCompat;
+import com.trello.rxlifecycle2.components.support.RxAppCompatActivity;
+
+import org.greenrobot.eventbus.EventBus;
 
 /**
  * Created by Administrator on 2018/10/28.
  */
 
-public class BaseActivity extends AppCompatActivity {
+public class BaseActivity extends RxAppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -73,5 +76,10 @@ public class BaseActivity extends AppCompatActivity {
 
     public void translucentStatusBar(boolean hideStatusBarBackground) {
         StatusBarCompat.translucentStatusBar(this,hideStatusBarBackground);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
     }
 }

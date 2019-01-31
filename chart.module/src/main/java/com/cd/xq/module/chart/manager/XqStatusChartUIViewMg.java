@@ -44,6 +44,7 @@ import com.cd.xq.module.util.beans.jmessage.JMChartResp;
 import com.cd.xq.module.util.beans.jmessage.JMChartRoomSendBean;
 import com.cd.xq.module.util.beans.jmessage.Member;
 import com.cd.xq.module.util.beans.user.UserInfoBean;
+import com.cd.xq.module.util.beans.user.UserResp;
 import com.cd.xq.module.util.glide.GlideCircleBorderTransform;
 import com.cd.xq.module.util.jmessage.JMsgSender;
 import com.cd.xq.module.util.manager.DataManager;
@@ -355,6 +356,7 @@ public class XqStatusChartUIViewMg extends AbsChartView{
         params.put("roomId",DataManager.getInstance().getChartData().getRoomId());
         mChatApi.reportUser(params)
                 .subscribeOn(Schedulers.io())
+                .compose(mXqActivity.<NetResult<String>>bindToLifecycle())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Consumer<NetResult<String>>() {
                     @Override
@@ -537,6 +539,7 @@ public class XqStatusChartUIViewMg extends AbsChartView{
     private void getChartRoomMembersList(long roomId) {
         mApi.getChartRoomMemeberList(roomId)
                 .subscribeOn(Schedulers.io())
+                .compose(mXqActivity.<JMChartResp>bindToLifecycle())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Consumer<JMChartResp>() {
                     @Override
@@ -578,6 +581,7 @@ public class XqStatusChartUIViewMg extends AbsChartView{
         params.put("status",mIsRoomMatchSuccess?1:0);
         mApi.deleteChartRoom(params)
                 .subscribeOn(Schedulers.io())
+                .compose(mXqActivity.<JMChartResp>bindToLifecycle())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Consumer<JMChartResp>() {
                     @Override
@@ -610,6 +614,7 @@ public class XqStatusChartUIViewMg extends AbsChartView{
         params.put("status",mIsSelefMatchSuccess?1:0);
         mApi.exitChartRoom(params)
                 .subscribeOn(Schedulers.io())
+                .compose(mXqActivity.<JMChartResp>bindToLifecycle())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Consumer<JMChartResp>() {
                     @Override
@@ -1241,6 +1246,7 @@ public class XqStatusChartUIViewMg extends AbsChartView{
             Log.e("yy",e.toString());
             return;
         }
+
         JMNormalSendBean normalSendBean = new Gson().fromJson(text,JMNormalSendBean.class);
         if(normalSendBean.getRoomId() != DataManager.getInstance().getChartData().getRoomId())
         {
@@ -1528,6 +1534,7 @@ public class XqStatusChartUIViewMg extends AbsChartView{
     private void getReportItems() {
         mChatApi.getReportItems()
                 .subscribeOn(Schedulers.io())
+                .compose(mXqActivity.<NetResult<List<BGetReportItem>>>bindToLifecycle())
                 .retryWhen(new Function<Observable<Throwable>, ObservableSource<?>>() {
                     @Override
                     public ObservableSource<?> apply(final Observable<Throwable> throwableObservable) throws Exception {

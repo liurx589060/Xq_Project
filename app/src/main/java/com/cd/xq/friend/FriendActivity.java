@@ -1,7 +1,6 @@
 package com.cd.xq.friend;
 
 import android.app.Activity;
-import android.app.Dialog;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -18,9 +17,12 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.cd.xq.R;
+import com.cd.xq.manager.AppDataManager;
 import com.cd.xq.module.util.base.BaseActivity;
+import com.cd.xq.module.util.beans.EventBusParam;
 import com.cd.xq.module.util.beans.NetResult;
 import com.cd.xq.module.util.beans.user.UserInfoBean;
+import com.cd.xq.module.util.beans.user.UserResp;
 import com.cd.xq.module.util.manager.DataManager;
 import com.cd.xq.module.util.network.NetWorkMg;
 import com.cd.xq.module.util.tools.DialogFactory;
@@ -32,6 +34,10 @@ import com.rx.linklib.AbsLinkHandle;
 import com.rx.linklib.HeadModel;
 import com.rx.linklib.LinkAdapter;
 import com.rx.linklib.Utils;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -68,19 +74,14 @@ public class FriendActivity extends BaseActivity {
     private MainAdapter mainAdapter;
     private MyLinkHandle myLinkHandle;
 
-    private XqRequestApi mXqApi;
-
     private List<UserInfoBean> mDataList;
-    private Dialog mLoadingDialog;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_friend);
         ButterKnife.bind(this);
-
-        mXqApi = NetWorkMg.newRetrofit().create(XqRequestApi.class);
-        mLoadingDialog = DialogFactory.createLoadingDialog(this);
+        EventBus.getDefault().register(this);
 
         init();
     }
@@ -100,8 +101,17 @@ public class FriendActivity extends BaseActivity {
         });
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        EventBus.getDefault().unregister(this);
+    }
+
     private void init() {
         mDataList = new ArrayList<>();
+
+        mDataList.addAll(AppDataManager.getInstance().getFriendList());
+        checkDataList();
 
         friendTaitouRecyclerView.setOverScrollMode(OVER_SCROLL_NEVER);
         friendTaitouRecyclerView.setLayoutManager(new LinearLayoutManager(this,
@@ -111,48 +121,14 @@ public class FriendActivity extends BaseActivity {
         myLinkHandle = new MyLinkHandle();
         mainAdapter = new MainAdapter(this, mDataList, friendTaitouRecyclerView, myLinkHandle);
         friendMainRecyclerView.setAdapter(mainAdapter);
-
-        //获取好友列表
-        getFriendList();
     }
 
-    /**
-     * 获取好友列表
-     */
-    private void getFriendList() {
-        mLoadingDialog.show();
-        mXqApi.getFriendListByUser(DataManager.getInstance().getUserInfo().getUser_name())
-                .retry(3)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<NetResult<List<UserInfoBean>>>() {
-                    @Override
-                    public void accept(NetResult<List<UserInfoBean>> listNetResult) throws
-                            Exception {
-                        mLoadingDialog.dismiss();
-                        if (listNetResult.getStatus() != XqErrorCode.SUCCESS && listNetResult.getStatus() !=
-                                XqErrorCode.ERROR_NO_DATA) {
-                            Tools.toast(getApplicationContext(), listNetResult.getMsg(), false);
-                            return;
-                        }
-
-                        if (listNetResult.getData() == null || listNetResult.getData().size() == 0) {
-                            friendEmptyLayout.setVisibility(View.VISIBLE);
-                            return;
-                        }
-
-                        mDataList.clear();
-                        mDataList.addAll(listNetResult.getData());
-                        sortDataList(mDataList);
-                        mainAdapter.updateData(mDataList);
-                    }
-                }, new Consumer<Throwable>() {
-                    @Override
-                    public void accept(Throwable throwable) throws Exception {
-                        Log.e("getFriendList--" + throwable.toString());
-                        mLoadingDialog.dismiss();
-                    }
-                });
+    private void checkDataList() {
+        if(mDataList.size() == 0) {
+            friendEmptyLayout.setVisibility(View.VISIBLE);
+        }else {
+            friendEmptyLayout.setVisibility(View.GONE);
+        }
     }
 
     @OnClick(R.id.friend_btn_close)
@@ -214,12 +190,14 @@ public class FriendActivity extends BaseActivity {
     private class MainNormalViewHolder extends RecyclerView.ViewHolder {
         public ImageView imageView;
         public TextView textView;
+        public TextView textOnlineStatus;
         public View divide;
 
         public MainNormalViewHolder(View itemView) {
             super(itemView);
             imageView = itemView.findViewById(R.id.normal_image);
             textView = itemView.findViewById(R.id.normal_textview);
+            textOnlineStatus = itemView.findViewById(R.id.normal_text_online_status);
             divide = itemView.findViewById(R.id.normal_divide);
         }
     }
@@ -287,6 +265,14 @@ public class FriendActivity extends BaseActivity {
                         .load(model.getHead_image())
                         .placeholder(R.drawable.chart_room_default_head)
                         .into(viewHolder.imageView);
+
+                if(model.isOnLine()) {
+                    viewHolder.textOnlineStatus.setText("在线");
+                    viewHolder.textOnlineStatus.setTextColor(Color.parseColor("#32b7b9"));
+                }else {
+                    viewHolder.textOnlineStatus.setText("离开");
+                    viewHolder.textOnlineStatus.setTextColor(Color.parseColor("#aaaaaa"));
+                }
             }
         }
 
@@ -309,6 +295,10 @@ public class FriendActivity extends BaseActivity {
             }
             return NORMAL_ITEM;
         }
+
+        public void reset() {
+            strPre = "";
+        }
     }
 
     private class TaiTouViewHolder extends RecyclerView.ViewHolder {
@@ -319,6 +309,17 @@ public class FriendActivity extends BaseActivity {
             super(itemView);
             textView = itemView.findViewById(R.id.taitou_textview);
             taiTouBgView = itemView.findViewById(R.id.taitou_bg);
+        }
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onUpdateList(EventBusParam param) {
+        if(param.getEventBusCode() == EventBusParam.EVENT_BUS_UPDATE_FRIENDLIST) {
+            mDataList.clear();
+            mDataList.addAll(AppDataManager.getInstance().getFriendList());
+            checkDataList();
+            mainAdapter.reset();
+            mainAdapter.updateData(mDataList);
         }
     }
 

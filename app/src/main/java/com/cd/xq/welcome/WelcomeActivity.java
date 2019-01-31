@@ -14,6 +14,7 @@ import android.view.WindowManager;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.cd.xq.AppService;
 import com.cd.xq.R;
 import com.cd.xq.frame.MainActivity;
 import com.cd.xq.login.LoginActivity;
@@ -60,6 +61,10 @@ public class WelcomeActivity extends AppCompatActivity {
             finish();
             return;
         }
+
+        Intent intent = new Intent(this, AppService.class);
+        startService(intent);
+
         //设置全屏
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_welcome);

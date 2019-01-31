@@ -7,11 +7,13 @@ import android.text.TextUtils;
 import android.widget.Toast;
 
 import com.cd.xq.module.util.beans.NetResult;
+import com.cd.xq.module.util.beans.jmessage.JMChartResp;
 import com.cd.xq.module.util.beans.user.BBlackUser;
 import com.cd.xq.module.util.interfaces.ICheckBlackListener;
 import com.cd.xq.module.util.manager.DataManager;
 import com.cd.xq.module.util.network.NetWorkMg;
 import com.cd.xq.module.util.network.RequestApi;
+import com.trello.rxlifecycle2.components.support.RxAppCompatActivity;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -106,6 +108,7 @@ public class Tools {
         params.put("status",1);
         api.getBlackUserByName(params)
                 .subscribeOn(Schedulers.io())
+                .compose(((RxAppCompatActivity)activity).<NetResult<BBlackUser>>bindToLifecycle())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Consumer<NetResult<BBlackUser>>() {
                     @Override

@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="linklib-release:@aar">
+    <CLASSES>
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-1/files-1.1/linklib-release.aar/1eab3d5aa3e91babd30268c9cfd3b176/res" />
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-1/files-1.1/linklib-release.aar/1eab3d5aa3e91babd30268c9cfd3b176/jars/classes.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

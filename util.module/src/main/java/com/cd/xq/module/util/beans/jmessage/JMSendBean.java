@@ -5,10 +5,11 @@ package com.cd.xq.module.util.beans.jmessage;
  */
 
 public class JMSendBean<T> {
-    public static final int JM_SEND_FRIEND_ONLINE = 0x1000;  //检查好友在线
+    public static final int JM_SEND_USER_CHECK_ONLINE = 0x1000;  //检查用户是否在线
 
     private int code;
     private String targetUserName;
+    private String fromUserName;
     private T data;
 
     public int getCode() {
@@ -33,5 +34,13 @@ public class JMSendBean<T> {
 
     public void setTargetUserName(String targetUserName) {
         this.targetUserName = targetUserName;
+    }
+
+    public String getFromUserName() {
+        return fromUserName;
+    }
+
+    public void setFromUserName(String fromUserName) {
+        this.fromUserName = fromUserName;
     }
 }
