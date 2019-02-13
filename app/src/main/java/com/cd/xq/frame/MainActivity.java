@@ -16,28 +16,22 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.cd.xq.AppService;
 import com.cd.xq.R;
-import com.cd.xq.beans.JMOnlineParam;
 import com.cd.xq.login.BlackCheckListener;
 import com.cd.xq.login.RegisterActivity;
-import com.cd.xq.manager.AppDataManager;
 import com.cd.xq.module.util.Constant;
 import com.cd.xq.module.util.base.BaseActivity;
 import com.cd.xq.module.util.base.BaseFragment;
 import com.cd.xq.module.util.base.SlideViewPager;
 import com.cd.xq.module.util.beans.EventBusParam;
-import com.cd.xq.module.util.beans.jmessage.JMSendBean;
-import com.cd.xq.module.util.beans.user.UserInfoBean;
 import com.cd.xq.module.util.beans.user.UserResp;
-import com.cd.xq.module.util.jmessage.JMsgSender;
 import com.cd.xq.module.util.manager.DataManager;
 import com.cd.xq.module.util.network.NetWorkMg;
 import com.cd.xq.module.util.network.RequestApi;
 import com.cd.xq.module.util.tools.Tools;
 import com.cd.xq.module.util.tools.XqErrorCode;
+import com.cd.xq.utils.AppTools;
 import com.cd.xq.utils.CheckUtil;
-import com.cd.xq.welcome.WelcomeActivity;
 
 import org.greenrobot.eventbus.EventBus;
 
@@ -143,6 +137,9 @@ public class MainActivity extends BaseActivity {
                             param.setEventBusCode(EventBusParam.EVENT_BUS_GET_FRIENDLIST);
                             EventBus.getDefault().post(param);
 
+                            //通知好友上线
+                            AppTools.notifyFriendOnLine(true);
+
                         }else if(userResp.getStatus() == XqErrorCode.ERROR_USER_PASSWORD_WRONG) {
                             Tools.toast(getApplicationContext(),"密码错误",true);
                         }else if(userResp.getStatus() == XqErrorCode.ERROR_USER_NOT_EXIST) {
@@ -212,19 +209,9 @@ public class MainActivity extends BaseActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        DataManager.getInstance().getUserInfo().setOnLine(false);
         //告知好友离线
-        for(int i = 0 ; i < AppDataManager.getInstance().getFriendList().size() ; i++) {
-            UserInfoBean userInfoBean = AppDataManager.getInstance().getFriendList().get(i);
-            JMSendBean sendBean = new JMSendBean();
-            sendBean.setCode(JMSendBean.JM_SEND_USER_CHECK_ONLINE);
-            sendBean.setTargetUserName(userInfoBean.getUser_name());
-            sendBean.setFromUserName(DataManager.getInstance().getUserInfo().getUser_name());
-            JMOnlineParam param = new JMOnlineParam();
-            param.setType(JMOnlineParam.TYPE_SEND);
-            param.setOnLine(false);
-            sendBean.setData(param);
-            JMsgSender.sendTextMessage(sendBean);
-        }
+        AppTools.notifyFriendOnLine(false);
     }
 
     private void addTab() {

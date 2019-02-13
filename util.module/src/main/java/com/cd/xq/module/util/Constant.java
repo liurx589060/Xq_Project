@@ -6,7 +6,7 @@ package com.cd.xq.module.util;
 
 public class Constant {
     public static String CONSTANT_REMOTE_IP = "47.107.190.107";
-    public static String CONSTANT_LOCOL_IP = "192.168.1.101";
+    public static String CONSTANT_LOCOL_IP = "192.168.1.102";
 
     public static String thumbUrl = "http://p.nanrenwo.net/uploads/allimg/161104/8450-161104134439-50.jpg";
     public static String SP_NAME = "xq_cd";

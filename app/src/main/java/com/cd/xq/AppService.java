@@ -18,6 +18,7 @@ import com.cd.xq.module.util.tools.Log;
 import com.cd.xq.module.util.tools.XqErrorCode;
 import com.cd.xq.network.JMRestApi;
 import com.cd.xq.network.XqRequestApi;
+import com.cd.xq.utils.AppTools;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -53,8 +54,6 @@ public class AppService extends Service {
     public static final String PRE = "AppService";
     private XqRequestApi mXqApi;
     private Disposable mDisposable;
-
-    private boolean isDoCheckOnLine = false;
 
 
     @Nullable
@@ -122,58 +121,13 @@ public class AppService extends Service {
                         }
                         AppDataManager.getInstance().getFriendList().clear();
                         AppDataManager.getInstance().getFriendList().addAll(listNetResult.getData());
-                        if(!isDoCheckOnLine) {
-                            //checkUserOnline();
-                            userStat();
-                            isDoCheckOnLine = true;
-                        }
-
-                        //告知好友已经上线
-                        checkUserOnline(false,true);
-
-                        //发送需要更新好友列表状态
-                        eventBusToUpdateFriend();
+                        //获取好友在线状态
+                        userStat();
                     }
                 }, new Consumer<Throwable>() {
                     @Override
                     public void accept(Throwable throwable) throws Exception {
                         Log.e(PRE ,"getFriendList--" + throwable.toString());
-                    }
-                });
-    }
-
-    private void checkUserOnline(final boolean isInterval, final boolean isOnLine) {
-        final int period = 60*2;
-        Observable.interval(0,period,TimeUnit.SECONDS)
-                .takeWhile(new Predicate<Long>() {
-                    @Override
-                    public boolean test(Long aLong) throws Exception {
-                        if(isInterval) {
-                            return true;
-                        }else {
-                            return aLong< 1;
-                        }
-                    }
-                })
-                .subscribeOn(AndroidSchedulers.mainThread())
-                .flatMap(new Function<Long, ObservableSource<UserInfoBean>>() {
-                    @Override
-                    public ObservableSource<UserInfoBean> apply(Long aLong) throws Exception {
-                        return Observable.fromIterable(AppDataManager.getInstance().getFriendList());
-                    }
-                })
-                .subscribe(new Consumer<UserInfoBean>() {
-                    @Override
-                    public void accept(UserInfoBean userInfoBean) throws Exception {
-                        JMSendBean sendBean = new JMSendBean();
-                        sendBean.setCode(JMSendBean.JM_SEND_USER_CHECK_ONLINE);
-                        sendBean.setTargetUserName(userInfoBean.getUser_name());
-                        sendBean.setFromUserName(DataManager.getInstance().getUserInfo().getUser_name());
-                        JMOnlineParam param = new JMOnlineParam();
-                        param.setType(JMOnlineParam.TYPE_SEND);
-                        param.setOnLine(isOnLine);
-                        sendBean.setData(param);
-                        JMsgSender.sendTextMessage(sendBean);
                     }
                 });
     }
@@ -260,6 +214,7 @@ public class AppService extends Service {
                 UserInfoBean infoBean = getUserInfoFromFriendListByName(fromUserName);
                 if(infoBean != null && (infoBean.isOnLine() != bean.getData().isOnLine())) {
                     infoBean.setOnLine(bean.getData().isOnLine());
+                    infoBean.setManualOnLine(bean.getData().isOnLine());
                     //发送需要更新好友列表状态
                     eventBusToUpdateFriend();
                 }
@@ -273,6 +228,10 @@ public class AppService extends Service {
         for(int i = 0 ; i < AppDataManager.getInstance().getFriendList().size() ; i++) {
             list.add(AppDataManager.getInstance().getFriendList().get(i).getUser_name());
         }
+        if(list.size() == 0) {
+            return;
+        }
+
         String jsonBody = new Gson().toJson(list);
         final RequestBody body = RequestBody.create(MediaType.parse("application/json; charset=utf-8"),jsonBody);
         final int period = 60*2;
@@ -317,7 +276,7 @@ public class AppService extends Service {
                                 }
 
                                 UserInfoBean bean = getUserInfoFromFriendListByName(userName);
-                                if(bean.isOnLine() != isOnLine) {
+                                if(bean.isOnLine() != isOnLine && bean.isManualOnLine()) {
                                     isUpdateOnLine = true;
                                     bean.setOnLine(isOnLine);
                                 }

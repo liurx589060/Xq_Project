@@ -37,6 +37,7 @@ public class UserInfoBean implements Serializable{
     private int limitMan = 1;
     private int limitAngel = 1;
     private boolean isOnLine = false;
+    private boolean isManualOnLine = true; //手动退出或者启动
 
 
 
@@ -246,5 +247,13 @@ public class UserInfoBean implements Serializable{
 
     public void setOnLine(boolean onLine) {
         isOnLine = onLine;
+    }
+
+    public boolean isManualOnLine() {
+        return isManualOnLine;
+    }
+
+    public void setManualOnLine(boolean manualOnLine) {
+        isManualOnLine = manualOnLine;
     }
 }

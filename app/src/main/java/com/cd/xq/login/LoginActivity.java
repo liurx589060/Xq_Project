@@ -29,6 +29,7 @@ import com.cd.xq.module.util.tools.DialogFactory;
 import com.cd.xq.module.util.tools.Log;
 import com.cd.xq.module.util.tools.Tools;
 import com.cd.xq.module.util.tools.XqErrorCode;
+import com.cd.xq.utils.AppTools;
 
 import org.greenrobot.eventbus.EventBus;
 
@@ -216,6 +217,10 @@ public class LoginActivity extends BaseActivity {
                     public void accept(UserResp userResp) throws Exception {
                         mLoadingDialog.dismiss();
                         if (userResp.getStatus() == XqErrorCode.SUCCESS) {
+                            if(DataManager.getInstance().getUserInfo() != null) {
+                                AppTools.notifyFriendOnLine(false);
+                            }
+
                             DataManager.getInstance().setJmUserName(userName);
                             DataManager.getInstance().setUserInfo(userResp.getData());
                             mLoadingDialog.dismiss();
@@ -233,6 +238,10 @@ public class LoginActivity extends BaseActivity {
                             EventBusParam param = new EventBusParam();
                             param.setEventBusCode(EventBusParam.EVENT_BUS_UPDATE_FRIENDLIST);
                             EventBus.getDefault().post(param);
+
+                            if(DataManager.getInstance().getUserInfo() != null) {
+                                AppTools.notifyFriendOnLine(true);
+                            }
 
                             startActivity(intent);
                             LoginActivity.this.finish();
