@@ -5,7 +5,10 @@ import android.content.Intent;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 
+import com.cd.xq.beans.JMFriendInviteParam;
 import com.cd.xq.beans.JMOnlineParam;
+import com.cd.xq.frame.MainActivity;
+import com.cd.xq.friend.FriendActivity;
 import com.cd.xq.manager.AppDataManager;
 import com.cd.xq.module.util.beans.EventBusParam;
 import com.cd.xq.module.util.beans.NetResult;
@@ -21,6 +24,7 @@ import com.cd.xq.network.XqRequestApi;
 import com.cd.xq.utils.AppTools;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.mob.wrappers.UMSSDKWrapper;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -119,8 +123,20 @@ public class AppService extends Service {
                         if (listNetResult.getData() == null || listNetResult.getData().size() == 0) {
                             return;
                         }
+
+                        List<UserInfoBean> newList = new ArrayList<>();
+                        for(int i = 0 ; i < listNetResult.getData().size() ; i++) {
+                            UserInfoBean bean = getUserInfoFromFriendListByName(listNetResult.getData().get(i).getUser_name());
+                            if(bean == null) {
+                                newList.add(listNetResult.getData().get(i));
+                            }else {
+                                listNetResult.getData().get(i).setManualOnLine(bean.isManualOnLine());
+                                listNetResult.getData().get(i).setOnLine(bean.isOnLine());
+                                newList.add(listNetResult.getData().get(i));
+                            }
+                        }
                         AppDataManager.getInstance().getFriendList().clear();
-                        AppDataManager.getInstance().getFriendList().addAll(listNetResult.getData());
+                        AppDataManager.getInstance().getFriendList().addAll(newList);
                         //获取好友在线状态
                         userStat();
                     }
@@ -148,49 +164,6 @@ public class AppService extends Service {
         }
     }
 
-//    /**
-//     * 接收普通消息
-//     * @param event
-//     */
-//    public void onEventMainThread(MessageEvent event){
-//        String message = event.getMessage().getContent().toJson();
-//        String text = null;
-//        try {
-//            JSONObject object = new JSONObject(message);
-//            text = object.getString("text");
-//        }catch (Exception e) {
-//            Log.e(PRE,"onEventMainThread--" + e.toString());
-//            return;
-//        }
-//
-//        JMSendBean<JMOnlineParam> bean = new Gson().fromJson(text,new TypeToken<JMSendBean<JMOnlineParam>>(){}.getType());
-//        if(bean.getCode() == JMSendBean.JM_SEND_USER_CHECK_ONLINE) {
-//            if(bean.getData().getType() == JMOnlineParam.TYPE_SEND) {
-//                //回复
-//                JMSendBean sendBean = new JMSendBean();
-//                sendBean.setCode(JMSendBean.JM_SEND_USER_CHECK_ONLINE);
-//                sendBean.setTargetUserName(bean.getFromUserName());
-//                sendBean.setFromUserName(bean.getTargetUserName());
-//                JMOnlineParam param = new JMOnlineParam();
-//                param.setOnLine(true);
-//                param.setType(JMOnlineParam.TYPE_RESPONSE);
-//                sendBean.setData(param);
-//                JMsgSender.sendTextMessage(sendBean);
-//            }else if(bean.getData().getType() == JMOnlineParam.TYPE_RESPONSE) {
-//                String fromUserName = bean.getFromUserName();
-//                for(int i = 0 ; i < AppDataManager.getInstance().getFriendList().size() ; i++) {
-//                    UserInfoBean infoBean = AppDataManager.getInstance().getFriendList().get(i);
-//                    if(infoBean.getUser_name().equals(fromUserName)
-//                            && infoBean.isOnLine() != bean.getData().isOnLine()) {
-//                        infoBean.setOnLine(bean.getData().isOnLine());
-//                        //发送需要更新好友列表状态
-//                        eventBusToUpdateFriend();
-//                    }
-//                }
-//            }
-//        }
-//    }
-
     /**
      * 接收普通消息
      * @param event
@@ -206,19 +179,33 @@ public class AppService extends Service {
             return;
         }
 
-        JMSendBean<JMOnlineParam> bean = new Gson().fromJson(text,new TypeToken<JMSendBean<JMOnlineParam>>(){}.getType());
-        if(bean.getCode() == JMSendBean.JM_SEND_USER_CHECK_ONLINE) {
-            if(bean.getData().getType() == JMOnlineParam.TYPE_SEND) {
-                //更新好友在线状态
-                String fromUserName = bean.getFromUserName();
-                UserInfoBean infoBean = getUserInfoFromFriendListByName(fromUserName);
-                if(infoBean != null && (infoBean.isOnLine() != bean.getData().isOnLine())) {
-                    infoBean.setOnLine(bean.getData().isOnLine());
-                    infoBean.setManualOnLine(bean.getData().isOnLine());
-                    //发送需要更新好友列表状态
-                    eventBusToUpdateFriend();
+        JMSendBean bean = new Gson().fromJson(text,JMSendBean.class);
+        switch (bean.getCode()) {
+            case JMSendBean.JM_SEND_USER_CHECK_ONLINE:
+            {
+                JMOnlineParam param = new Gson().fromJson(bean.getJsonData(),JMOnlineParam.class);
+                if(param.getType() == JMOnlineParam.TYPE_SEND) {
+                    //更新好友在线状态
+                    String fromUserName = bean.getFromUserName();
+                    UserInfoBean infoBean = getUserInfoFromFriendListByName(fromUserName);
+                    if(infoBean != null && (infoBean.isOnLine() != param.isOnLine())) {
+                        infoBean.setOnLine(param.isOnLine());
+                        infoBean.setManualOnLine(param.isOnLine());
+                        //发送需要更新好友列表状态
+                        eventBusToUpdateFriend();
+                    }
                 }
             }
+                break;
+            case JMSendBean.JM_SEND_FRIEND_INVITE:
+            {
+                JMFriendInviteParam param = new Gson().fromJson(bean.getJsonData(),JMFriendInviteParam.class);
+                if(param.getType() == JMFriendInviteParam.TYPE_SEND
+                        && param.getAction() == JMFriendInviteParam.ACTION_CREATE) {
+                    InviteRoomDlgActivity.startWithReceive(getApplicationContext(),param.getFromUser());
+                }
+            }
+                break;
         }
     }
 
@@ -236,12 +223,12 @@ public class AppService extends Service {
         final RequestBody body = RequestBody.create(MediaType.parse("application/json; charset=utf-8"),jsonBody);
         final int period = 60*2;
         mDisposable = Observable.interval(0,period,TimeUnit.SECONDS)
-                .takeWhile(new Predicate<Long>() {
-                    @Override
-                    public boolean test(Long aLong) throws Exception {
-                        return aLong<1;
-                    }
-                })
+//                .takeWhile(new Predicate<Long>() {
+//                    @Override
+//                    public boolean test(Long aLong) throws Exception {
+//                        return aLong<1;
+//                    }
+//                })
                 .subscribeOn(AndroidSchedulers.mainThread())
                 .flatMap(new Function<Long, ObservableSource<String>>() {
                     @Override
@@ -286,6 +273,11 @@ public class AppService extends Service {
                             if(isUpdateOnLine) {
                                 eventBusToUpdateFriend();
                             }
+
+//                            Intent intent = new Intent(getApplicationContext(),DialogContainerActivity.class);
+//                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//                            startActivity(intent);
+
                         }catch (Exception e) {
                             Log.e("userStat--" + e.toString());
                         }

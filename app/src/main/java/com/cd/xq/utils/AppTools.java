@@ -6,6 +6,7 @@ import com.cd.xq.module.util.beans.jmessage.JMSendBean;
 import com.cd.xq.module.util.beans.user.UserInfoBean;
 import com.cd.xq.module.util.jmessage.JMsgSender;
 import com.cd.xq.module.util.manager.DataManager;
+import com.google.gson.Gson;
 
 /**
  * Created by Administrator on 2019/2/13.
@@ -32,7 +33,7 @@ public class AppTools {
         JMOnlineParam param = new JMOnlineParam();
         param.setType(JMOnlineParam.TYPE_SEND);
         param.setOnLine(isOnLine);
-        sendBean.setData(param);
+        sendBean.setJsonData(new Gson().toJson(param));
         JMsgSender.sendTextMessage(sendBean);
     }
 }

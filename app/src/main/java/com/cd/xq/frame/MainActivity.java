@@ -16,6 +16,7 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.cd.xq.AppService;
 import com.cd.xq.R;
 import com.cd.xq.login.BlackCheckListener;
 import com.cd.xq.login.RegisterActivity;
@@ -210,6 +211,9 @@ public class MainActivity extends BaseActivity {
     protected void onDestroy() {
         super.onDestroy();
         DataManager.getInstance().getUserInfo().setOnLine(false);
+        Intent intent = new Intent(this, AppService.class);
+        stopService(intent);
+
         //告知好友离线
         AppTools.notifyFriendOnLine(false);
     }

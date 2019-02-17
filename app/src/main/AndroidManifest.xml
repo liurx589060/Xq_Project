@@ -82,6 +82,20 @@
             android:configChanges="orientation|keyboard|keyboardHidden|navigation"
             android:name=".friend.FriendActivity"/>
 
+        <activity
+            android:theme="@style/ActivityTranslucent"
+            android:excludeFromRecents="true"
+            android:screenOrientation="portrait"
+            android:configChanges="orientation|keyboard|keyboardHidden|navigation"
+            android:name=".DialogContainerActivity"/>
+
+        <activity
+            android:theme="@style/ActivityDialog"
+            android:excludeFromRecents="true"
+            android:screenOrientation="portrait"
+            android:configChanges="orientation|keyboard|keyboardHidden|navigation"
+            android:name=".InviteRoomDlgActivity"/>
+
 
 
         <!--图片选择器-->

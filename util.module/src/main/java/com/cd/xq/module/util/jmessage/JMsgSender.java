@@ -24,7 +24,7 @@ public class JMsgSender {
      * @param sendBean
      */
     public static void sendTextMessage(JMSendBean sendBean) {
-        if(sendBean == null || sendBean.getTargetUserName() == null || sendBean.getData() == null) {
+        if(sendBean == null || sendBean.getTargetUserName() == null || sendBean.getFromUserName() == null) {
             return;
         }
 

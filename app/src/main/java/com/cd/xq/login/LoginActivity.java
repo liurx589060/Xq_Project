@@ -236,7 +236,7 @@ public class LoginActivity extends BaseActivity {
 
                             //通知获取好友列表
                             EventBusParam param = new EventBusParam();
-                            param.setEventBusCode(EventBusParam.EVENT_BUS_UPDATE_FRIENDLIST);
+                            param.setEventBusCode(EventBusParam.EVENT_BUS_GET_FRIENDLIST);
                             EventBus.getDefault().post(param);
 
                             if(DataManager.getInstance().getUserInfo() != null) {

@@ -145,6 +145,11 @@ public class HomeFragment extends BaseFragment {
         homeBtnFriend.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if(!DataManager.getInstance().getUserInfo().isOnLine()) {
+                    Tools.toast(getActivity(), "请先登录...", true);
+                    return;
+                }
+
                 Intent intent = new Intent(getActivity(), FriendActivity.class);
                 getActivity().startActivity(intent);
             }
@@ -236,6 +241,12 @@ public class HomeFragment extends BaseFragment {
             Log.e("createChartRoom UserInfoBean=null");
             return;
         }
+
+        if(!DataManager.getInstance().getUserInfo().isOnLine()) {
+            Tools.toast(getActivity(), "请先登录...", true);
+            return;
+        }
+
         if (!userInfo.getRole_type().equals(Constant.ROLRTYPE_ANGEL)) {
             Tools.toast(getActivity(), "您不是爱心大使", true);
             return;
@@ -293,6 +304,11 @@ public class HomeFragment extends BaseFragment {
     }
 
     private void joinChartRoom(int roomRoleType, long roomId) {
+        if(!DataManager.getInstance().getUserInfo().isOnLine()) {
+            Tools.toast(getActivity(), "请先登录...", true);
+            return;
+        }
+
         UserInfoBean userInfo = DataManager.getInstance().getUserInfo();
 
         Map<String, Object> params = new HashMap<>();

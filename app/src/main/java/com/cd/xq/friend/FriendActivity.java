@@ -1,6 +1,7 @@
 package com.cd.xq.friend;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -14,22 +15,14 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-
 import com.bumptech.glide.Glide;
+import com.cd.xq.InviteRoomDlgActivity;
 import com.cd.xq.R;
 import com.cd.xq.manager.AppDataManager;
 import com.cd.xq.module.util.base.BaseActivity;
 import com.cd.xq.module.util.beans.EventBusParam;
-import com.cd.xq.module.util.beans.NetResult;
 import com.cd.xq.module.util.beans.user.UserInfoBean;
-import com.cd.xq.module.util.beans.user.UserResp;
 import com.cd.xq.module.util.manager.DataManager;
-import com.cd.xq.module.util.network.NetWorkMg;
-import com.cd.xq.module.util.tools.DialogFactory;
-import com.cd.xq.module.util.tools.Log;
-import com.cd.xq.module.util.tools.Tools;
-import com.cd.xq.module.util.tools.XqErrorCode;
-import com.cd.xq.network.XqRequestApi;
 import com.rx.linklib.AbsLinkHandle;
 import com.rx.linklib.HeadModel;
 import com.rx.linklib.LinkAdapter;
@@ -47,9 +40,6 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.functions.Consumer;
-import io.reactivex.schedulers.Schedulers;
 
 import static android.view.View.OVER_SCROLL_NEVER;
 
@@ -192,6 +182,7 @@ public class FriendActivity extends BaseActivity {
         public TextView textView;
         public TextView textOnlineStatus;
         public View divide;
+        public Button btnVideo;
 
         public MainNormalViewHolder(View itemView) {
             super(itemView);
@@ -199,6 +190,7 @@ public class FriendActivity extends BaseActivity {
             textView = itemView.findViewById(R.id.normal_textview);
             textOnlineStatus = itemView.findViewById(R.id.normal_text_online_status);
             divide = itemView.findViewById(R.id.normal_divide);
+            btnVideo = itemView.findViewById(R.id.normal_btn_video);
         }
     }
 
@@ -253,7 +245,7 @@ public class FriendActivity extends BaseActivity {
                 viewHolder.divide.setVisibility(View.GONE);
             } else if (holder instanceof MainNormalViewHolder) {
                 MainNormalViewHolder viewHolder = (MainNormalViewHolder) holder;
-                UserInfoBean model = (UserInfoBean) getDataList().get(position);
+                final UserInfoBean model = (UserInfoBean) getDataList().get(position);
                 viewHolder.textView.setText(model.getNick_name());
                 if (getHeadPosList().contains(position + 1) || position == getItemCount() - 1) {
                     viewHolder.divide.setVisibility(View.GONE);
@@ -269,10 +261,19 @@ public class FriendActivity extends BaseActivity {
                 if(model.isOnLine()) {
                     viewHolder.textOnlineStatus.setText("在线");
                     viewHolder.textOnlineStatus.setTextColor(Color.parseColor("#32b7b9"));
+                    viewHolder.btnVideo.setEnabled(true);
                 }else {
-                    viewHolder.textOnlineStatus.setText("离开");
+                    viewHolder.textOnlineStatus.setText("离线");
                     viewHolder.textOnlineStatus.setTextColor(Color.parseColor("#aaaaaa"));
+                    viewHolder.btnVideo.setEnabled(false);
                 }
+
+                viewHolder.btnVideo.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        InviteRoomDlgActivity.startWithSend(FriendActivity.this,model);
+                    }
+                });
             }
         }
 

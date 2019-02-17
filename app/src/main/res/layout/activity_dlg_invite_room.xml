@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent">
+
+    <LinearLayout
+        android:id="@+id/dlg_invite_send_linearLayout"
+        android:layout_width="@dimen/dp_300"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="#eeeeee"
+        android:paddingTop="@dimen/dp_10"
+        android:paddingBottom="@dimen/dp_10"
+        android:gravity="center"
+        android:visibility="gone"
+        >
+
+        <TextView
+            android:id="@+id/dlg_invite_send_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="已发送邀请，等待对方接受中...  30s"
+            android:textSize="@dimen/sp_16"
+            android:textColor="#000000"
+            android:layout_marginLeft="@dimen/dp_10"
+            android:layout_marginRight="@dimen/dp_10"
+            android:gravity="center"/>
+
+        <Button
+            android:id="@+id/dlg_invite_send_btn_cancel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="取消"
+            android:textColor="#000000"
+            android:textSize="@dimen/sp_16"
+            android:layout_marginTop="@dimen/dp_20"/>
+
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:id="@+id/dlg_invite_receive_linearLayout"
+        android:layout_width="@dimen/dp_300"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="#eeeeee"
+        android:paddingTop="@dimen/dp_10"
+        android:paddingBottom="@dimen/dp_10"
+        android:gravity="center">
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/dlg_invite_receive_img_head"
+            android:layout_width="@dimen/dp_50"
+            android:layout_height="@dimen/dp_50"
+            android:src="@drawable/chart_room_default_head"/>
+
+        <TextView
+            android:id="@+id/dlg_invite_receive_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="wys30201邀请您视频... "
+            android:textSize="@dimen/sp_16"
+            android:textColor="#000000"
+            android:layout_marginTop="@dimen/dp_20"
+            android:layout_marginLeft="@dimen/dp_10"
+            android:layout_marginRight="@dimen/dp_10"/>
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/dp_20">
+
+            <Button
+                android:id="@+id/dlg_invite_receive_btn_refuse"
+                android:layout_width="@dimen/dp_80"
+                android:layout_height="@dimen/dp_30"
+                android:text="拒绝"
+                android:textColor="#000000"
+                android:textSize="@dimen/sp_16"
+                android:layout_alignParentLeft="true"
+                android:layout_marginLeft="@dimen/dp_20"
+                android:background="#32b7b9"
+                />
+
+            <Button
+                android:id="@+id/dlg_invite_receive_btn_accept"
+                android:layout_width="@dimen/dp_80"
+                android:layout_height="@dimen/dp_30"
+                android:text="接受"
+                android:textColor="#000000"
+                android:textSize="@dimen/sp_16"
+                android:layout_alignParentRight="true"
+                android:layout_marginRight="@dimen/dp_30"
+                android:background="#564512"
+                />
+
+        </RelativeLayout>
+
+    </LinearLayout>
+
+</RelativeLayout>
