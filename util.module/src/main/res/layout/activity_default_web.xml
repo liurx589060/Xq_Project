@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <RelativeLayout
+        android:id="@+id/relayout_1"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp_50"
+        android:layout_alignParentTop="true"
+        android:background="#eeeeee">
+
+        <ImageView
+            android:id="@+id/default_web_btn_back"
+            android:layout_width="@dimen/dp_40"
+            android:layout_height="@dimen/dp_40"
+            android:padding="@dimen/dp_10"
+            android:src="@drawable/back_arrow"
+            android:layout_centerVertical="true"
+            android:layout_alignParentLeft="true"
+            android:layout_marginLeft="@dimen/dp_5"/>
+
+        <TextView
+            android:id="@+id/default_web_text_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="用户手册"
+            android:textSize="@dimen/sp_18"
+            android:textColor="#000000"
+            android:layout_centerInParent="true"/>
+
+    </RelativeLayout>
+
+    <com.tencent.smtt.sdk.WebView
+        android:id="@+id/default_web_webView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignTop="@+id/default_web_progressBar"
+        android:layout_below="@id/relayout_1">
+
+    </com.tencent.smtt.sdk.WebView>
+
+    <ProgressBar
+        android:id="@+id/default_web_progressBar"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp_2"
+        android:layout_below="@+id/relayout_1"
+        android:progressDrawable="@drawable/layerlist_web_progress_bg"
+        android:max="100"
+        android:progress="50"/>
+
+
+</RelativeLayout>

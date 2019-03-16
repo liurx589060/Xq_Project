@@ -14,12 +14,6 @@
             android:screenOrientation="portrait"
             android:configChanges="orientation|keyboard|keyboardHidden|navigation"
             android:name="com.cd.xq.module.chart.DoubleRoomActivity">
-
-            <intent-filter >
-                <action android:name="com.cd.xq_chart/doubleRoomActivity"/>
-                <category android:name="android.intent.category.DEFAULT"/>
-            </intent-filter>
-
         </activity>
     </application>
 </manifest>

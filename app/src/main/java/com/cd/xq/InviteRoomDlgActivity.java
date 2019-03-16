@@ -13,6 +13,7 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.cd.xq.beans.JMFriendInviteParam;
+import com.cd.xq.module.chart.DoubleRoomActivity;
 import com.cd.xq.module.util.beans.jmessage.JMSendBean;
 import com.cd.xq.module.util.beans.user.UserInfoBean;
 import com.cd.xq.module.util.jmessage.JMsgSender;
@@ -261,7 +262,7 @@ public class InviteRoomDlgActivity extends Activity {
         String pushAddress = NetWorkMg.getCameraUrl() + "_" + DataManager.getInstance().getUserInfo().getUser_id();
         String playAddress = NetWorkMg.getCameraUrl() + "_" + mTargetUserInfo.getUser_id();
 
-        Intent intent = new Intent("com.cd.xq_chart/doubleRoomActivity");
+        Intent intent = new Intent(this, DoubleRoomActivity.class);
         Bundle bundle = new Bundle();
         bundle.putString("push",pushAddress);
         bundle.putString("play",playAddress);

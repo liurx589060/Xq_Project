@@ -19,6 +19,7 @@ import com.cd.xq.R;
 import com.cd.xq.frame.MainActivity;
 import com.cd.xq.module.util.Constant;
 import com.cd.xq.module.util.base.BaseActivity;
+import com.cd.xq.module.util.base.DefaultWebActivity;
 import com.cd.xq.module.util.beans.BaseResp;
 import com.cd.xq.module.util.beans.EventBusParam;
 import com.cd.xq.module.util.beans.user.UserResp;
@@ -106,8 +107,8 @@ public class LoginActivity extends BaseActivity {
         loginTextPrivacy.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(LoginActivity.this,ProtocolActivity.class);
-                startActivity(intent);
+                String url = "http://" + NetWorkMg.IP_ADDRESS + "/thinkphp/file/html/xq_protocol.html";
+                DefaultWebActivity.startWeb(LoginActivity.this,url,"用户协议");
             }
         });
     }

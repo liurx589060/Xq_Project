@@ -10,6 +10,7 @@ import com.hc.lib.msc.MscManager;
 import com.mob.MobSDK;
 import com.tencent.bugly.crashreport.CrashReport;
 import com.tencent.rtmp.TXLiveBase;
+import com.tencent.smtt.sdk.QbSdk;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -50,6 +51,10 @@ public class XqApplication extends Application {
         TXLiveBase.setConsoleEnabled(true);
 
         MscManager.initMsc(this);
+
+        //x5内核初始化接口
+        QbSdk.initX5Environment(getApplicationContext(),null);
+
     }
 
     @Override

@@ -8,7 +8,7 @@
         android:protectionLevel="signature" />
 
     <!-- Required  一些系统要求的权限，如访问网络等-->
-    <uses-permission android:name="您应用的包名.permission.JPUSH_MESSAGE" />
+    <uses-permission android:name="${applicationId}.permission.JPUSH_MESSAGE" />
     <uses-permission android:name="android.permission.RECEIVE_USER_PRESENT" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
@@ -71,11 +71,6 @@
             android:screenOrientation="portrait"
             android:configChanges="orientation|keyboard|keyboardHidden|navigation"
             android:name=".login.ResetPasswordActivity"/>
-
-        <activity
-            android:screenOrientation="portrait"
-            android:configChanges="orientation|keyboard|keyboardHidden|navigation"
-            android:name=".login.ProtocolActivity"/>
 
         <activity
             android:screenOrientation="portrait"
