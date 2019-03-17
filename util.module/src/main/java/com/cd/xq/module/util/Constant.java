@@ -30,4 +30,10 @@ public class Constant {
     public static String JM_SECRET = "cd7be344156c9afc0d218bad";
 
     public static String TAG = "XQ_HYF";
+
+    /************************礼券*********************************/
+    public static int CARD_JIANFANG = 100; //建房卡
+    public static int CARD_LIPIN = 101; //礼品卡
+    public static int CARD_RUMEN = 102; //入门卡
+    public static int CARD_YANSHI = 103; //延时卡
 }

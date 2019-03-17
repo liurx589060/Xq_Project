@@ -1,9 +1,9 @@
 <component name="libraryTable">
   <library name="LiteAVSDK_Smart_5.1.5293:@aar">
     <CLASSES>
-      <root url="jar://$USER_HOME$/.gradle/caches/transforms-1/files-1.1/LiteAVSDK_Smart_5.1.5293.aar/72f6b344b75842cc0b5f89efa79d624f/jars/classes.jar!/" />
-      <root url="file://$USER_HOME$/.gradle/caches/transforms-1/files-1.1/LiteAVSDK_Smart_5.1.5293.aar/72f6b344b75842cc0b5f89efa79d624f/res" />
-      <root url="jar://$USER_HOME$/.gradle/caches/transforms-1/files-1.1/LiteAVSDK_Smart_5.1.5293.aar/72f6b344b75842cc0b5f89efa79d624f/jars/libs/LiteAVSDK_Smart.jar!/" />
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-1/files-1.1/LiteAVSDK_Smart_5.1.5293.aar/ea3bdff83a47ee51fb83cef3078bf3a5/jars/libs/LiteAVSDK_Smart.jar!/" />
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-1/files-1.1/LiteAVSDK_Smart_5.1.5293.aar/ea3bdff83a47ee51fb83cef3078bf3a5/jars/classes.jar!/" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-1/files-1.1/LiteAVSDK_Smart_5.1.5293.aar/ea3bdff83a47ee51fb83cef3078bf3a5/res" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />
