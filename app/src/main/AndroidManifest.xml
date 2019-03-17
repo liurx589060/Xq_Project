@@ -78,6 +78,56 @@
             android:name=".friend.FriendActivity"/>
 
         <activity
+            android:screenOrientation="portrait"
+            android:configChanges="orientation|keyboard|keyboardHidden|navigation"
+            android:name=".my.MyNotifyActivity"/>
+
+        <activity
+            android:screenOrientation="portrait"
+            android:configChanges="orientation|keyboard|keyboardHidden|navigation"
+            android:name=".my.MyCertificateActivity"/>
+
+        <activity
+            android:screenOrientation="portrait"
+            android:configChanges="orientation|keyboard|keyboardHidden|navigation"
+            android:name=".my.MyChargeHistoryActivity"/>
+
+        <activity
+            android:screenOrientation="portrait"
+            android:configChanges="orientation|keyboard|keyboardHidden|navigation"
+            android:name=".my.MyConsumeHistoryActivity"/>
+
+        <activity
+            android:screenOrientation="portrait"
+            android:configChanges="orientation|keyboard|keyboardHidden|navigation"
+            android:name=".my.MyFootprinterActivity"/>
+
+        <activity
+            android:screenOrientation="portrait"
+            android:configChanges="orientation|keyboard|keyboardHidden|navigation"
+            android:name=".my.MyProfitActivity"/>
+
+        <activity
+            android:screenOrientation="portrait"
+            android:configChanges="orientation|keyboard|keyboardHidden|navigation"
+            android:name=".my.MyBalanceActivity"/>
+
+        <activity
+            android:screenOrientation="portrait"
+            android:configChanges="orientation|keyboard|keyboardHidden|navigation"
+            android:name=".my.MyCashHistoryActivity"/>
+
+        <activity
+            android:screenOrientation="portrait"
+            android:configChanges="orientation|keyboard|keyboardHidden|navigation"
+            android:name=".my.MySettingsActivity"/>
+
+        <activity
+            android:screenOrientation="portrait"
+            android:configChanges="orientation|keyboard|keyboardHidden|navigation"
+            android:name=".my.MyAboutActivity"/>
+
+        <activity
             android:theme="@style/ActivityTranslucent"
             android:excludeFromRecents="true"
             android:screenOrientation="portrait"

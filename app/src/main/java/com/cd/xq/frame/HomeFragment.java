@@ -37,6 +37,8 @@ import com.cd.xq.module.util.beans.jmessage.JMChartResp;
 import com.cd.xq.module.util.beans.jmessage.JMChartRoomSendBean;
 import com.cd.xq.module.util.beans.user.UserInfoBean;
 import com.cd.xq.module.util.common.MultiItemDivider;
+import com.cd.xq.module.util.glide.GlideCircleTransform;
+import com.cd.xq.module.util.glide.GlideRoundTransform;
 import com.cd.xq.module.util.jmessage.JMsgSender;
 import com.cd.xq.module.util.manager.DataManager;
 import com.cd.xq.module.util.network.NetWorkMg;
@@ -107,7 +109,6 @@ public class HomeFragment extends BaseFragment {
     private String mTXPlayerAddress = "";
     private int mPushAddressType = 0;
     private int mPublic = 1;  // 1：公开    0：非公开
-    //private JPushMessageReceiver mReceiver;
 
     private ArrayList<BGetArrays> m_roomList;
     private OnLookerRecyclerViewAdapter mOnLookerAdapter;
@@ -122,10 +123,6 @@ public class HomeFragment extends BaseFragment {
 
         init();
 
-//        IntentFilter filter = new IntentFilter();
-//        filter.addAction(AppConstant.BROADCAST_JPUSH_MESSAGE_ACTION);
-//        mReceiver = new JPushMessageReceiver();
-//        getActivity().registerReceiver(mReceiver, filter);
         return mRootView;
     }
 
@@ -346,7 +343,7 @@ public class HomeFragment extends BaseFragment {
                             getActivity().startActivity(intent);
                         }
                         //发送聊天室信息
-                        sendChartRoomMessage(true);
+                        sendChartRoomMessage();
                     }
                 }, new Consumer<Throwable>() {
                     @Override
@@ -374,6 +371,7 @@ public class HomeFragment extends BaseFragment {
         //设置 Footer 为 球脉冲 样式
         homeRefreshLayout.setRefreshFooter(new BallPulseFooter(getActivity()).setSpinnerStyle
                 (SpinnerStyle.Scale));
+        homeRefreshLayout.setEnableLoadMore(false);
     }
 
     private void initXBanner() {
@@ -403,7 +401,7 @@ public class HomeFragment extends BaseFragment {
         });
     }
 
-    private void sendChartRoomMessage(boolean isUpdateMembers) {
+    private void sendChartRoomMessage() {
         //发送聊天室信息
         Data data = DataManager.getInstance().getChartData();
         UserInfoBean selfInfo = DataManager.getInstance().getUserInfo();

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="@dimen/dp_60"
+    android:clickable="true"
+    android:background="@drawable/selector_my_top_head_bg">
+
+    <ImageView
+        android:id="@+id/image_1"
+        android:layout_width="@dimen/dp_25"
+        android:layout_height="@dimen/dp_25"
+        android:src="@drawable/icon_gold_coin"
+        android:layout_centerVertical="true"
+        android:layout_alignParentLeft="true"
+        android:layout_marginLeft="@dimen/dp_10"/>
+
+    <TextView
+        android:id="@+id/text_coin_count"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_toRightOf="@+id/image_1"
+        android:layout_marginLeft="@dimen/dp_6"
+        android:text="60"
+        android:textColor="#000000"
+        android:textSize="@dimen/sp_18"/>
+
+    <Button
+        android:id="@+id/btn_coin_pay"
+        android:layout_width="@dimen/dp_80"
+        android:layout_height="@dimen/dp_25"
+        android:layout_centerVertical="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="@dimen/dp_20"
+        android:text="¥ 6"
+        android:textSize="@dimen/sp_18"
+        android:textColor="#32b7b9"
+        android:clickable="false"
+        android:background="@drawable/shape_btn_balance_pay_bg"/>
+
+</RelativeLayout>

@@ -3,7 +3,6 @@ package com.cd.xq.frame;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
@@ -24,11 +23,14 @@ import com.cd.xq.login.RegisterActivity;
 import com.cd.xq.module.util.Constant;
 import com.cd.xq.module.util.base.BaseFragment;
 import com.cd.xq.module.util.beans.user.UserInfoBean;
-import com.cd.xq.module.util.glide.GlideCircleBorderTransform;
-import com.cd.xq.module.util.glide.GlideCircleTransform;
 import com.cd.xq.module.util.manager.DataManager;
 import com.cd.xq.module.util.network.NetWorkMg;
-import com.cd.xq.module.util.tools.Tools;
+import com.cd.xq.my.MyBalanceActivity;
+import com.cd.xq.my.MyCertificateActivity;
+import com.cd.xq.my.MyFootprinterActivity;
+import com.cd.xq.my.MyNotifyActivity;
+import com.cd.xq.my.MyProfitActivity;
+import com.cd.xq.my.MySettingsActivity;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -46,37 +48,52 @@ public class MyFragment extends BaseFragment {
     ImageView myImgHead;
     @BindView(R.id.my_text_edit)
     TextView myTextEdit;
-    @BindView(R.id.my_text_nick)
-    TextView myTextNick;
+    Unbinder unbinder;
+    @BindView(R.id.my_img_notify_dot)
+    ImageView myImgNotifyDot;
+    @BindView(R.id.my_title_relayout)
+    RelativeLayout myTitleRelayout;
+    @BindView(R.id.checkbox_remote)
+    CheckBox checkboxRemote;
+    @BindView(R.id.my_top_head_layout)
+    RelativeLayout myTopHeadLayout;
+    @BindView(R.id.ip_edit)
+    EditText ipEdit;
+    @BindView(R.id.btn_save)
+    Button btnSave;
     @BindView(R.id.my_img_gender)
     ImageView myImgGender;
-    @BindView(R.id.my_text_age)
-    TextView myTextAge;
-    @BindView(R.id.my_text_tall)
-    TextView myTextTall;
-    @BindView(R.id.my_text_xueli)
-    TextView myTextXueli;
-    @BindView(R.id.register_text_jiguan)
-    TextView registerTextJiguan;
-    @BindView(R.id.register_relayout_role)
-    RelativeLayout registerRelayoutRole;
-    @BindView(R.id.register_text_zhiye)
-    TextView registerTextZhiye;
-    @BindView(R.id.register_relayout_nick)
-    RelativeLayout registerRelayoutNick;
-    @BindView(R.id.register_text_gzdd)
-    TextView registerTextGzdd;
-    @BindView(R.id.register_relayout_gzdd)
-    RelativeLayout registerRelayoutGzdd;
-    Unbinder unbinder;
-    @BindView(R.id.my_btn_switch)
-    Button myBtnSwitch;
+    @BindView(R.id.my_text_id)
+    TextView myTextId;
+    @BindView(R.id.my_text_yue)
+    TextView myTextYue;
+    @BindView(R.id.my_relayout_yue)
+    RelativeLayout myRelayoutYue;
+    @BindView(R.id.my_text_liquan)
+    TextView myTextLiquan;
+    @BindView(R.id.my_relayout_liquan)
+    RelativeLayout myRelayoutLiquan;
+    @BindView(R.id.my_text_shouyi)
+    TextView myTextShouyi;
+    @BindView(R.id.my_relayout_shouyi)
+    RelativeLayout myRelayoutShouyi;
+    @BindView(R.id.my_text_role)
+    TextView myTextRole;
+    @BindView(R.id.my_text_nick)
+    TextView myTextNick;
+    @BindView(R.id.my_relayout_footprint)
+    RelativeLayout myRelayoutFootprint;
+    @BindView(R.id.my_text_settings)
+    TextView myTextSettings;
+    @BindView(R.id.my_relayout_settings)
+    RelativeLayout myRelayoutSettings;
 
     private String SUFFIX = "  >";
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable
+            Bundle savedInstanceState) {
         mRootView = inflater.inflate(R.layout.tab_my, null);
         unbinder = ButterKnife.bind(this, mRootView);
 
@@ -92,17 +109,9 @@ public class MyFragment extends BaseFragment {
         getActivity().startActivityForResult(intent, 1);
     }
 
-    private void jumpToLoginActivity() {
-        Intent intent = new Intent(getActivity(), LoginActivity.class);
-        Bundle bundle = new Bundle();
-        bundle.putInt("from", LoginActivity.FROM_MY);
-        intent.putExtras(bundle);
-        getActivity().startActivityForResult(intent, 200);
-    }
-
     public void setData() {
         UserInfoBean userInfo = DataManager.getInstance().getUserInfo();
-        if(userInfo == null) {
+        if (userInfo == null) {
             return;
         }
 
@@ -112,30 +121,33 @@ public class MyFragment extends BaseFragment {
                 .dontAnimate()
                 .centerCrop()
                 .into(myImgHead);
-        myImgGender.setImageResource(userInfo.getGender().equals(Constant.GENDER_LADY) ? R.drawable.my_gender_lady : R.drawable.my_gender_man);
-        myTextAge.setText(String.valueOf(userInfo.getAge()));
-        myTextTall.setText(String.valueOf(userInfo.getTall()) + "cm");
+
+        myImgGender.setImageResource(userInfo.getGender().equals(Constant.GENDER_LADY) ?
+                R.drawable.my_gender_lady : R.drawable.my_gender_man);
+        if (userInfo.getRole_type().equals(Constant.ROLRTYPE_ANGEL)) {
+            myTextRole.setText("爱心大使");
+        } else {
+            myTextRole.setText("嘉宾");
+        }
         myTextNick.setText(userInfo.getNick_name());
-        myTextXueli.setText(userInfo.getScholling());
-        registerTextJiguan.setText(userInfo.getNative_place() + SUFFIX);
-        registerTextGzdd.setText(userInfo.getJob_address() + SUFFIX);
-        registerTextZhiye.setText(userInfo.getProfessional() + SUFFIX);
+        myTextId.setText("ID:" + userInfo.getUser_id());
     }
 
     private void init() {
         setData();
 
+        myImgNotifyDot.setVisibility(View.GONE);
         myTextEdit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                jumpToRegisterActivity();
+                Intent intent = new Intent(getActivity(), MyNotifyActivity.class);
+                getActivity().startActivity(intent);
             }
         });
-
-        myBtnSwitch.setOnClickListener(new View.OnClickListener() {
+        myTopHeadLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                jumpToLoginActivity();
+                jumpToRegisterActivity();
             }
         });
 
@@ -150,11 +162,11 @@ public class MyFragment extends BaseFragment {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if(requestCode == 1 && resultCode == RESULT_OK) {
+        if (requestCode == 1 && resultCode == RESULT_OK) {
             setData();
-        }else if(requestCode == 2 && resultCode == RESULT_OK) {
+        } else if (requestCode == 2 && resultCode == RESULT_OK) {
             setData();
-        }else if(requestCode == 200 && resultCode == RESULT_OK) {
+        } else if (requestCode == 200 && resultCode == RESULT_OK) {
             setData();
         }
     }
@@ -183,28 +195,60 @@ public class MyFragment extends BaseFragment {
     }
 
     private void setSpIpAddress(String ipAddress) {
-        SharedPreferences sp = getActivity().getSharedPreferences(Constant.SP_NAME, Activity.MODE_PRIVATE);
-        sp.edit().putString("ipAddress",ipAddress).commit();
+        SharedPreferences sp = getActivity().getSharedPreferences(Constant.SP_NAME, Activity
+                .MODE_PRIVATE);
+        sp.edit().putString("ipAddress", ipAddress).commit();
     }
 
     private void setSpRemoteIpFlag(boolean isRemote) {
-        SharedPreferences sp = getActivity().getSharedPreferences(Constant.SP_NAME, Activity.MODE_PRIVATE);
-        sp.edit().putBoolean("isRemote",isRemote).commit();
+        SharedPreferences sp = getActivity().getSharedPreferences(Constant.SP_NAME, Activity
+                .MODE_PRIVATE);
+        sp.edit().putBoolean("isRemote", isRemote).commit();
     }
 
     private String getSpIpAddress() {
-        SharedPreferences sp = getActivity().getSharedPreferences(Constant.SP_NAME, Activity.MODE_PRIVATE);
-        return sp.getString("ipAddress",Constant.CONSTANT_LOCOL_IP);
+        SharedPreferences sp = getActivity().getSharedPreferences(Constant.SP_NAME, Activity
+                .MODE_PRIVATE);
+        return sp.getString("ipAddress", Constant.CONSTANT_LOCOL_IP);
     }
 
     private boolean getIsRemote() {
-        SharedPreferences sp = getActivity().getSharedPreferences(Constant.SP_NAME, Activity.MODE_PRIVATE);
-        return sp.getBoolean("isRemote",false);
+        SharedPreferences sp = getActivity().getSharedPreferences(Constant.SP_NAME, Activity
+                .MODE_PRIVATE);
+        return sp.getBoolean("isRemote", false);
     }
 
     @Override
     public void onLogin() {
         super.onLogin();
         init();
+    }
+
+    @OnClick({R.id.my_relayout_yue, R.id.my_relayout_liquan, R.id.my_relayout_shouyi, R.id
+            .my_text_role,R.id.my_relayout_footprint, R.id.my_relayout_settings})
+    public void onViewClicked(View view) {
+        Intent intent = null;
+        switch (view.getId()) {
+            case R.id.my_relayout_yue:
+                intent = new Intent(getActivity(), MyBalanceActivity.class);
+                break;
+            case R.id.my_relayout_liquan:
+                intent = new Intent(getActivity(), MyCertificateActivity.class);
+                break;
+            case R.id.my_relayout_shouyi:
+                intent = new Intent(getActivity(), MyProfitActivity.class);
+                break;
+            case R.id.my_text_role:
+                break;
+            case R.id.my_relayout_footprint:
+                intent = new Intent(getActivity(), MyFootprinterActivity.class);
+                break;
+            case R.id.my_relayout_settings:
+                intent = new Intent(getActivity(), MySettingsActivity.class);
+                break;
+        }
+        if (intent != null) {
+            getActivity().startActivity(intent);
+        }
     }
 }

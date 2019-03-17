@@ -7,4 +7,8 @@
     <color name="tab_background">#ffa07a</color>
     <color name="register_edit_ps_border">#666666</color>
     <color name="shape_home_recycler_divider">#eeeeee</color>
+    <color name="selector_color_my_top_head_bg_p">#dddddd</color>
+    <color name="selector_color_my_top_head_bg">#ffffff</color>
+    <color name="selector_color_title_text_p">#dddddd</color>
+    <color name="selector_color_title_text">#333333</color>
 </resources>

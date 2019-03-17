@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#eeeeee">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp_50"
+        android:background="#ffffff">
+
+        <Button
+            android:id="@+id/btn_back"
+            android:layout_width="@dimen/dp_25"
+            android:layout_height="@dimen/dp_25"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="@dimen/dp_14"
+            android:background="@drawable/image_back"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:text="设置"
+            android:textColor="#333333"
+            android:textSize="@dimen/sp_20"
+            android:textStyle="bold"/>
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/relayout_about"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp_50"
+        android:clickable="true"
+        android:background="@drawable/selector_register_layout_bg"
+        android:layout_marginTop="@dimen/dp_20"
+        >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="@dimen/dp_20"
+            android:text="关于"
+            android:textColor="#333333"
+            android:textSize="@dimen/sp_20" />
+
+        <TextView
+            android:id="@+id/text_about"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="@dimen/dp_20"
+            android:text=">"
+            android:textSize="@dimen/sp_16" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/relayout_feedback"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp_50"
+        android:clickable="true"
+        android:background="@drawable/selector_register_layout_bg"
+        >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="@dimen/dp_20"
+            android:text="意见反馈"
+            android:textColor="#333333"
+            android:textSize="@dimen/sp_20" />
+
+        <TextView
+            android:id="@+id/text_feedback"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="@dimen/dp_20"
+            android:text=">"
+            android:textSize="@dimen/sp_16" />
+    </RelativeLayout>
+
+    <Button
+        android:id="@+id/btn_change_account"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp_50"
+        android:background="#ffffff"
+        android:text="切换账号"
+        android:textColor="#000000"
+        android:textSize="@dimen/sp_16"
+        android:layout_marginTop="@dimen/dp_20"
+        android:stateListAnimator="@null"/>
+
+    <Button
+        android:id="@+id/btn_exit_account"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp_50"
+        android:background="#ffffff"
+        android:text="退出登录"
+        android:textColor="#ff0000"
+        android:textSize="@dimen/sp_16"
+        android:layout_marginTop="@dimen/dp_10"
+        android:stateListAnimator="@null"/>
+
+</LinearLayout>
