@@ -22,6 +22,7 @@ import com.cd.xq.login.LoginActivity;
 import com.cd.xq.login.RegisterActivity;
 import com.cd.xq.module.util.Constant;
 import com.cd.xq.module.util.base.BaseFragment;
+import com.cd.xq.module.util.beans.EventBusParam;
 import com.cd.xq.module.util.beans.user.UserInfoBean;
 import com.cd.xq.module.util.manager.DataManager;
 import com.cd.xq.module.util.network.NetWorkMg;
@@ -31,6 +32,10 @@ import com.cd.xq.my.MyFootprinterActivity;
 import com.cd.xq.my.MyNotifyActivity;
 import com.cd.xq.my.MyProfitActivity;
 import com.cd.xq.my.MySettingsActivity;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;

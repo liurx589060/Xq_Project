@@ -154,6 +154,7 @@
     <orderEntry type="library" name="org.reactivestreams:reactive-streams:1.0.1@jar" level="project" />
     <orderEntry type="library" name="com.android.support:support-core-ui-26.1.0" level="project" />
     <orderEntry type="library" name="msclib-release:@aar" level="project" />
+    <orderEntry type="library" name="com.mob:MobCommons:2019.0321.1845@jar" level="project" />
     <orderEntry type="library" name="com.nostra13.universalimageloader:universal-image-loader:1.9.5@jar" level="project" />
     <orderEntry type="library" name="com.android.support:support-compat-26.1.0" level="project" />
     <orderEntry type="library" name="com.trello.rxlifecycle2:rxlifecycle:2.2.1@jar" level="project" />
@@ -170,11 +171,13 @@
     <orderEntry type="library" name="com.android.support:design-26.1.0" level="project" />
     <orderEntry type="library" name="LiteAVSDK_Smart_5.1.5293:@aar" level="project" />
     <orderEntry type="library" name="cn.smssdk:ShortMessageSDKGUI-3.3.0" level="project" />
+    <orderEntry type="library" name="com.hjq:xtoast-2.0" level="project" />
     <orderEntry type="library" name="com.yalantis:ucrop-2.2.0" level="project" />
     <orderEntry type="library" name="org.jetbrains.kotlin:kotlin-stdlib-jre7:1.1.51@jar" level="project" />
     <orderEntry type="library" name="com.squareup.okhttp3:logging-interceptor:3.6.0@jar" level="project" />
     <orderEntry type="library" name="com.mob:MobTools:2019.0306.1850@jar" level="project" />
     <orderEntry type="library" name="com.android.support:support-fragment-26.1.0" level="project" />
+    <orderEntry type="library" name="com.hjq:toast-5.8" level="project" />
     <orderEntry type="library" name="com.android.support:support-vector-drawable-26.1.0" level="project" />
     <orderEntry type="library" name="com.android.support:support-core-utils-26.1.0" level="project" />
     <orderEntry type="library" name="com.google.code.gson:gson:2.7@jar" level="project" />
@@ -196,7 +199,6 @@
     <orderEntry type="library" name="com.android.support:support-v4-26.1.0" level="project" />
     <orderEntry type="library" name="com.tencent.bugly:crashreport-2.8.6.0" level="project" />
     <orderEntry type="library" name="com.xhb:xbanner-1.5.1" level="project" />
-    <orderEntry type="library" name="com.mob:MobCommons:2019.0306.1851@jar" level="project" />
     <orderEntry type="library" name="org.jetbrains:annotations:13.0@jar" level="project" />
     <orderEntry type="library" name="com.android.support:animated-vector-drawable-26.1.0" level="project" />
     <orderEntry type="library" name="cn.jiguang.sdk:jcore-1.2.5" level="project" />

@@ -6,10 +6,13 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import com.cd.xq.beans.BusChatRoomParam;
+import com.cd.xq.beans.BusPaySuccessParam;
 import com.cd.xq.module.util.beans.EventBusParam;
 import com.cd.xq.module.util.tools.Log;
+import com.google.gson.Gson;
 
 import org.greenrobot.eventbus.EventBus;
+import org.json.JSONObject;
 
 import cn.jpush.android.api.JPushInterface;
 
@@ -36,12 +39,29 @@ public class MyReceiver extends BroadcastReceiver {
 //				intent1.putExtras(bundle1);
 //				context.sendBroadcast(intent1);
 
-				EventBusParam<BusChatRoomParam> param = new EventBusParam();
-				param.setEventBusCode(EventBusParam.EVENT_BUS_UPDATE_CHATROOM);
-				BusChatRoomParam chatRoomParam = new BusChatRoomParam();
-				chatRoomParam.setMessage(bundle.getString(JPushInterface.EXTRA_MESSAGE));
-				param.setData(chatRoomParam);
-				EventBus.getDefault().post(param);
+				String msg = bundle.getString(JPushInterface.EXTRA_MESSAGE);
+				JSONObject object = new JSONObject(msg);
+				int nType = object.getInt("type");
+				switch (nType) {
+					case EventBusParam.EVENT_BUS_CHATROOM_CREATE:
+					case EventBusParam.EVENT_BUS_CHATROOM_DELETE: {
+						EventBusParam<BusChatRoomParam> param = new EventBusParam();
+						param.setEventBusCode(nType);
+						BusChatRoomParam chatRoomParam = new BusChatRoomParam();
+						chatRoomParam.setMessage(msg);
+						param.setData(chatRoomParam);
+						EventBus.getDefault().post(param);
+					}
+					break;
+					case EventBusParam.EVENT_BUS_PAY_SUCCESS: {
+						EventBusParam<BusPaySuccessParam> param = new EventBusParam();
+						param.setEventBusCode(nType);
+						BusPaySuccessParam dataParam = new Gson().fromJson(object.getJSONObject("data").toString()
+								,BusPaySuccessParam.class);
+						param.setData(dataParam);
+						EventBus.getDefault().post(param);
+					}
+				}
 			}
 		} catch (Exception e){
 			Log.e(TAG + "--" + e.toString());

@@ -34,6 +34,9 @@ public interface RequestApi {
     @GET("User/updateUserInfo")
     Observable<UserResp> updateUserInfo(@QueryMap Map<String, Object> map);
 
+    @GET("User/getUserInfoByUserName")
+    Observable<UserResp> getUserInfoByUserName(@Query("userName") String userName);
+
     @GET("User/checkUserExist")
     Observable<BaseResp> checkUserExist(@Query("userName") String userName);
 

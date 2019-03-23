@@ -90,7 +90,7 @@
                         android:id="@+id/text_balance"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="57"
+                        android:text=""
                         android:textColor="#000000"
                         android:textStyle="bold"
                         android:textSize="@dimen/dp_66"/>

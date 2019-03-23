@@ -128,6 +128,11 @@
             android:name=".my.MyAboutActivity"/>
 
         <activity
+            android:screenOrientation="portrait"
+            android:configChanges="orientation|keyboard|keyboardHidden|navigation"
+            android:name=".my.MyGiftBuyActivity"/>
+
+        <activity
             android:theme="@style/ActivityTranslucent"
             android:excludeFromRecents="true"
             android:screenOrientation="portrait"

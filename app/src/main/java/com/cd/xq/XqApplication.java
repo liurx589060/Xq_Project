@@ -3,10 +3,11 @@ package com.cd.xq;
 import android.app.Application;
 import android.content.Context;
 import android.support.multidex.MultiDex;
-import android.util.ArraySet;
 
 import com.cd.xq.module.util.tools.Log;
 import com.hc.lib.msc.MscManager;
+import com.hjq.toast.ToastUtils;
+import com.hjq.toast.style.ToastBlackStyle;
 import com.mob.MobSDK;
 import com.tencent.bugly.crashreport.CrashReport;
 import com.tencent.rtmp.TXLiveBase;
@@ -54,6 +55,8 @@ public class XqApplication extends Application {
 
         //x5内核初始化接口
         QbSdk.initX5Environment(getApplicationContext(),null);
+        //ToastUtils
+        ToastUtils.init(this,new ToastBlackStyle());
 
     }
 

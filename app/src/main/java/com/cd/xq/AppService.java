@@ -4,7 +4,10 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
+import android.view.Gravity;
+import android.widget.Toast;
 
+import com.cd.xq.beans.BusPaySuccessParam;
 import com.cd.xq.beans.JMFriendInviteParam;
 import com.cd.xq.beans.JMOnlineParam;
 import com.cd.xq.frame.MainActivity;
@@ -24,6 +27,8 @@ import com.cd.xq.network.XqRequestApi;
 import com.cd.xq.utils.AppTools;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.hjq.toast.ToastUtils;
+import com.hjq.xtoast.XToast;
 import com.mob.wrappers.UMSSDKWrapper;
 
 import org.greenrobot.eventbus.EventBus;
@@ -159,8 +164,17 @@ public class AppService extends Service {
     public void onGetFriendList(EventBusParam param) {
         if(param.getEventBusCode() == EventBusParam.EVENT_BUS_GET_FRIENDLIST) {
             getFriendList();
-            //不让继续传递
-            EventBus.getDefault().cancelEventDelivery(param);
+        }else if(param.getEventBusCode() == EventBusParam.EVENT_BUS_PAY_SUCCESS) {
+            //支付成功
+            BusPaySuccessParam paySuccessParam = (BusPaySuccessParam) param.getData();
+            if(paySuccessParam.getUserInfo().getUser_name()
+                    .equals(DataManager.getInstance().getUserInfo().getUser_name())) {
+                DataManager.getInstance().setUserInfo(paySuccessParam.getUserInfo());
+                Toast toast = Toast.makeText(getApplication(),"您购买成功，钻石数 +" + paySuccessParam.getCoin()
+                        + ",余额为 " + paySuccessParam.getBalance(),Toast.LENGTH_LONG);
+                toast.setGravity(Gravity.TOP,0,0);
+                toast.show();
+            }
         }
     }
 

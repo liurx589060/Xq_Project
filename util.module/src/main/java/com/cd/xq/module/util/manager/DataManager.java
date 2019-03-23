@@ -28,11 +28,12 @@ public class DataManager {
     }
 
     public void setUserInfo(UserInfoBean userInfo) {
-        this.userInfo = userInfo;
         if(userInfo != null) {
-            this.userInfo.setUser_name(this.jmUserName);
-            DataManager.getInstance().getUserInfo().setOnLine(true);
+            userInfo.setManualOnLine(this.userInfo.isManualOnLine());
+            userInfo.setOnLine(this.userInfo.isOnLine());
+            userInfo.setUser_name(this.jmUserName);
         }
+        this.userInfo = userInfo;
     }
 
     public Data getChartData() {

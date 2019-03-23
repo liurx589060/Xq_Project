@@ -664,17 +664,10 @@ public class HomeFragment extends BaseFragment {
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onChatRoomUpdate(EventBusParam<BusChatRoomParam> param) {
-        if(param.getEventBusCode() == EventBusParam.EVENT_BUS_UPDATE_CHATROOM) {
-            try {
-                JSONObject object = new JSONObject(param.getData().getMessage());
-                if (object.getInt("type") == AppConstant.JPUSH_TYPE_CHAT_CREATE
-                        || object.getInt("type") == AppConstant.JPUSH_TYPE_CHAT_DELETE) {
-                    //更新聊天室列表
-                    setOnLookerRecyclerView();
-                }
-            } catch (Exception e) {
-                Log.e("JPushMessageReceiver--" + e.toString());
-            }
+        if(param.getEventBusCode() == EventBusParam.EVENT_BUS_CHATROOM_CREATE
+                || param.getEventBusCode() == EventBusParam.EVENT_BUS_CHATROOM_DELETE) {
+            //更新聊天室列表
+            setOnLookerRecyclerView();
         }
     }
 }

@@ -17,6 +17,7 @@ public class UserInfoBean implements Serializable{
     private String gender = "";
     private int level = 0;
     private long balance = 0;
+    private long profit = 0;
     private String head_image = "";
     private String create_time = "";
     private String modify_time = "";
@@ -255,5 +256,13 @@ public class UserInfoBean implements Serializable{
 
     public void setManualOnLine(boolean manualOnLine) {
         isManualOnLine = manualOnLine;
+    }
+
+    public long getProfit() {
+        return profit;
+    }
+
+    public void setProfit(long profit) {
+        this.profit = profit;
     }
 }

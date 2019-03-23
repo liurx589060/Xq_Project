@@ -11,14 +11,30 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.cd.xq.R;
+import com.cd.xq.beans.BGetPayHistory;
 import com.cd.xq.module.util.base.BaseActivity;
+import com.cd.xq.module.util.beans.NetResult;
 import com.cd.xq.module.util.common.MultiItemDivider;
+import com.cd.xq.module.util.manager.DataManager;
+import com.cd.xq.module.util.network.NetWorkMg;
+import com.cd.xq.module.util.tools.DateUtils;
+import com.cd.xq.module.util.tools.Log;
+import com.cd.xq.module.util.tools.Tools;
+import com.cd.xq.module.util.tools.XqErrorCode;
+import com.cd.xq.network.XqRequestApi;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
 
 /**
  * 提现记录
@@ -31,11 +47,15 @@ public class MyCashHistoryActivity extends BaseActivity {
     @BindView(R.id.recycler)
     RecyclerView recycler;
 
+    private XqRequestApi mApi;
+    private MyAdapter myAdapter;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_my_cash_history);
         ButterKnife.bind(this);
+        mApi = NetWorkMg.newRetrofit().create(XqRequestApi.class);
 
         init();
     }
@@ -49,7 +69,8 @@ public class MyCashHistoryActivity extends BaseActivity {
                 ContextCompat.getDrawable(this, R.drawable.shape_consume_history_recycler_divider));
         divider.setDividerMode(MultiItemDivider.INSIDE);
         recycler.addItemDecoration(divider);
-        recycler.setAdapter(new MyAdapter());
+        myAdapter = new MyAdapter();
+        recycler.setAdapter(myAdapter);
     }
 
     @OnClick(R.id.btn_back)
@@ -79,8 +100,6 @@ public class MyCashHistoryActivity extends BaseActivity {
 
         @Override
         public void onBindViewHolder(MyViewHolder holder, int position) {
-            String text = "您提现了 " + position + "元";
-            holder.textContent.setText(text);
         }
 
         @Override

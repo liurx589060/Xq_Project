@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="@dimen/dp_80"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/dp_70"
+    android:orientation="vertical"
     android:gravity="center"
     >
 
@@ -11,7 +12,7 @@
         android:layout_height="wrap_content"
         android:text="建房卡"
         android:textColor="#666666"
-        android:textSize="@dimen/sp_16"/>
+        android:textSize="@dimen/sp_14"/>
 
     <LinearLayout
         android:layout_width="wrap_content"
@@ -22,19 +23,19 @@
 
         <ImageView
             android:id="@+id/image"
-            android:layout_width="@dimen/dp_30"
-            android:layout_height="@dimen/dp_30"
-            android:src="@drawable/card_liping"/>
+            android:layout_width="@dimen/dp_25"
+            android:layout_height="@dimen/dp_25"
+            />
 
         <TextView
             android:id="@+id/text_count"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="X 5"
-            android:textSize="@dimen/sp_18"
-            android:textColor="#f5f808"
+            android:textSize="@dimen/sp_16"
+            android:textColor="#1296db"
             android:textStyle="bold"
-            android:layout_marginLeft="@dimen/dp_5"/>
+            android:layout_marginLeft="@dimen/dp_10"/>
 
     </LinearLayout>
 
