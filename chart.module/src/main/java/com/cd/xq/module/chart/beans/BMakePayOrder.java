@@ -1,4 +1,4 @@
-package com.cd.xq.beans;
+package com.cd.xq.module.chart.beans;
 
 /**
  * Created by Administrator on 2019/3/23.

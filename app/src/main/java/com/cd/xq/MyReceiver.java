@@ -6,7 +6,7 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import com.cd.xq.beans.BusChatRoomParam;
-import com.cd.xq.beans.BusPaySuccessParam;
+import com.cd.xq.module.chart.beans.BusPaySuccessParam;
 import com.cd.xq.module.util.beans.EventBusParam;
 import com.cd.xq.module.util.tools.Log;
 import com.google.gson.Gson;

@@ -1,4 +1,4 @@
-package com.cd.xq.beans;
+package com.cd.xq.module.chart.beans;
 
 import com.cd.xq.module.util.beans.user.UserInfoBean;
 

@@ -1,5 +1,7 @@
 package com.cd.xq.beans;
 
+import com.cd.xq.module.chart.beans.BGetGiftItem;
+
 /**
  * Created by Administrator on 2019/3/23.
  */

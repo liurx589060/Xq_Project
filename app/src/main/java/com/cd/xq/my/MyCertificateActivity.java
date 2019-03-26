@@ -14,8 +14,7 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.cd.xq.R;
-import com.cd.xq.beans.BGetGiftItem;
-import com.cd.xq.beans.BusPaySuccessParam;
+import com.cd.xq.module.chart.beans.BGetGiftItem;
 import com.cd.xq.module.util.Constant;
 import com.cd.xq.module.util.base.BaseActivity;
 import com.cd.xq.module.util.beans.EventBusParam;
@@ -26,14 +25,11 @@ import com.cd.xq.module.util.tools.Log;
 import com.cd.xq.module.util.tools.Tools;
 import com.cd.xq.module.util.tools.XqErrorCode;
 import com.cd.xq.network.XqRequestApi;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 

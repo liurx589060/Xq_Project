@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/transparent">
+
+    <RelativeLayout
+        android:id="@+id/relayout_gift"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        >
+
+        <android.support.v4.view.ViewPager
+            android:id="@+id/viewPager_gift"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/dp_180"
+            android:layout_above="@id/line_1"
+            android:background="#33333333"
+            android:clickable="true"
+            >
+
+        </android.support.v4.view.ViewPager>
+
+        <View
+            android:id="@+id/line_1"
+            android:layout_width="match_parent"
+            android:layout_height="0.5dp"
+            android:background="#dddddd"
+            android:layout_above="@id/relayout_1"
+            android:clickable="true"/>
+
+        <RelativeLayout
+            android:id="@+id/relayout_1"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/dp_45"
+            android:layout_alignParentBottom="true"
+            android:background="#33333333"
+            android:clickable="true"
+            >
+
+            <android.support.design.widget.TabLayout
+                android:id="@+id/tabLayout_gift"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_alignParentLeft="true"
+                android:layout_marginLeft="@dimen/dp_10">
+
+            </android.support.design.widget.TabLayout>
+
+            <Button
+                android:id="@+id/btn_gift_charge"
+                android:layout_width="@dimen/dp_60"
+                android:layout_height="match_parent"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:background="@null"
+                android:text="充值"
+                android:textColor="#32b7b9"
+                android:textSize="@dimen/sp_16" />
+
+            <TextView
+                android:id="@+id/text_gift_balance"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_centerVertical="true"
+                android:layout_toLeftOf="@id/btn_gift_charge"
+                android:gravity="center"
+                android:text="余额：43"
+                android:textSize="@dimen/sp_14" />
+
+        </RelativeLayout>
+
+    </RelativeLayout>
+
+</RelativeLayout>

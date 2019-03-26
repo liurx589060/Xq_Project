@@ -2,6 +2,7 @@ package com.cd.xq.module.chart.manager;
 
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
+import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
@@ -19,6 +20,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
@@ -44,8 +46,6 @@ import com.cd.xq.module.util.beans.jmessage.JMChartResp;
 import com.cd.xq.module.util.beans.jmessage.JMChartRoomSendBean;
 import com.cd.xq.module.util.beans.jmessage.Member;
 import com.cd.xq.module.util.beans.user.UserInfoBean;
-import com.cd.xq.module.util.beans.user.UserResp;
-import com.cd.xq.module.util.glide.GlideCircleBorderTransform;
 import com.cd.xq.module.util.jmessage.JMsgSender;
 import com.cd.xq.module.util.manager.DataManager;
 import com.cd.xq.module.util.network.NetWorkMg;
@@ -63,7 +63,6 @@ import com.hc.lib.msc.MscDefaultSpeech;
 import com.iflytek.cloud.SpeechError;
 import org.json.JSONObject;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -122,6 +121,7 @@ public class XqStatusChartUIViewMg extends AbsChartView{
     private TextView mTextCountDown;
     private ImageView mBtnDisturb;
     private RadioGroup mRadioGroupLiveType;
+    private Button mBtnGift;
 
     private ViewInstance mAngelViewInstance;
     private ViewInstance mManViewInstance;
@@ -145,6 +145,7 @@ public class XqStatusChartUIViewMg extends AbsChartView{
     private boolean mIsRoomMatchSuccess = false;  //是否匹配成功
     private boolean mIsSelefMatchSuccess = false;  //是否自己匹配成功
     private boolean mIsGoToDouble = false;  //是否接受过进入双人聊天室
+    private PresentGiftViewMg mPresentGiftViewMg;  //赠送礼物弹窗
 
     private ArrayList<BGetReportItem> mReportItemList;
 
@@ -206,6 +207,10 @@ public class XqStatusChartUIViewMg extends AbsChartView{
                 viewMg.onDestroy();
             }
         }
+
+        if(mPresentGiftViewMg != null) {
+            mPresentGiftViewMg.onDestroy();
+        }
     }
 
     @Override
@@ -232,10 +237,10 @@ public class XqStatusChartUIViewMg extends AbsChartView{
         mHandler = new Handler();
 
         mRootView = LayoutInflater.from(mXqActivity).inflate(R.layout.layout_chart_room,null);
+        mBtnGift = mRootView.findViewById(R.id.chart_room_btn_gift);
         mRecyclerMembers = mRootView.findViewById(R.id.chart_room_recyclerView_member);
         mRecyclerSystem = mRootView.findViewById(R.id.chart_room_recyclerView_system);
         mBtnExit = mRootView.findViewById(R.id.chart_room_activity_img_exit);
-        //mBtnGift = mRootView.findViewById(R.id.btn_chart_gift);
         mBtnEnd = mRootView.findViewById(R.id.chart_room_activity_img_end);
         mTextCountDown = mRootView.findViewById(R.id.chart_room_activity_text_time);
         mTextTip = mRootView.findViewById(R.id.chart_room_activity_text_describe);
@@ -250,13 +255,30 @@ public class XqStatusChartUIViewMg extends AbsChartView{
             }
         });
 
-//        mBtnGift.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                mXqCameraViewMg.setVisible(true);
-//                mXqCameraViewMg.start();
-//            }
-//        });
+        mBtnGift.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(mPresentGiftViewMg == null) {
+                    mPresentGiftViewMg = new PresentGiftViewMg(mXqActivity);
+                    RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(RelativeLayout
+                            .LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT);
+                    ((RelativeLayout)mRootView).addView(mPresentGiftViewMg.getRootView(),params);
+                    mPresentGiftViewMg.setListener(new PresentGiftViewMg.IPresentGiftMg() {
+                        @Override
+                        public void onGiftShowed() {
+
+                        }
+
+                        @Override
+                        public void onGiftHid() {
+                            mBtnGift.setVisibility(View.VISIBLE);
+                        }
+                    });
+                }
+                mPresentGiftViewMg.show();
+                mBtnGift.setVisibility(View.GONE);
+            }
+        });
 
         mBtnEnd.setOnClickListener(new View.OnClickListener() {
             @Override

@@ -1,7 +1,5 @@
 package com.cd.xq.my;
 
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
@@ -17,9 +15,8 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.cd.xq.R;
-import com.cd.xq.beans.BGetGiftItem;
-import com.cd.xq.beans.BusPaySuccessParam;
-import com.cd.xq.module.util.Constant;
+import com.cd.xq.module.chart.beans.BGetGiftItem;
+import com.cd.xq.module.chart.network.ChatRequestApi;
 import com.cd.xq.module.util.base.BaseActivity;
 import com.cd.xq.module.util.beans.EventBusParam;
 import com.cd.xq.module.util.beans.NetResult;
@@ -30,7 +27,6 @@ import com.cd.xq.module.util.tools.Log;
 import com.cd.xq.module.util.tools.Tools;
 import com.cd.xq.module.util.tools.XqErrorCode;
 import com.cd.xq.network.XqRequestApi;
-import com.google.gson.Gson;
 
 import org.greenrobot.eventbus.EventBus;
 
@@ -57,7 +53,7 @@ public class MyGiftBuyActivity extends BaseActivity {
     RecyclerView recycler;
 
     private MyAdapter myAdapter;
-    private XqRequestApi mApi;
+    private ChatRequestApi mApi;
     private ArrayList<BGetGiftItem> mDataList;
 
     @Override
@@ -65,7 +61,7 @@ public class MyGiftBuyActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_my_gift_buy);
         ButterKnife.bind(this);
-        mApi = NetWorkMg.newRetrofit().create(XqRequestApi.class);
+        mApi = NetWorkMg.newRetrofit().create(ChatRequestApi.class);
 
         init();
     }

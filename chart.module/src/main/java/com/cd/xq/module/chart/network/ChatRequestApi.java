@@ -1,6 +1,9 @@
 package com.cd.xq.module.chart.network;
 
+import com.cd.xq.module.chart.beans.BGetGiftItem;
+import com.cd.xq.module.chart.beans.BGetPayItem;
 import com.cd.xq.module.chart.beans.BGetReportItem;
+import com.cd.xq.module.chart.beans.BMakePayOrder;
 import com.cd.xq.module.util.beans.NetResult;
 
 import java.util.List;
@@ -21,4 +24,24 @@ public interface ChatRequestApi {
 
     @GET("User/getReportItems")
     Observable<NetResult<List<BGetReportItem>>> getReportItems();
+
+    @GET("Pay/getPayItem")
+    Observable<NetResult<List<BGetPayItem>>> getPayItem();
+
+    @GET("Pay/getGiftItem")
+    Observable<NetResult<List<BGetGiftItem>>> getGiftItem();
+
+    @GET("Pay/buyGiftByCoin")
+    Observable<NetResult> buyGiftByCoin(@QueryMap Map<String, Object> map);
+
+    @GET("Pay/makePayOrder")
+    Observable<NetResult<BMakePayOrder>> makePayOrder(@QueryMap Map<String, Object> map);
+
+    /**
+     * 模拟
+     * @param orderId
+     * @return
+     */
+    @GET("Pay/handlePayCallback")
+    Observable<NetResult> handlePayCallback(@Query("orderId") String orderId);
 }

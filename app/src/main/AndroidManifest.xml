@@ -95,7 +95,12 @@
         <activity
             android:screenOrientation="portrait"
             android:configChanges="orientation|keyboard|keyboardHidden|navigation"
-            android:name=".my.MyConsumeHistoryActivity"/>
+            android:name=".my.MyConsumeHistoryActivity">
+            <intent-filter>
+                <category android:name="android.intent.category.DEFAULT" />
+                <action android:name="com.cd.xq.intent.action.MyConsumeHistoryActivity" />
+            </intent-filter>
+        </activity>
 
         <activity
             android:screenOrientation="portrait"
@@ -110,7 +115,8 @@
         <activity
             android:screenOrientation="portrait"
             android:configChanges="orientation|keyboard|keyboardHidden|navigation"
-            android:name=".my.MyBalanceActivity"/>
+            android:name=".my.MyBalanceActivity" >
+        </activity>
 
         <activity
             android:screenOrientation="portrait"

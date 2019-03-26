@@ -5,21 +5,18 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.cd.xq.R;
-import com.cd.xq.beans.BGetGiftItem;
-import com.cd.xq.beans.BGetPayItem;
-import com.cd.xq.beans.BMakePayOrder;
-import com.cd.xq.beans.BusPaySuccessParam;
-import com.cd.xq.module.util.Constant;
+import com.cd.xq.module.chart.beans.BGetPayItem;
+import com.cd.xq.module.chart.beans.BMakePayOrder;
+import com.cd.xq.module.chart.beans.BusPaySuccessParam;
+import com.cd.xq.module.chart.network.ChatRequestApi;
 import com.cd.xq.module.util.base.BaseActivity;
 import com.cd.xq.module.util.beans.EventBusParam;
 import com.cd.xq.module.util.beans.NetResult;
@@ -65,6 +62,7 @@ public class MyBalanceActivity extends BaseActivity {
     RecyclerView recyclerViewGoods;
 
     private XqRequestApi mApi;
+    private ChatRequestApi mChatApi;
     private RequestApi mCommonApi;
     private ArrayList<BGetPayItem> mDataList;
     private MyAdapter mAdapter;
@@ -76,6 +74,7 @@ public class MyBalanceActivity extends BaseActivity {
         ButterKnife.bind(this);
         EventBus.getDefault().register(this);
         mApi = NetWorkMg.newRetrofit().create(XqRequestApi.class);
+        mChatApi = NetWorkMg.newRetrofit().create(ChatRequestApi.class);
         mCommonApi = NetWorkMg.newRetrofit().create(RequestApi.class);
 
         init();
@@ -126,7 +125,7 @@ public class MyBalanceActivity extends BaseActivity {
      * 获取支付项
      */
     private void requestPayItem() {
-        mApi.getPayItem()
+        mChatApi.getPayItem()
                 .compose(this.<NetResult<List<BGetPayItem>>>bindToLifecycle())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -172,7 +171,7 @@ public class MyBalanceActivity extends BaseActivity {
      * 模拟支付回调
      */
     private void requestHandlePayCallback(BMakePayOrder bean) {
-        mApi.handlePayCallback(bean.getOrder_id())
+        mChatApi.handlePayCallback(bean.getOrder_id())
                 .compose(this.<NetResult>bindToLifecycle())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -205,7 +204,7 @@ public class MyBalanceActivity extends BaseActivity {
         params.put("payType",1);
         params.put("coin",bean.getCoin());
         params.put("money",bean.getMoney());
-        mApi.makePayOrder(params)
+        mChatApi.makePayOrder(params)
                 .compose(this.<NetResult<BMakePayOrder>>bindToLifecycle())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())

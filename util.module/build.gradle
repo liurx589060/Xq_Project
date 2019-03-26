@@ -73,6 +73,16 @@ dependencies {
     //ToastUtils
     api 'com.hjq:toast:5.8'
     api 'com.hjq:xtoast:2.0'
+
+    //XBanner
+    api 'com.xhb:xbanner:1.5.1'
+
+    //SmartRefreshLayout
+    api 'com.scwang.smartrefresh:SmartRefreshLayout:1.1.0-alpha-18'
+    api 'com.scwang.smartrefresh:SmartRefreshHeader:1.1.0-alpha-18'//没有使用特殊Header，可以不加这行
+
+    //汉字转拼音
+    api 'com.belerweb:pinyin4j:2.5.0'
 }
 
 //configurations.all {

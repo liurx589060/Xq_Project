@@ -166,4 +166,14 @@
 
         </LinearLayout>
     </RelativeLayout>
+
+    <Button
+        android:id="@+id/chart_room_btn_gift"
+        android:layout_width="@dimen/dp_40"
+        android:layout_height="@dimen/dp_40"
+        android:background="@drawable/btn_room_gift"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginRight="@dimen/dp_30"
+        android:layout_marginBottom="@dimen/dp_30"/>
 </RelativeLayout>
