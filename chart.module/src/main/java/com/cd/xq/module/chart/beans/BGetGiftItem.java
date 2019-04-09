@@ -10,11 +10,16 @@ public class BGetGiftItem {
     private int gift_id;
     private String name = "";
     private int coin;
-    private int is_show;
+    private String value;
     private int is_trade;
     private String image = "";
     private String description = "";
     private int num;
+    private String gif = "";
+    private int status;
+    private int expiry_num;
+    private String start_time = "";
+    private String end_time = "";
 
     public int getSort() {
         return sort;
@@ -56,14 +61,6 @@ public class BGetGiftItem {
         this.gift_id = gift_id;
     }
 
-    public int getIs_show() {
-        return is_show;
-    }
-
-    public void setIs_show(int is_show) {
-        this.is_show = is_show;
-    }
-
     public int getIs_trade() {
         return is_trade;
     }
@@ -94,5 +91,53 @@ public class BGetGiftItem {
 
     public void setNum(int num) {
         this.num = num;
+    }
+
+    public String getGif() {
+        return gif;
+    }
+
+    public void setGif(String gif) {
+        this.gif = gif;
+    }
+
+    public String getValue() {
+        return value;
+    }
+
+    public void setValue(String value) {
+        this.value = value;
+    }
+
+    public int getStatus() {
+        return status;
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
+    }
+
+    public int getExpiry_num() {
+        return expiry_num;
+    }
+
+    public void setExpiry_num(int expiry_num) {
+        this.expiry_num = expiry_num;
+    }
+
+    public String getStart_time() {
+        return start_time;
+    }
+
+    public void setStart_time(String start_time) {
+        this.start_time = start_time;
+    }
+
+    public String getEnd_time() {
+        return end_time;
+    }
+
+    public void setEnd_time(String end_time) {
+        this.end_time = end_time;
     }
 }

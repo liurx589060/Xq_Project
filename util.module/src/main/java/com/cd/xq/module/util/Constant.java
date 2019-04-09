@@ -29,14 +29,16 @@ public class Constant {
     public static String JM_APP_KEY = "2f3cff28d0bcc572927bf624";
     public static String JM_SECRET = "cd7be344156c9afc0d218bad";
 
+    public static String TRPAY_KEY = "e08c9287fc9b4f8990c254457820141a";
+
     public static String TAG = "XQ_HYF";
 
     /************************礼券*********************************/
     public static int GIFT_TYPE_LIPIN = 1;   //礼物
     public static int GIFT_TYPE_CARD = 2;   //卡券
 
-    public static int CARD_JIANFANG = 100; //建房卡
-    public static int CARD_LIPIN = 101; //礼品卡
-    public static int CARD_RUMEN = 102; //入门卡
-    public static int CARD_YANSHI = 103; //延时卡
+    public static int GIFT_ID_LIPIN = 5;   //礼品券
+    public static int GIFT_ID_JIANFANG = 6;   //建房卡
+    public static int GIFT_ID_YANSHI = 7;   //延时卡
+    public static int GIFT_ID_RUMEN = 4;   //入门券
 }

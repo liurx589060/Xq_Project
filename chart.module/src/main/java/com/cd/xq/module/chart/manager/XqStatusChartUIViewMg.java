@@ -32,6 +32,7 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.cd.xq.module.chart.ChartRoomActivity;
 import com.cd.xq.module.chart.DoubleRoomActivity;
+import com.cd.xq.module.chart.beans.BGetGiftItem;
 import com.cd.xq.module.chart.beans.BGetReportItem;
 import com.cd.xq.module.chart.network.ChatRequestApi;
 import com.cd.xq.module.chart.status.statusBeans.StatusHelpChangeLiveTypeBean;
@@ -61,6 +62,9 @@ import com.hc.lib.msc.HCMscParams;
 import com.hc.lib.msc.ISpeechListener;
 import com.hc.lib.msc.MscDefaultSpeech;
 import com.iflytek.cloud.SpeechError;
+
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -121,7 +125,6 @@ public class XqStatusChartUIViewMg extends AbsChartView{
     private TextView mTextCountDown;
     private ImageView mBtnDisturb;
     private RadioGroup mRadioGroupLiveType;
-    private Button mBtnGift;
 
     private ViewInstance mAngelViewInstance;
     private ViewInstance mManViewInstance;
@@ -237,7 +240,6 @@ public class XqStatusChartUIViewMg extends AbsChartView{
         mHandler = new Handler();
 
         mRootView = LayoutInflater.from(mXqActivity).inflate(R.layout.layout_chart_room,null);
-        mBtnGift = mRootView.findViewById(R.id.chart_room_btn_gift);
         mRecyclerMembers = mRootView.findViewById(R.id.chart_room_recyclerView_member);
         mRecyclerSystem = mRootView.findViewById(R.id.chart_room_recyclerView_system);
         mBtnExit = mRootView.findViewById(R.id.chart_room_activity_img_exit);
@@ -252,31 +254,6 @@ public class XqStatusChartUIViewMg extends AbsChartView{
             @Override
             public void onClick(View v) {
                 exit();
-            }
-        });
-
-        mBtnGift.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(mPresentGiftViewMg == null) {
-                    mPresentGiftViewMg = new PresentGiftViewMg(mXqActivity);
-                    RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(RelativeLayout
-                            .LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT);
-                    ((RelativeLayout)mRootView).addView(mPresentGiftViewMg.getRootView(),params);
-                    mPresentGiftViewMg.setListener(new PresentGiftViewMg.IPresentGiftMg() {
-                        @Override
-                        public void onGiftShowed() {
-
-                        }
-
-                        @Override
-                        public void onGiftHid() {
-                            mBtnGift.setVisibility(View.VISIBLE);
-                        }
-                    });
-                }
-                mPresentGiftViewMg.show();
-                mBtnGift.setVisibility(View.GONE);
             }
         });
 
@@ -317,7 +294,7 @@ public class XqStatusChartUIViewMg extends AbsChartView{
         mRadioGroupLiveType.setOnCheckedChangeListener(mCheckChangedListener);
         mHeadInfoViewMg = new HeadInfoViewMg(mXqActivity,mRootView.findViewById(R.id.chart_room_activity_headInfo));
         mHeadInfoBgRelayout = mRootView.findViewById(R.id.chart_room_activity_relayout_headInfo);
-        mHeadInfoViewMg.getReportBtn().setVisibility(View.VISIBLE);
+        mHeadInfoViewMg.mBtnReport.setVisibility(View.VISIBLE);
         mHeadInfoBgRelayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -329,6 +306,7 @@ public class XqStatusChartUIViewMg extends AbsChartView{
         initAngelManViewInstance();
         initMemberRecyclerView();
         initSystemRecyclerView();
+        initPresentGiftView();
 
         JMessageClient.registerEventReceiver(this);
         upDataMembers();
@@ -348,6 +326,79 @@ public class XqStatusChartUIViewMg extends AbsChartView{
         MemberViewHolder viewHolder = new MemberViewHolder(mRootView.findViewById(R.id.chart_room_activity_member_item_0));
         mAngelViewInstance = viewHolder.viewHolderLeft;
         mManViewInstance = viewHolder.viewHolderRight;
+    }
+
+    public class ChatGiftInstance {
+        private String targetUser = "";
+        private BGetGiftItem giftItem;
+
+        public String getTargetUser() {
+            return targetUser;
+        }
+
+        public void setTargetUser(String targetUser) {
+            this.targetUser = targetUser;
+        }
+
+        public BGetGiftItem getGiftItem() {
+            return giftItem;
+        }
+
+        public void setGiftItem(BGetGiftItem giftItem) {
+            this.giftItem = giftItem;
+        }
+    }
+
+    private void initPresentGiftView() {
+        mPresentGiftViewMg = new PresentGiftViewMg(mXqActivity);
+        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(RelativeLayout
+                .LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT);
+        ((RelativeLayout)mRootView).addView(mPresentGiftViewMg.getRootView(),params);
+        mPresentGiftViewMg.setListener(new PresentGiftViewMg.IPresentGiftMg() {
+            @Override
+            public void onGiftShowed() {
+
+            }
+
+            @Override
+            public void onGiftHid() {
+
+            }
+
+            @Override
+            public void onConsume(Member member,BGetGiftItem item) {
+                //发送礼物消费事件
+                BaseStatus status = mStatusManager.getStatus(JMChartRoomSendBean.CHART_HELP_GIFT_CONSUMR_STATUS);
+                JMChartRoomSendBean sendBean = status.getChartSendBeanWillSend(null,
+                        BaseStatus.MessageType.TYPE_SEND);
+                String str = "";
+                if(item.getGift_id() == Constant.GIFT_ID_YANSHI) {
+                    //延时卡
+                    str = DataManager.getInstance().getSelfMember().getIndex() + "号嘉宾使用了"
+                            + item.getName() + ",讲话延时" + item.getValue() + "秒";
+                    Tools.toast(mXqActivity.getApplicationContext(),str,false);
+                }else {
+                    if(member.getUserInfo().getRole_type().equals(Constant.ROLRTYPE_ANGEL)) {
+                        str = DataManager.getInstance().getSelfMember().getIndex() + "号嘉宾送给"
+                                + "爱心大使" + item.getName();
+                    }else if(member.getUserInfo().getRole_type().equals(Constant.ROLETYPE_GUEST)){
+                        if(member.getUserInfo().getGender().equals(Constant.GENDER_MAN)) {
+                            str = DataManager.getInstance().getSelfMember().getIndex() + "号嘉宾送给"
+                                    + "男嘉宾" + item.getName();
+                        }else {
+                            str = DataManager.getInstance().getSelfMember().getIndex() + "号嘉宾送给"
+                                    + member.getIndex() + "嘉宾" + item.getName();
+                        }
+                    }
+                }
+                ChatGiftInstance instance = new ChatGiftInstance();
+                instance.setGiftItem(item);
+                instance.setTargetUser(member.getUserInfo().getUser_name());
+                sendBean.setMsg(str);
+                sendBean.setData(new Gson().toJson(instance));
+                mStatusManager.sendRoomMessage(sendBean);
+            }
+        });
     }
 
     private void initMemberRecyclerView() {
@@ -1223,6 +1274,7 @@ public class XqStatusChartUIViewMg extends AbsChartView{
      * 接收聊天室消息
      * @param event
      */
+    @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEventMainThread(ChatRoomMessageEvent event) {
         Log.d("yy", "chartRoomMessage received .");
         List<Message> msgs = event.getMessages();
@@ -1256,6 +1308,7 @@ public class XqStatusChartUIViewMg extends AbsChartView{
      * 接收普通消息
      * @param event
      */
+    @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEventMainThread(MessageEvent event){
         Log.d("yy", "NormalMessage received .");
         //do your own business
@@ -1492,8 +1545,27 @@ public class XqStatusChartUIViewMg extends AbsChartView{
                 .append("职业： ").append(bean.getProfessional()).append("\n\n")
                 .append("工作地点： ").append(bean.getJob_address()).append("\n\n");
         mHeadInfoViewMg.setContent(builder.toString());
+        mHeadInfoViewMg.mBtnGift.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mPresentGiftViewMg.show();
+                mHeadInfoBgRelayout.setVisibility(View.GONE);
+                Member member = null;
+                List<Member> list = DataManager.getInstance().getChartData().getMembers();
+                for(int i = 0 ; i < list.size() ; i++) {
+                    if(list.get(i).getUserInfo().getUser_name().equals(bean.getUser_name())) {
+                        member = list.get(i);
+                        break;
+                    }
+                }
+                if(member == null) {
+                    member = new Member();
+                }
+                mPresentGiftViewMg.setTargetUser(member);
+            }
+        });
 
-        mHeadInfoViewMg.getReportBtn().setOnClickListener(new View.OnClickListener() {
+        mHeadInfoViewMg.mBtnReport.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 mHeadInfoBgRelayout.setVisibility(View.GONE);
@@ -1551,6 +1623,31 @@ public class XqStatusChartUIViewMg extends AbsChartView{
                 });
             }
         });
+    }
+
+    /**
+     * 自己或者其他嘉宾使用了礼物
+     * @param instance
+     */
+    public void doConsumeGift(ChatGiftInstance instance) {
+        if(instance == null) return;
+        BGetGiftItem item = instance.getGiftItem();
+        if(item == null) return;
+        if(item.getGift_id() == Constant.GIFT_ID_YANSHI
+                && mTextCountDown.getVisibility() == View.VISIBLE) {
+            //延时卡,倒计时
+            try{
+                timeCount -= Integer.parseInt(item.getValue());
+            }catch (Exception e) {
+                com.cd.xq.module.util.tools.Log.e("onUseCard--" + e.toString());
+            }
+        }else {
+            if(instance.getTargetUser().equals(DataManager.getInstance().getUserInfo().getUser_name())) {
+                long balance = DataManager.getInstance().getUserInfo().getBalance() + item.getCoin();
+                DataManager.getInstance().getUserInfo().setBalance(balance);
+            }
+            mPresentGiftViewMg.playGiftGifImage(item);
+        }
     }
 
     private void getReportItems() {

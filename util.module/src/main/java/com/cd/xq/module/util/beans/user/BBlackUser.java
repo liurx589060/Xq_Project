@@ -7,8 +7,8 @@ package com.cd.xq.module.util.beans.user;
 public class BBlackUser {
     private String user_name = "";
     private String report_msg = "";
-    private long start_time;
-    private long end_time;
+    private String start_time = "";
+    private String end_time = "";
     private long room_id;
     private int status;
 
@@ -28,22 +28,6 @@ public class BBlackUser {
         this.report_msg = report_msg;
     }
 
-    public long getStart_time() {
-        return start_time;
-    }
-
-    public void setStart_time(long start_time) {
-        this.start_time = start_time;
-    }
-
-    public long getEnd_time() {
-        return end_time;
-    }
-
-    public void setEnd_time(long end_time) {
-        this.end_time = end_time;
-    }
-
     public long getRoom_id() {
         return room_id;
     }
@@ -58,5 +42,21 @@ public class BBlackUser {
 
     public void setStatus(int status) {
         this.status = status;
+    }
+
+    public String getStart_time() {
+        return start_time;
+    }
+
+    public void setStart_time(String start_time) {
+        this.start_time = start_time;
+    }
+
+    public String getEnd_time() {
+        return end_time;
+    }
+
+    public void setEnd_time(String end_time) {
+        this.end_time = end_time;
     }
 }

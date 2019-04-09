@@ -6,6 +6,7 @@ import com.cd.xq.module.chart.status.statusBeans.ChatBaseStatus;
 import com.cd.xq.module.chart.status.statusBeans.EmptyChatBean;
 import com.cd.xq.module.chart.status.statusBeans.StatusAngelChartBean;
 import com.cd.xq.module.chart.status.statusBeans.StatusChartFinalBean;
+import com.cd.xq.module.chart.status.statusBeans.StatusConsumeGiftBean;
 import com.cd.xq.module.chart.status.statusBeans.StatusHelpChangeLiveTypeBean;
 import com.cd.xq.module.chart.status.statusBeans.StatusHelpDoingDisturbBean;
 import com.cd.xq.module.chart.status.statusBeans.StatusHelpExitBean;
@@ -112,6 +113,7 @@ public class StatusManager {
         mHelpStatusMap.put(JMChartRoomSendBean.CHART_HELP_STATUS_CHART_EXIT_ROOM,new StatusHelpExitBean());
         mHelpStatusMap.put(JMChartRoomSendBean.CHART_ONLOOKER_ENTER,new StatusOnLookerEnterBean());
         mHelpStatusMap.put(JMChartRoomSendBean.CHART_ONLOOKER_EXIT,new StatusOnLookerExitBean());
+        mHelpStatusMap.put(JMChartRoomSendBean.CHART_HELP_GIFT_CONSUMR_STATUS,new StatusConsumeGiftBean());
 
         //设置流程序列
         Iterator helpEntry = mHelpStatusMap.entrySet().iterator();

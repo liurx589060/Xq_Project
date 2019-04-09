@@ -14,7 +14,6 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.cd.xq.module.chart.beans.BConsumeGift;
 import com.cd.xq.module.chart.beans.BGetGiftItem;
-import com.cd.xq.module.chart.manager.PresentGiftViewMg;
 import com.cd.xq.module.chart.network.ChatRequestApi;
 import com.cd.xq.module.chart.utils.ChatTools;
 import com.cd.xq.module.util.beans.EventBusParam;
@@ -41,7 +40,7 @@ import io.reactivex.schedulers.Schedulers;
  * Created by Administrator on 2019/3/24.
  */
 
-public class RecommendFragment extends InnerGiftFragment {
+public class CardFragment extends InnerGiftFragment {
     private RecyclerView mRecyclerView;
     private ArrayList<BGetGiftItem> mDataList;
     private MyAdapter myAdapter;
@@ -75,7 +74,7 @@ public class RecommendFragment extends InnerGiftFragment {
 
     @Override
     public String getTitle() {
-        return "推荐";
+        return "卡包";
     }
 
     public void refresh(ArrayList<BGetGiftItem> list) {
@@ -88,7 +87,7 @@ public class RecommendFragment extends InnerGiftFragment {
      * 获取礼物Item
      */
     private void requestGetGiftItem() {
-        mApi.getGiftItem(2)
+        mApi.getGiftItem(3)
                 .compose(this.<NetResult<List<BGetGiftItem>>>bindToLifecycle())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -109,7 +108,7 @@ public class RecommendFragment extends InnerGiftFragment {
                     @Override
                     public void accept(Throwable throwable) throws Exception {
                         Tools.toast(getActivity().getApplicationContext(),throwable.toString(),false);
-                        Log.e("getGiftItem--" + throwable.toString());
+                        Log.e("requestGetGiftItem--" + throwable.toString());
                     }
                 });
     }
@@ -151,7 +150,7 @@ public class RecommendFragment extends InnerGiftFragment {
         params.put("userName", DataManager.getInstance().getUserInfo().getUser_name());
         params.put("giftId",item.getGift_id());
         params.put("coin",item.getCoin());
-        params.put("toUser",mGiftViewMg.getTargetUser().getUserInfo().getUser_name());
+        params.put("toUser",DataManager.getInstance().getUserInfo().getUser_name());
         params.put("handleType",1);  //直接用金币消费
         mApi.consumeGift(params)
                 .compose(this.<NetResult<BConsumeGift>>bindToLifecycle())
@@ -171,10 +170,11 @@ public class RecommendFragment extends InnerGiftFragment {
                             return;
                         }
 
-                        Tools.toast(getActivity().getApplicationContext(), "你送出了" + item.getName()
+                        Tools.toast(getActivity().getApplicationContext(), "你使用了" + item.getName()
                                 , false);
                         //更新余额
                         DataManager.getInstance().getUserInfo().setBalance(netResult.getData().getBalance());
+                        //跳转充值页面
                         mGiftViewMg.setGiftConsume(item);
                     }
                 }, new Consumer<Throwable>() {
@@ -230,6 +230,7 @@ public class RecommendFragment extends InnerGiftFragment {
                 holder.itemView.setBackgroundResource(R.drawable.shape_recycler_gift_item_bg);
             }
 
+            holder.btnSend.setText("使用");
             holder.textCoin.setText(String.valueOf(bean.getCoin()));
             Glide.with(getActivity())
                     .load(bean.getImage())
@@ -237,7 +238,7 @@ public class RecommendFragment extends InnerGiftFragment {
             holder.btnSend.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    //送出礼物
+                    //使用卡
                     doRequestConsumeGift(bean);
                 }
             });

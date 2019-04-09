@@ -30,6 +30,7 @@ public class JMChartRoomSendBean {
     public static final int CHART_HELP_STATUS_CHART_MUTIL_PEOPLE = 102;       //多人连麦
     public static final int CHART_HELP_STATUS_CHART_CHANGR_LIVETYPE = 103;       //直播方式更改
     public static final int CHART_HELP_STATUS_CHART_EXIT_ROOM = 104;       //离开房间
+    public static final int CHART_HELP_GIFT_CONSUMR_STATUS = 105;//礼物消费
 
     public static final int CHART_ONLOOKER_ENTER = 1000;          //围观者进入
     public static final int CHART_ONLOOKER_EXIT = 1001;          //围观者离开
@@ -54,6 +55,7 @@ public class JMChartRoomSendBean {
     private BaseStatus.MessageType messageType = BaseStatus.MessageType.TYPE_SEND;
     private boolean isLadySelected;
     private int manSelects = -1;
+    private String data = "";
 
     public int getProcessStatus() {
         return processStatus;
@@ -157,5 +159,13 @@ public class JMChartRoomSendBean {
 
     public void setLadySelected(boolean ladySelected) {
         isLadySelected = ladySelected;
+    }
+
+    public String getData() {
+        return data;
+    }
+
+    public void setData(String data) {
+        this.data = data;
     }
 }

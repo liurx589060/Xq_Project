@@ -65,6 +65,7 @@ public class PresentPayViewMg {
         mTextBalance = mRootView.findViewById(R.id.text_balance);
         mBtnConsumeHis = mRootView.findViewById(R.id.btn_consume_history);
 
+        mRootView.setVisibility(View.GONE);
         init();
 
         //获取支付项
@@ -247,7 +248,7 @@ public class PresentPayViewMg {
         public void onBindViewHolder(final MyViewHolder holder, final int position) {
             final BGetPayItem bean = mDataList.get(position);
             holder.textCoin.setText(String.valueOf(bean.getCoin() + bean.getBonus()));
-            holder.textMoney.setText("¥ " + String.valueOf(bean.getMoney()));
+            holder.textMoney.setText("¥ " + String.valueOf(bean.getMoney()/10.0f));
             holder.itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {

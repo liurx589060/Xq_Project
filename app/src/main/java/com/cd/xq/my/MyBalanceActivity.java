@@ -12,6 +12,7 @@ import android.widget.Button;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.base.bj.paysdk.utils.TrPay;
 import com.cd.xq.R;
 import com.cd.xq.module.chart.beans.BGetPayItem;
 import com.cd.xq.module.chart.beans.BMakePayOrder;
@@ -198,7 +199,7 @@ public class MyBalanceActivity extends BaseActivity {
      * 下订单
      * @param bean
      */
-    private void requestMakePayOrder(BGetPayItem bean) {
+    private void requestMakePayOrder(final BGetPayItem bean) {
         HashMap<String,Object> params = new HashMap<>();
         params.put("userName",DataManager.getInstance().getUserInfo().getUser_name());
         params.put("payType",1);
@@ -216,7 +217,15 @@ public class MyBalanceActivity extends BaseActivity {
                             Log.e("requestMakePayOrder--" + bMakePayOrderNetResult.getMsg());
                             return;
                         }
+                        BMakePayOrder order = bMakePayOrderNetResult.getData();
                         Tools.toast(getApplicationContext(),"下单成功",false);
+                        //调用TrPay支付
+//                        TrPay.getInstance(MyBalanceActivity.this).callPay(bean.getDescription(),
+//                                order.getOrder_id(),
+//                                order.getMoney(),
+//                                "",
+//                                "",
+//                                );
                         //模拟支付回调
                         requestHandlePayCallback(bMakePayOrderNetResult.getData());
                     }
@@ -267,7 +276,7 @@ public class MyBalanceActivity extends BaseActivity {
         public void onBindViewHolder(MyViewHolder holder, int position) {
             final BGetPayItem bean = mDataList.get(position);
             holder.textCoinCount.setText("" + (bean.getCoin() + bean.getBonus()));
-            holder.btnPay.setText("¥ " + bean.getMoney());
+            holder.btnPay.setText("¥ " + bean.getMoney()/10.0f);
             holder.itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {

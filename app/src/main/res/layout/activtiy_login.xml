@@ -114,4 +114,15 @@
             android:textSize="@dimen/sp_10"
             android:textColor="#f80813"/>
     </LinearLayout>
+
+    <Button
+        android:id="@+id/Test"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignEnd="@+id/login_edit_userName"
+        android:layout_alignRight="@+id/login_edit_userName"
+        android:layout_alignTop="@+id/login_btn_close"
+        android:layout_marginEnd="16dp"
+        android:layout_marginRight="16dp"
+        android:text="Test" />
 </RelativeLayout>

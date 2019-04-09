@@ -24,6 +24,7 @@ allprojects {
         flatDir{
             dirs '../chart.module/libs'
             dirs '../app/libs'
+            dirs '../util.module/libs'
         }
     }
 }

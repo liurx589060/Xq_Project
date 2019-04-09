@@ -26,11 +26,6 @@
             android:gravity="center"
             android:layout_marginTop="@dimen/dp_5">
 
-            <ImageView
-                android:layout_width="@dimen/dp_18"
-                android:layout_height="@dimen/dp_18"
-                android:src="@drawable/icon_gold_coin"/>
-
             <TextView
                 android:id="@+id/text_coin"
                 android:layout_width="wrap_content"
@@ -59,6 +54,7 @@
             android:textSize="@dimen/sp_16"
             android:textColor="#ffffff"
             android:layout_centerInParent="true"
+            android:layout_centerHorizontal="true"
             android:background="@drawable/selector_btn_send_bg"/>
 
     </RelativeLayout>

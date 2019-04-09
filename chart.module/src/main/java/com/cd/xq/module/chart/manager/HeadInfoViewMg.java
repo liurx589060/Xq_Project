@@ -19,11 +19,12 @@ public class HeadInfoViewMg {
     private Activity mActivity;
     private View mRootView;
 
-    private TextView mTextNickName;
-    private ImageView mImgHead;
-    private TextView mTextSpecialInfo;
-    private TextView mTextContent;
-    private Button mBtnReport;
+    public TextView mTextNickName;
+    public ImageView mImgHead;
+    public TextView mTextSpecialInfo;
+    public TextView mTextContent;
+    public Button mBtnReport;
+    public Button mBtnGift;
 
     public HeadInfoViewMg(Activity activity,View view) {
         mActivity = activity;
@@ -44,6 +45,7 @@ public class HeadInfoViewMg {
         mTextNickName = mRootView.findViewById(R.id.head_info_text_nickName);
         mTextSpecialInfo = mRootView.findViewById(R.id.head_info_text_specialInfo);
         mBtnReport = mRootView.findViewById(R.id.head_info_btn_report);
+        mBtnGift = mRootView.findViewById(R.id.head_info_btn_gift);
         mBtnReport.setVisibility(View.GONE);
     }
 
@@ -77,9 +79,5 @@ public class HeadInfoViewMg {
 
     public void setVisible(boolean isVisible) {
         mRootView.setVisibility(isVisible?View.VISIBLE:View.GONE);
-    }
-
-    public Button getReportBtn() {
-        return mBtnReport;
     }
 }

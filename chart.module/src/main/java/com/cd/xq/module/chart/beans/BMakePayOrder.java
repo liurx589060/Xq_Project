@@ -11,7 +11,7 @@ public class BMakePayOrder {
     private int money;
     private String order_id = "";
     private int status;
-    private long create_time;
+    private String create_time = "";
 
     public String getUser_name() {
         return user_name;
@@ -61,11 +61,11 @@ public class BMakePayOrder {
         this.status = status;
     }
 
-    public long getCreate_time() {
+    public String getCreate_time() {
         return create_time;
     }
 
-    public void setCreate_time(long create_time) {
+    public void setCreate_time(String create_time) {
         this.create_time = create_time;
     }
 }

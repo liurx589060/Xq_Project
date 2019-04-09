@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.cd.xq.module.chart.manager.PresentGiftViewMg;
 import com.cd.xq.module.util.base.BaseFragment;
 
 /**
@@ -16,5 +17,9 @@ import com.cd.xq.module.util.base.BaseFragment;
 
 public abstract class InnerGiftFragment extends BaseFragment {
     protected View mRootView;
+    protected PresentGiftViewMg mGiftViewMg;
     public abstract String getTitle();
+    public void setGiftViewMg(PresentGiftViewMg viewMg) {
+        this.mGiftViewMg = viewMg;
+    }
 }

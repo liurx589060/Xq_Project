@@ -77,4 +77,15 @@
         android:layout_marginTop="@dimen/dp_10"
         android:layout_marginRight="@dimen/dp_10"
         />
+
+    <Button
+        android:id="@+id/head_info_btn_gift"
+        android:layout_width="@dimen/dp_26"
+        android:layout_height="@dimen/dp_32"
+        android:background="@drawable/btn_room_gift"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="@dimen/dp_10"
+        android:layout_marginLeft="@dimen/dp_10"
+        />
 </RelativeLayout>

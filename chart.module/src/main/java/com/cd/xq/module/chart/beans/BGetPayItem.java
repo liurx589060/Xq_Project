@@ -9,6 +9,7 @@ public class BGetPayItem {
     private int coin;
     private int money;
     private int bonus;
+    private String description = "";
 
     public int getId() {
         return id;
@@ -40,5 +41,13 @@ public class BGetPayItem {
 
     public void setBonus(int bonus) {
         this.bonus = bonus;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 }

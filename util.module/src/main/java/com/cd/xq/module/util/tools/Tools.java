@@ -7,10 +7,8 @@ import android.text.TextUtils;
 import android.widget.Toast;
 
 import com.cd.xq.module.util.beans.NetResult;
-import com.cd.xq.module.util.beans.jmessage.JMChartResp;
 import com.cd.xq.module.util.beans.user.BBlackUser;
 import com.cd.xq.module.util.interfaces.ICheckBlackListener;
-import com.cd.xq.module.util.manager.DataManager;
 import com.cd.xq.module.util.network.NetWorkMg;
 import com.cd.xq.module.util.network.RequestApi;
 import com.trello.rxlifecycle2.components.support.RxAppCompatActivity;
@@ -102,6 +100,7 @@ public class Tools {
     }
 
     public static void checkUserOrBlack(final Activity activity, String userName,final ICheckBlackListener listener) {
+        if(activity == null || userName == null) return;
         RequestApi api = NetWorkMg.newRetrofit().create(RequestApi.class);
         HashMap<String,Object> params = new HashMap<>();
         params.put("userName", userName);
@@ -113,10 +112,11 @@ public class Tools {
                 .subscribe(new Consumer<NetResult<BBlackUser>>() {
                     @Override
                     public void accept(NetResult<BBlackUser> bBlackUserNetResult) throws Exception {
-                        if(bBlackUserNetResult.getStatus() == XqErrorCode.SUCCESS) {
+                        if(bBlackUserNetResult.getStatus() == XqErrorCode.SUCCESS
+                                && bBlackUserNetResult.getData() != null) {
                             String report_msg = bBlackUserNetResult.getData().getReport_msg();
-                            String startData = DateUtils.timeStampToStr(bBlackUserNetResult.getData().getStart_time(),"yyyy-MM-dd HH:mm:ss");
-                            String endData = DateUtils.timeStampToStr(bBlackUserNetResult.getData().getEnd_time(),"yyyy-MM-dd HH:mm:ss");
+                            String startData = bBlackUserNetResult.getData().getStart_time();
+                            String endData = bBlackUserNetResult.getData().getEnd_time();
                             String content = "您因违法以下条款：\n" + report_msg + "\n" + "将从" + startData + "到" + endData + "被禁止登录使用";
                             Dialog dialog = DialogFactory.createBlackDialog(activity, content,listener);
                             dialog.show();

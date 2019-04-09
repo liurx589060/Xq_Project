@@ -155,7 +155,7 @@ public class HomeFragment extends BaseFragment {
         mBtnAngel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                /*requestPermission(new OnPermission() {
+                requestPermission(new OnPermission() {
                     @Override
                     public void hasPermission(List<String> granted, boolean isAll) {
                         if (!isAll) {
@@ -184,10 +184,10 @@ public class HomeFragment extends BaseFragment {
                     public void noPermission(List<String> denied, boolean quick) {
 
                     }
-                });*/
+                });
 
-                Intent intent = new Intent(getActivity(),ChartRoomActivity.class);
-                getActivity().startActivity(intent);
+//                Intent intent = new Intent(getActivity(),ChartRoomActivity.class);
+//                getActivity().startActivity(intent);
             }
         });
 

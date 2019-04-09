@@ -144,10 +144,9 @@ public class MyChargeHistoryActivity extends BaseActivity {
         @Override
         public void onBindViewHolder(MyViewHolder holder, int position) {
             BGetPayHistory bean = mDataList.get(position);
-            String text = "您充值了" + bean.getMoney() + "元" + ",获得" + bean.getCoin() + "钻石";
+            String text = "您充值了" + bean.getMoney()/1.0f + "元" + ",获得" + bean.getCoin() + "钻石";
             holder.textContent.setText(text);
-            holder.textTime.setText("交易时间："
-                    + DateUtils.timeStampToStr(bean.getModify_time(), "yyyy-MM-dd HH:mm:ss"));
+            holder.textTime.setText("交易时间：" + bean.getModify_time());
             holder.textOrderId.setText("订单号：" + bean.getOrder_id());
             holder.textSerialId.setText("交易流水号：" + bean.getSerial_id());
         }

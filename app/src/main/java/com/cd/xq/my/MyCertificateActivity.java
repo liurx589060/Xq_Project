@@ -15,6 +15,7 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.cd.xq.R;
 import com.cd.xq.module.chart.beans.BGetGiftItem;
+import com.cd.xq.module.chart.network.ChatRequestApi;
 import com.cd.xq.module.util.Constant;
 import com.cd.xq.module.util.base.BaseActivity;
 import com.cd.xq.module.util.beans.EventBusParam;
@@ -57,7 +58,7 @@ public class MyCertificateActivity extends BaseActivity {
 
     private MyAdapter mGiftAdapter;
     private MyAdapter mCertificateAdapter;
-    private XqRequestApi mApi;
+    private ChatRequestApi mApi;
     private ArrayList<BGetGiftItem> mGiftList;
     private ArrayList<BGetGiftItem> mCertificateList;
 
@@ -67,7 +68,7 @@ public class MyCertificateActivity extends BaseActivity {
         setContentView(R.layout.activity_my_certificate);
         ButterKnife.bind(this);
         EventBus.getDefault().register(this);
-        mApi = NetWorkMg.newRetrofit().create(XqRequestApi.class);
+        mApi = NetWorkMg.newRetrofit().create(ChatRequestApi.class);
 
         init();
     }
@@ -162,6 +163,7 @@ public class MyCertificateActivity extends BaseActivity {
     private class MyViewHolder extends RecyclerView.ViewHolder {
         public TextView textName;
         public TextView textCount;
+        public TextView textExpiry;
         public ImageView image;
 
         public MyViewHolder(View itemView) {
@@ -169,6 +171,7 @@ public class MyCertificateActivity extends BaseActivity {
 
             textName = itemView.findViewById(R.id.text_name);
             textCount = itemView.findViewById(R.id.text_count);
+            textExpiry = itemView.findViewById(R.id.text_expiry);
             image = itemView.findViewById(R.id.image);
         }
     }
@@ -201,6 +204,18 @@ public class MyCertificateActivity extends BaseActivity {
                     .load(bean.getImage())
                     .into(holder.image);
             holder.textName.setText(bean.getName());
+            if(bean.getStatus() == 0) {
+                //未使用
+                holder.textExpiry.setVisibility(View.INVISIBLE);
+            }else if(bean.getStatus() == 1){
+                //使用中
+                holder.textExpiry.setVisibility(View.VISIBLE);
+                if(bean.getExpiry_num() != 0) {
+                    holder.textExpiry.setText("剩余次数：" + bean.getExpiry_num());
+                }else {
+                    holder.textExpiry.setText("截止至：" + bean.getEnd_time());
+                }
+            }
         }
 
         @Override

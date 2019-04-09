@@ -3,13 +3,12 @@ package com.cd.xq.module.util.tools;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.graphics.Color;
 import android.support.v7.app.AlertDialog;
 import android.view.KeyEvent;
-import android.view.View;
 import android.view.ViewGroup;
 
+import com.cd.xq.module.util.interfaces.IDialogListener;
 import com.cd.xq.module.util.interfaces.ICheckBlackListener;
 import com.cd.xq.module.util.views.PoterDuffLoadingView;
 import com.cd.xq_util.com.R;
@@ -62,6 +61,48 @@ public class DialogFactory {
                 }).create();
 
         dialog.setCanceledOnTouchOutside(false);
+        return dialog;
+    }
+
+    public static Dialog createNotEnoughBalance(final Activity activity, String text, final IDialogListener listener) {
+        final AlertDialog dialog = new AlertDialog.Builder(activity).setTitle("提示")
+                .setMessage(text)
+                .setPositiveButton("去充值", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        if(listener != null) {
+                            listener.onConfirm();
+                        }
+                    }
+                }).setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        if(listener != null) {
+                            listener.onCancel();
+                        }
+                    }
+                }).create();
+        return dialog;
+    }
+
+    public static Dialog createConsumeDialog(final Activity activity, String text, final IDialogListener listener) {
+        final AlertDialog dialog = new AlertDialog.Builder(activity).setTitle("提示")
+                .setMessage(text)
+                .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        if(listener != null) {
+                            listener.onConfirm();
+                        }
+                    }
+                }).setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        if(listener != null) {
+                            listener.onCancel();
+                        }
+                    }
+                }).create();
         return dialog;
     }
 }

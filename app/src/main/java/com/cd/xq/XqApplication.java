@@ -4,6 +4,7 @@ import android.app.Application;
 import android.content.Context;
 import android.support.multidex.MultiDex;
 
+import com.base.bj.paysdk.utils.TrPay;
 import com.cd.xq.module.util.tools.Log;
 import com.hc.lib.msc.MscManager;
 import com.hjq.toast.ToastUtils;
@@ -57,7 +58,6 @@ public class XqApplication extends Application {
         QbSdk.initX5Environment(getApplicationContext(),null);
         //ToastUtils
         ToastUtils.init(this,new ToastBlackStyle());
-
     }
 
     @Override

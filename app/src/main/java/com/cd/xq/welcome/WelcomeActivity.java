@@ -14,6 +14,7 @@ import android.view.WindowManager;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.base.bj.paysdk.utils.TrPay;
 import com.cd.xq.AppService;
 import com.cd.xq.R;
 import com.cd.xq.frame.MainActivity;
@@ -61,6 +62,9 @@ public class WelcomeActivity extends AppCompatActivity {
             finish();
             return;
         }
+
+        //TrPay
+        TrPay.getInstance(this).initPaySdk(Constant.TRPAY_KEY,"baidu");
 
         Intent intent = new Intent(this, AppService.class);
         startService(intent);

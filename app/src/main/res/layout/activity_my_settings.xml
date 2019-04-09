@@ -65,6 +65,7 @@
         android:layout_height="@dimen/dp_50"
         android:clickable="true"
         android:background="@drawable/selector_register_layout_bg"
+        android:visibility="gone"
         >
 
         <TextView

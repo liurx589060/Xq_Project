@@ -81,7 +81,7 @@ public class MainActivity extends BaseActivity {
 
         mApi = NetWorkMg.newRetrofit().create(RequestApi.class);
         UserInfo userInfo = JMessageClient.getMyInfo();
-        if(userInfo != null && !DataManager.getInstance().getUserInfo().isOnLine()) {
+        if(userInfo != null && (!DataManager.getInstance().getUserInfo().isOnLine())) {
             //自动登陆
             DataManager.getInstance().setJmUserName(userInfo.getUserName());
             toAutoLogin();

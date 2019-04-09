@@ -14,20 +14,15 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.cd.xq.module.chart.beans.BConsumeGift;
 import com.cd.xq.module.chart.beans.BGetGiftItem;
-import com.cd.xq.module.chart.manager.PresentGiftViewMg;
 import com.cd.xq.module.chart.network.ChatRequestApi;
-import com.cd.xq.module.chart.utils.ChatTools;
-import com.cd.xq.module.util.beans.EventBusParam;
+import com.cd.xq.module.util.Constant;
 import com.cd.xq.module.util.beans.NetResult;
-import com.cd.xq.module.util.interfaces.IDialogListener;
 import com.cd.xq.module.util.manager.DataManager;
 import com.cd.xq.module.util.network.NetWorkMg;
 import com.cd.xq.module.util.tools.Log;
 import com.cd.xq.module.util.tools.Tools;
 import com.cd.xq.module.util.tools.XqErrorCode;
 import com.cd.xq_chart.module.R;
-
-import org.greenrobot.eventbus.EventBus;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -41,7 +36,7 @@ import io.reactivex.schedulers.Schedulers;
  * Created by Administrator on 2019/3/24.
  */
 
-public class RecommendFragment extends InnerGiftFragment {
+public class PackageFragment extends InnerGiftFragment {
     private RecyclerView mRecyclerView;
     private ArrayList<BGetGiftItem> mDataList;
     private MyAdapter myAdapter;
@@ -69,13 +64,13 @@ public class RecommendFragment extends InnerGiftFragment {
                 GridLayoutManager.HORIZONTAL,false));
         mRecyclerView.setAdapter(myAdapter);
 
-        //获取支付项
-        requestGetGiftItem();
+        //获取我的礼物
+        requestGetGiftList();
     }
 
     @Override
     public String getTitle() {
-        return "推荐";
+        return "包裹";
     }
 
     public void refresh(ArrayList<BGetGiftItem> list) {
@@ -85,65 +80,43 @@ public class RecommendFragment extends InnerGiftFragment {
     }
 
     /**
-     * 获取礼物Item
+     * 获取我的礼物列表
      */
-    private void requestGetGiftItem() {
-        mApi.getGiftItem(2)
+    private void requestGetGiftList() {
+        //获取未消耗的礼物
+        mApi.getGiftList(DataManager.getInstance().getUserInfo().getUser_name())
                 .compose(this.<NetResult<List<BGetGiftItem>>>bindToLifecycle())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Consumer<NetResult<List<BGetGiftItem>>>() {
                     @Override
-                    public void accept(NetResult<List<BGetGiftItem>> listNetResult) throws Exception {
-                        if(listNetResult.getStatus() != XqErrorCode.SUCCESS) {
-                            Tools.toast(getActivity().getApplicationContext(),listNetResult.getMsg(),false);
-                            Log.e("requestGetGiftItem--" + listNetResult.getMsg());
+                    public void accept(NetResult<List<BGetGiftItem>> listNetResult) throws
+                            Exception {
+                        if (listNetResult.getStatus() != XqErrorCode.SUCCESS) {
+                            Tools.toast(getActivity().getApplicationContext(), listNetResult.getMsg(), false);
+                            Log.e("requestGetGiftList--" + listNetResult.getMsg());
                             return;
                         }
                         mDataList.clear();
-                        mDataList.addAll(listNetResult.getData());
+                        for (int i = 0; i < listNetResult.getData().size(); i++) {
+                            if(listNetResult.getData().get(i).getGift_id() != Constant.GIFT_ID_JIANFANG) {
+                                mDataList.add(listNetResult.getData().get(i));
+                            }
+                        }
                         myAdapter.notifyDataSetChanged();
 
                     }
                 }, new Consumer<Throwable>() {
                     @Override
                     public void accept(Throwable throwable) throws Exception {
-                        Tools.toast(getActivity().getApplicationContext(),throwable.toString(),false);
-                        Log.e("getGiftItem--" + throwable.toString());
+                        Tools.toast(getActivity().getApplicationContext(), throwable.toString(), false);
+                        Log.e("requestGetGiftList--" + throwable.toString());
                     }
                 });
     }
 
-    private void doRequestConsumeGift(final BGetGiftItem item) {
-        boolean isEnough = ChatTools.checkBalance(getActivity(), item.getCoin(), new IDialogListener() {
-            @Override
-            public void onConfirm() {
-                //发送余额不足的通知，跳转到充值页面
-                mGiftViewMg.lackShowPayView();
-            }
-
-            @Override
-            public void onCancel() {
-
-            }
-        });
-        if(!isEnough) return;
-//        ChatTools.consumeConfirm(getActivity(), item, new IDialogListener() {
-//            @Override
-//            public void onConfirm() {
-//                requestConsumeGift(item);
-//            }
-//
-//            @Override
-//            public void onCancel() {
-//
-//            }
-//        });
-        requestConsumeGift(item);
-    }
-
     /**
-     * 送礼物,直接金币送出
+     * 送礼物,包裹消费
      * @param item
      */
     private void requestConsumeGift(final BGetGiftItem item) {
@@ -152,7 +125,7 @@ public class RecommendFragment extends InnerGiftFragment {
         params.put("giftId",item.getGift_id());
         params.put("coin",item.getCoin());
         params.put("toUser",mGiftViewMg.getTargetUser().getUserInfo().getUser_name());
-        params.put("handleType",1);  //直接用金币消费
+        params.put("handleType",2);  //用包裹消费
         mApi.consumeGift(params)
                 .compose(this.<NetResult<BConsumeGift>>bindToLifecycle())
                 .subscribeOn(Schedulers.io())
@@ -161,20 +134,24 @@ public class RecommendFragment extends InnerGiftFragment {
                     @Override
                     public void accept(NetResult<BConsumeGift> netResult) throws Exception {
                         if (netResult.getStatus() != XqErrorCode.SUCCESS) {
-                            if(netResult.getStatus() == XqErrorCode.ERROR_LACK_STOCK) {
-                                //余额不足
-                                doRequestConsumeGift(item);
-                            }else {
-                                Tools.toast(getActivity().getApplicationContext(), netResult.getMsg(), false);
-                            }
+                            Tools.toast(getActivity().getApplicationContext(), netResult.getMsg(), false);
                             Log.e("requestConsumeGift--" + netResult.getMsg());
                             return;
                         }
 
                         Tools.toast(getActivity().getApplicationContext(), "你送出了" + item.getName()
                                 , false);
-                        //更新余额
-                        DataManager.getInstance().getUserInfo().setBalance(netResult.getData().getBalance());
+                        //更新包裹
+                        mDataList.clear();
+                        for (int i = 0; i < netResult.getData().getGift_list().size(); i++) {
+                            if(netResult.getData().getGift_list().get(i).getGift_id() != Constant.GIFT_ID_JIANFANG
+                             && netResult.getData().getGift_list().get(i).getGift_id() != Constant.GIFT_ID_RUMEN) {
+                                mDataList.add(netResult.getData().getGift_list().get(i));
+                            }
+                        }
+                        myAdapter.notifyDataSetChanged();
+
+                        //播放gif
                         mGiftViewMg.setGiftConsume(item);
                     }
                 }, new Consumer<Throwable>() {
@@ -207,7 +184,7 @@ public class RecommendFragment extends InnerGiftFragment {
         @Override
         public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
             return new MyViewHolder(LayoutInflater.from(getActivity())
-                    .inflate(R.layout.layout_recycler_gift_gift_item,parent,false));
+                    .inflate(R.layout.layout_recycler_gift_package_item,parent,false));
         }
 
         @Override
@@ -230,15 +207,15 @@ public class RecommendFragment extends InnerGiftFragment {
                 holder.itemView.setBackgroundResource(R.drawable.shape_recycler_gift_item_bg);
             }
 
-            holder.textCoin.setText(String.valueOf(bean.getCoin()));
+            holder.textCoin.setText("X " + String.valueOf(bean.getNum()));
             Glide.with(getActivity())
                     .load(bean.getImage())
                     .into(holder.image);
             holder.btnSend.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    //送出礼物
-                    doRequestConsumeGift(bean);
+                    //从包裹消费礼物
+                    requestConsumeGift(bean);
                 }
             });
         }

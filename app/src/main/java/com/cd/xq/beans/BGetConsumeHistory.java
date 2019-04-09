@@ -7,18 +7,10 @@ import com.cd.xq.module.chart.beans.BGetGiftItem;
  */
 
 public class BGetConsumeHistory extends BGetGiftItem {
-    private int create_time;
+    private String create_time = "";
     private String to_user = "";
     private String nick_name = "";
     private String head_image = "";
-
-    public int getCreate_time() {
-        return create_time;
-    }
-
-    public void setCreate_time(int create_time) {
-        this.create_time = create_time;
-    }
 
     public String getTo_user() {
         return to_user;
@@ -42,5 +34,13 @@ public class BGetConsumeHistory extends BGetGiftItem {
 
     public void setHead_image(String head_image) {
         this.head_image = head_image;
+    }
+
+    public String getCreate_time() {
+        return create_time;
+    }
+
+    public void setCreate_time(String create_time) {
+        this.create_time = create_time;
     }
 }

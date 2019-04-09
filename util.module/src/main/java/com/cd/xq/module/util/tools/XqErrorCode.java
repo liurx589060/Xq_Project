@@ -22,4 +22,6 @@ public class XqErrorCode {
     public static int ERROR_USER_UPLOAD = 7103;//上传文件出错
     public static int ERROR_USER_PASSWORD_WRONG = 7104;//密码错误
     public static int ERROR_USER_PASSWORD_CHANGE = 7105;//修改密码出错
+    public static int ERROR_PARAMS_SAME = 7106;//参数相同
+    public static int ERROR_LACK_STOCK = 7107;//库存不够
 }

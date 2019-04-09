@@ -83,6 +83,9 @@ dependencies {
 
     //汉字转拼音
     api 'com.belerweb:pinyin4j:2.5.0'
+
+    //TrPay
+    compile(name:'paysdk-release-1.2.4',ext:'aar')
 }
 
 //configurations.all {

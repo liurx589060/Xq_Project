@@ -31,9 +31,6 @@ public interface XqRequestApi {
     Observable<NetResult<List<BGetPayHistory>>> getPayHistory(@Query("userName") String userName
             ,@Query("status") int status);
 
-    @GET("Pay/getGiftList")
-    Observable<NetResult<List<BGetGiftItem>>> getGiftList(@Query("userName") String userName);
-
     @GET("Pay/getConsumeHistory")
     Observable<NetResult<List<BGetConsumeHistory>>> getConsumeHistory(@Query("userName") String userName);
 }

@@ -12,8 +12,8 @@ public class BGetPayHistory {
     private String user_name = "";
     private int money = 0;
     private int status = 0;  //状态
-    private long create_time = 0;
-    private long modify_time = 0;
+    private String create_time = "";
+    private String modify_time = "";
 
     public String getOrder_id() {
         return order_id;
@@ -71,19 +71,19 @@ public class BGetPayHistory {
         this.status = status;
     }
 
-    public long getCreate_time() {
+    public String getCreate_time() {
         return create_time;
     }
 
-    public void setCreate_time(long create_time) {
+    public void setCreate_time(String create_time) {
         this.create_time = create_time;
     }
 
-    public long getModify_time() {
+    public String getModify_time() {
         return modify_time;
     }
 
-    public void setModify_time(long modify_time) {
+    public void setModify_time(String modify_time) {
         this.modify_time = modify_time;
     }
 }

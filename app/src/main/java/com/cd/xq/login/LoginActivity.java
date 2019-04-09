@@ -80,6 +80,8 @@ public class LoginActivity extends BaseActivity {
     @BindView(R.id.login_text_fpassword)
     TextView loginTextFpassword;
 
+    private Button mBtnSetting;
+
     private Dialog mLoadingDialog;
     private RequestApi mApi;
     private int mFrom = FROM_WELCOME;
@@ -111,6 +113,15 @@ public class LoginActivity extends BaseActivity {
                 DefaultWebActivity.startWeb(LoginActivity.this,url,"用户协议");
             }
         });
+
+        mBtnSetting = findViewById(R.id.Test);
+        mBtnSetting.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent3 = new Intent(LoginActivity.this, MainActivity.class);
+                startActivity(intent3);
+            }
+        });
     }
 
     @OnClick({R.id.login_btn_close, R.id.login_edit_userName, R.id.login_edit_password, R.id.login_btn_login, R.id.login_btn_register, R.id.login_text_fpassword})
@@ -135,8 +146,6 @@ public class LoginActivity extends BaseActivity {
                 }
                 break;
             case R.id.login_text_fpassword:
-//                Intent intent3 = new Intent(this, MainActivity.class);
-//                startActivity(intent3);
                 sendSMSCode(this,1);
                 break;
         }

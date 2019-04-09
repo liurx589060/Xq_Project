@@ -17,10 +17,12 @@ import com.bumptech.glide.Glide;
 import com.cd.xq.R;
 import com.cd.xq.module.chart.beans.BGetGiftItem;
 import com.cd.xq.module.chart.network.ChatRequestApi;
+import com.cd.xq.module.chart.utils.ChatTools;
 import com.cd.xq.module.util.base.BaseActivity;
 import com.cd.xq.module.util.beans.EventBusParam;
 import com.cd.xq.module.util.beans.NetResult;
 import com.cd.xq.module.util.common.MultiItemDivider;
+import com.cd.xq.module.util.interfaces.IDialogListener;
 import com.cd.xq.module.util.manager.DataManager;
 import com.cd.xq.module.util.network.NetWorkMg;
 import com.cd.xq.module.util.tools.Log;
@@ -91,7 +93,7 @@ public class MyGiftBuyActivity extends BaseActivity {
     }
 
     private void requestGetGiftItem() {
-        mApi.getGiftItem()
+        mApi.getGiftItem(1)
                 .compose(this.<NetResult<List<BGetGiftItem>>>bindToLifecycle())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -104,12 +106,7 @@ public class MyGiftBuyActivity extends BaseActivity {
                             return;
                         }
                         mDataList.clear();
-                        for(int i = 0 ; i < listNetResult.getData().size() ; i++) {
-                            if(listNetResult.getData().get(i).getIs_show() == 1) {
-                                //显示
-                                mDataList.add(listNetResult.getData().get(i));
-                            }
-                        }
+                        mDataList.addAll(listNetResult.getData());
                         myAdapter.notifyDataSetChanged();
 
                     }
@@ -122,6 +119,21 @@ public class MyGiftBuyActivity extends BaseActivity {
                 });
     }
 
+    private void doRequestBuyGift(final BGetGiftItem item) {
+        if(!ChatTools.checkBalance(this,item.getCoin())) return;
+        ChatTools.consumeConfirm(this, item, new IDialogListener() {
+            @Override
+            public void onConfirm() {
+                requestBuyGift(item);
+            }
+
+            @Override
+            public void onCancel() {
+
+            }
+        });
+    }
+
     /**
      * 用钻石购买礼物
      * @param item
@@ -131,21 +143,27 @@ public class MyGiftBuyActivity extends BaseActivity {
         params.put("userName",DataManager.getInstance().getUserInfo().getUser_name());
         params.put("giftId",item.getGift_id());
         params.put("coin",item.getCoin());
-        params.put("handleType",1); //充值到我的礼物中
         mApi.buyGiftByCoin(params)
-                .compose(this.<NetResult>bindToLifecycle())
+                .compose(this.<NetResult<Long>>bindToLifecycle())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<NetResult>() {
+                .subscribe(new Consumer<NetResult<Long>>() {
                     @Override
-                    public void accept(NetResult netResult) throws Exception {
+                    public void accept(NetResult<Long> netResult) throws Exception {
                         if (netResult.getStatus() != XqErrorCode.SUCCESS) {
-                            Tools.toast(getApplicationContext(), netResult.getMsg(), false);
+                            if(netResult.getStatus() == XqErrorCode.ERROR_LACK_STOCK) {
+                                //余额不足
+                                doRequestBuyGift(item);
+                            }else {
+                                Tools.toast(getApplicationContext(), netResult.getMsg(), false);
+                            }
                             Log.e("requestBuyGift--" + netResult.getMsg());
                             return;
                         }
 
                         //更新我的礼物
+                        //更新余额
+                        DataManager.getInstance().getUserInfo().setBalance(netResult.getData().longValue());
                         Tools.toast(getApplicationContext(), "购买" + item.getName() + "成功", false);
                         EventBusParam param = new EventBusParam();
                         param.setEventBusCode(EventBusParam.EVENT_BUS_GIFT_BUY);
@@ -199,7 +217,7 @@ public class MyGiftBuyActivity extends BaseActivity {
                 @Override
                 public void onClick(View v) {
                     //购买礼物
-                    requestBuyGift(bean);
+                    doRequestBuyGift(bean);
                 }
             });
         }

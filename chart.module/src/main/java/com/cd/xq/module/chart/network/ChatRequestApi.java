@@ -1,5 +1,6 @@
 package com.cd.xq.module.chart.network;
 
+import com.cd.xq.module.chart.beans.BConsumeGift;
 import com.cd.xq.module.chart.beans.BGetGiftItem;
 import com.cd.xq.module.chart.beans.BGetPayItem;
 import com.cd.xq.module.chart.beans.BGetReportItem;
@@ -29,13 +30,19 @@ public interface ChatRequestApi {
     Observable<NetResult<List<BGetPayItem>>> getPayItem();
 
     @GET("Pay/getGiftItem")
-    Observable<NetResult<List<BGetGiftItem>>> getGiftItem();
+    Observable<NetResult<List<BGetGiftItem>>> getGiftItem(@Query("position") int position);
 
     @GET("Pay/buyGiftByCoin")
-    Observable<NetResult> buyGiftByCoin(@QueryMap Map<String, Object> map);
+    Observable<NetResult<Long>> buyGiftByCoin(@QueryMap Map<String, Object> map);
 
     @GET("Pay/makePayOrder")
     Observable<NetResult<BMakePayOrder>> makePayOrder(@QueryMap Map<String, Object> map);
+
+    @GET("Pay/getGiftList")
+    Observable<NetResult<List<BGetGiftItem>>> getGiftList(@Query("userName") String userName);
+
+    @GET("Pay/consumeGift")
+    Observable<NetResult<BConsumeGift>> consumeGift(@QueryMap Map<String, Object> map);
 
     /**
      * 模拟

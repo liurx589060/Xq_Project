@@ -157,17 +157,20 @@ public class MyConsumeHistoryActivity extends BaseActivity {
             BGetConsumeHistory bean = mDataList.get(position);
             String str = "";
             if (bean.getType() == Constant.GIFT_TYPE_LIPIN) {
-                str = "你送" + bean.getNick_name() + bean.getNum() + "个" + bean.getName();
+                if(bean.getTo_user().equals(DataManager.getInstance().getUserInfo().getUser_name())) {
+                    str = "你购买了" + bean.getNum() + "个" + bean.getName();
+                }else {
+                    str = "你送" + bean.getNick_name() + bean.getNum() + "个" + bean.getName();
+                }
             } else if (bean.getType() == Constant.GIFT_TYPE_CARD) {
                 str = "你购买了" + bean.getNum() + "张" + bean.getName();
             }
             holder.textContent.setText(str);
-            holder.textTime.setText(DateUtils.timeStampToStr(bean.getCreate_time(),
-                    "yyyy-MM-dd HH:mm:ss"));
+            holder.textTime.setText(bean.getCreate_time());
             Glide.with(MyConsumeHistoryActivity.this)
                     .load(bean.getImage())
                     .into(holder.imageGift);
-            if(bean.getType() == Constant.GIFT_TYPE_LIPIN) {
+            if(!bean.getTo_user().equals(DataManager.getInstance().getUserInfo().getUser_name())) {
                 holder.imageHead.setVisibility(View.VISIBLE);
                 Glide.with(MyConsumeHistoryActivity.this)
                         .load(bean.getHead_image())
