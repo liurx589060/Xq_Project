@@ -164,6 +164,8 @@ public class MyConsumeHistoryActivity extends BaseActivity {
                 }
             } else if (bean.getType() == Constant.GIFT_TYPE_CARD) {
                 str = "你购买了" + bean.getNum() + "张" + bean.getName();
+            } else if(bean.getType() == Constant.GIFT_TYPE_FIX) {
+                str = "你消费了" + bean.getCoin() + "钻石用于" + bean.getName();
             }
             holder.textContent.setText(str);
             holder.textTime.setText(bean.getCreate_time());

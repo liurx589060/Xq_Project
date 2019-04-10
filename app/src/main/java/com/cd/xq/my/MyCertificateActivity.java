@@ -210,7 +210,7 @@ public class MyCertificateActivity extends BaseActivity {
             }else if(bean.getStatus() == 1){
                 //使用中
                 holder.textExpiry.setVisibility(View.VISIBLE);
-                if(bean.getExpiry_num() != 0) {
+                if(bean.getEnd_time() == null) {
                     holder.textExpiry.setText("剩余次数：" + bean.getExpiry_num());
                 }else {
                     holder.textExpiry.setText("截止至：" + bean.getEnd_time());

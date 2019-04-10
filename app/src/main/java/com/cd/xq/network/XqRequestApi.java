@@ -1,5 +1,6 @@
 package com.cd.xq.network;
 
+import com.cd.xq.beans.BCheckRoomExpiry;
 import com.cd.xq.beans.BGetArrays;
 import com.cd.xq.beans.BGetConsumeHistory;
 import com.cd.xq.module.chart.beans.BGetGiftItem;
@@ -33,4 +34,8 @@ public interface XqRequestApi {
 
     @GET("Pay/getConsumeHistory")
     Observable<NetResult<List<BGetConsumeHistory>>> getConsumeHistory(@Query("userName") String userName);
+
+    @GET("Pay/checkRoomExpiry")
+    Observable<NetResult<BCheckRoomExpiry>> checkRoomExpiry(@Query("userName") String userName
+            , @Query("handleType") int handleType);
 }

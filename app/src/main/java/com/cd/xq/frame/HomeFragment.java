@@ -86,8 +86,6 @@ import static android.app.Activity.RESULT_OK;
  */
 
 public class HomeFragment extends BaseFragment {
-    public static final int AC_CHATROOM_REQUEST_CODE = 1000;
-
     @BindView(R.id.btn_angel)
     Button mBtnAngel;
     @BindView(R.id.btn_guest)
@@ -164,20 +162,18 @@ public class HomeFragment extends BaseFragment {
                             return;
                         }
 
-                        UserInfoBean infoBean = DataManager.getInstance().getUserInfo();
-                        if (infoBean == null) {
-                            Tools.toast(getActivity(), "请先登录", false);
+                        if(!DataManager.getInstance().getUserInfo().isOnLine()) {
+                            Tools.toast(getActivity(), "请先登录...", true);
                             return;
                         }
 
-                        UserInfoBean bean = new UserInfoBean();
-                        bean.setUser_name(DataManager.getInstance().getUserInfo().getUser_name());
-                        bean.setRole_type(DataManager.getInstance().getUserInfo().getRole_type());
-                        bean.setGender(DataManager.getInstance().getUserInfo().getGender());
-                        bean.setLevel(DataManager.getInstance().getUserInfo().getLevel());
-                        bean.setLimitLady(AppConstant.CHATROOM_LIMIT_LADY_COUNT);
-                        bean.setLimitLevel(-1);
-                        createChartRoom(bean);
+                        if (!DataManager.getInstance().getUserInfo().getRole_type().equals(Constant.ROLRTYPE_ANGEL)) {
+                            Tools.toast(getActivity(), "您不是爱心大使", true);
+                            return;
+                        }
+
+                        Intent intent = new Intent(getActivity(),CreateRoomActivity.class);
+                        getActivity().startActivity(intent);
                     }
 
                     @Override
@@ -185,9 +181,6 @@ public class HomeFragment extends BaseFragment {
 
                     }
                 });
-
-//                Intent intent = new Intent(getActivity(),ChartRoomActivity.class);
-//                getActivity().startActivity(intent);
             }
         });
 
@@ -234,73 +227,6 @@ public class HomeFragment extends BaseFragment {
     public void onDestroy() {
         super.onDestroy();
         EventBus.getDefault().unregister(this);
-    }
-
-    private void createChartRoom(UserInfoBean userInfo) {
-        if (userInfo == null) {
-            Log.e("createChartRoom UserInfoBean=null");
-            return;
-        }
-
-        if(!DataManager.getInstance().getUserInfo().isOnLine()) {
-            Tools.toast(getActivity(), "请先登录...", true);
-            return;
-        }
-
-        if (!userInfo.getRole_type().equals(Constant.ROLRTYPE_ANGEL)) {
-            Tools.toast(getActivity(), "您不是爱心大使", true);
-            return;
-        }
-
-        setLiveAddress();
-
-        Map<String, Object> params = new HashMap<>();
-        params.put("userName", userInfo.getUser_name());
-        params.put("gender", userInfo.getGender());
-        params.put("level", userInfo.getLevel());
-        params.put("limitLevel", userInfo.getLimitLevel());
-        params.put("limitLady", userInfo.getLimitLady());
-        params.put("limitMan", userInfo.getLimitMan());
-        params.put("limitAngel", userInfo.getLimitAngel());
-        params.put("pushAddress", Base64.encodeToString(mTXPushAddress.getBytes(), Base64.DEFAULT));
-        params.put("playAddress", Base64.encodeToString(mTXPlayerAddress.getBytes(),
-                Base64.DEFAULT));
-        params.put("public", mPublic);
-        params.put("describe", "一起来相亲吧");
-
-        if (userInfo.getLimitLady() % 2 != 0) {
-            Tools.toast(getActivity(), "请输入偶数", true);
-            return;
-        }
-
-        mApi.createChartRoom(params)
-                .subscribeOn(Schedulers.io())
-                .compose(this.<JMChartResp>bindToLifecycle())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<JMChartResp>() {
-                    @Override
-                    public void accept(JMChartResp jmChartResp) throws Exception {
-                        if (jmChartResp == null) {
-                            Log.e("jmChartResp is null");
-                            Tools.toast(getActivity(), "jmChartResp is null", true);
-                            return;
-                        }
-                        if (jmChartResp.getStatus() != XqErrorCode.SUCCESS) {
-                            Log.e(jmChartResp.getMsg());
-                            Tools.toast(getActivity(), jmChartResp.getMsg(), true);
-                            return;
-                        }
-                        DataManager.getInstance().setChartData(jmChartResp.getData());
-                        Intent intent = new Intent(getActivity(), ChartRoomActivity.class);
-                        getActivity().startActivityForResult(intent, AC_CHATROOM_REQUEST_CODE);
-                    }
-                }, new Consumer<Throwable>() {
-                    @Override
-                    public void accept(Throwable throwable) throws Exception {
-                        Log.e(throwable.toString());
-                        Tools.toast(getActivity(), throwable.toString(), true);
-                    }
-                });
     }
 
     private void joinChartRoom(int roomRoleType, long roomId) {
@@ -424,72 +350,6 @@ public class HomeFragment extends BaseFragment {
         JMsgSender.sendRoomMessage(bean);
     }
 
-    /*
-     * KEY+ stream_id + txTime
-	 */
-    private void setLiveAddress() {
-        if (mPushAddressType == 0) {
-            //本地
-            mTXPushAddress = NetWorkMg.getCameraUrl();
-            mTXPlayerAddress = mTXPushAddress;
-        } else if (mPushAddressType == 1) {
-            Calendar calendar = Calendar.getInstance();
-            calendar.add(Calendar.HOUR, 24);
-            long txTime = calendar.getTimeInMillis() / 1000;
-            String input = new StringBuilder().
-                    append(Constant.TX_LIVE_PUSH_KEY).
-                    append(Constant.TX_LIVE_BIZID + "_"
-                            + String.valueOf(DataManager.getInstance().getUserInfo().getUser_id())).
-                    append(Long.toHexString(txTime).toUpperCase()).toString();
-            Log.d("yy", input);
-
-            String txSecret = null;
-            try {
-                MessageDigest messageDigest = MessageDigest.getInstance("MD5");
-                txSecret = byteArrayToHexString(
-                        messageDigest.digest(input.getBytes("UTF-8")));
-            } catch (NoSuchAlgorithmException e) {
-                e.printStackTrace();
-                Log.e(e.toString());
-            } catch (UnsupportedEncodingException e) {
-                e.printStackTrace();
-                Log.e(e.toString());
-            }
-
-            mTXPlayerAddress = "rtmp://" + Constant.TX_LIVE_BIZID + ".liveplay.myqcloud.com/live/"
-                    + Constant.TX_LIVE_BIZID + "_" + DataManager.getInstance().getUserInfo()
-                    .getUser_id();
-
-            String ip = "rtmp://" + Constant.TX_LIVE_BIZID + ".livepush.myqcloud.com/live/"
-                    + Constant.TX_LIVE_BIZID + "_" + DataManager.getInstance().getUserInfo()
-                    .getUser_id()
-                    + "?bizid=" + Constant.TX_LIVE_BIZID;
-            mTXPushAddress = new StringBuilder().
-                    append(ip).
-                    append("&").
-                    append("txSecret=").
-                    append(txSecret).
-                    append("&").
-                    append("txTime=").
-                    append(Long.toHexString(txTime).toUpperCase()).
-                    toString();
-        }
-        Log.i("yy", "TXPlayerAddress=" + mTXPlayerAddress);
-        Log.i("yy", "TXPushAddress=" + mTXPushAddress);
-    }
-
-    private String byteArrayToHexString(byte[] data) {
-        char[] DIGITS_LOWER = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c',
-                'd', 'e', 'f'};
-        char[] out = new char[data.length << 1];
-
-        for (int i = 0, j = 0; i < data.length; i++) {
-            out[j++] = DIGITS_LOWER[(0xF0 & data[i]) >>> 4];
-            out[j++] = DIGITS_LOWER[0x0F & data[i]];
-        }
-        return new String(out);
-    }
-
     @Override
     public void onDestroyView() {
         super.onDestroyView();
@@ -561,18 +421,18 @@ public class HomeFragment extends BaseFragment {
                 });
     }
 
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == AC_CHATROOM_REQUEST_CODE && resultCode == RESULT_OK) {
-            Tools.checkUserOrBlack(getActivity(), DataManager.getInstance().getUserInfo()
-                    .getUser_name(), new BlackCheckListener() {
-                @Override
-                public void onResult(boolean isBlack) {
-                }
-            });
-        }
-    }
+//    @Override
+//    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+//        super.onActivityResult(requestCode, resultCode, data);
+//        if (requestCode == AC_CHATROOM_REQUEST_CODE && resultCode == RESULT_OK) {
+//            Tools.checkUserOrBlack(getActivity(), DataManager.getInstance().getUserInfo()
+//                    .getUser_name(), new BlackCheckListener() {
+//                @Override
+//                public void onResult(boolean isBlack) {
+//                }
+//            });
+//        }
+//    }
 
     private class OnLookerViewHolder extends RecyclerView.ViewHolder {
         public TextView textRoomId;

@@ -116,6 +116,7 @@ public class DefaultWebActivity extends BaseActivity {
         webSetting.setSupportMultipleWindows(false);
         // webSetting.setLoadWithOverviewMode(true);
         webSetting.setAppCacheEnabled(true);
+        webSetting.setCacheMode(WebSettings.LOAD_NO_CACHE); //不使用缓存
         // webSetting.setDatabaseEnabled(true);
         webSetting.setDomStorageEnabled(true);
         webSetting.setJavaScriptEnabled(true);

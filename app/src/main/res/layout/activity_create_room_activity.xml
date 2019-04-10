@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#ffffff">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp_40"
+        android:background="#ffffff"
+        >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="创建房间"
+            android:textColor="#000000"
+            android:textSize="@dimen/sp_20"
+            android:textStyle="bold"
+            android:layout_centerInParent="true"/>
+
+        <Button
+            android:id="@+id/btn_back"
+            android:layout_width="@dimen/dp_20"
+            android:layout_height="@dimen/dp_20"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="@dimen/dp_14"
+            android:background="@drawable/image_back"/>
+
+    </RelativeLayout>
+
+    <EditText
+        android:id="@+id/edit_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="请输入房间标题"
+        android:textColorHint="#cccccc"
+        android:textSize="@dimen/sp_16"
+        android:textColor="#666666"
+        android:layout_gravity="center"
+        android:layout_marginTop="@dimen/dp_20"
+        android:padding="@dimen/dp_10"/>
+
+    <RadioGroup
+        android:id="@+id/radioGroup"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/dp_10"
+        android:orientation="horizontal"
+        android:gravity="center">
+
+        <RadioButton
+            android:id="@+id/radio_public"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="公开"
+            android:textSize="@dimen/sp_16"
+            android:textColor="#333333"
+            android:checked="true"
+            />
+
+        <RadioButton
+            android:id="@+id/radio_private"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="私密"
+            android:textSize="@dimen/sp_16"
+            android:textColor="#333333"
+            android:layout_marginLeft="@dimen/dp_30"
+            />
+
+    </RadioGroup>
+
+    <Button
+        android:id="@+id/btn_commit"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp_40"
+        android:text="确定"
+        android:textSize="@dimen/sp_18"
+        android:textColor="#ffffff"
+        android:background="@drawable/selector_btn_profit_cash"
+        android:layout_marginTop="@dimen/dp_40"
+        />
+
+</LinearLayout>

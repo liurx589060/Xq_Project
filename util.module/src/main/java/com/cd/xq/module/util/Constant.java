@@ -36,6 +36,7 @@ public class Constant {
     /************************礼券*********************************/
     public static int GIFT_TYPE_LIPIN = 1;   //礼物
     public static int GIFT_TYPE_CARD = 2;   //卡券
+    public static int GIFT_TYPE_FIX = 100;   //固定消费
 
     public static int GIFT_ID_LIPIN = 5;   //礼品券
     public static int GIFT_ID_JIANFANG = 6;   //建房卡
