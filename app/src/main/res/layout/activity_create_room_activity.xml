@@ -34,7 +34,7 @@
         android:id="@+id/edit_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="请输入房间标题"
+        android:hint="一起来相亲吧"
         android:textColorHint="#cccccc"
         android:textSize="@dimen/sp_16"
         android:textColor="#666666"
@@ -81,6 +81,8 @@
         android:textColor="#ffffff"
         android:background="@drawable/selector_btn_profit_cash"
         android:layout_marginTop="@dimen/dp_40"
+        android:layout_marginLeft="@dimen/dp_10"
+        android:layout_marginRight="@dimen/dp_10"
         />
 
 </LinearLayout>

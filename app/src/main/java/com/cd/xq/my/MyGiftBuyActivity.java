@@ -153,6 +153,8 @@ public class MyGiftBuyActivity extends BaseActivity {
                         if (netResult.getStatus() != XqErrorCode.SUCCESS) {
                             if(netResult.getStatus() == XqErrorCode.ERROR_LACK_STOCK) {
                                 //余额不足
+                                //更新余额
+                                DataManager.getInstance().getUserInfo().setBalance(netResult.getData().longValue());
                                 doRequestBuyGift(item);
                             }else {
                                 Tools.toast(getApplicationContext(), netResult.getMsg(), false);

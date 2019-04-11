@@ -1,33 +1,38 @@
 package com.cd.xq.frame;
 
-import android.content.BroadcastReceiver;
-import android.content.Context;
+import android.app.Activity;
+import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Base64;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
-import com.cd.xq.AppConstant;
 import com.cd.xq.R;
+import com.cd.xq.beans.BCheckRoomExpiry;
 import com.cd.xq.beans.BGetArrays;
 import com.cd.xq.beans.BusChatRoomParam;
 import com.cd.xq.friend.FriendActivity;
 import com.cd.xq.login.BlackCheckListener;
 import com.cd.xq.module.chart.ChartRoomActivity;
+import com.cd.xq.module.chart.beans.BConsumeGift;
+import com.cd.xq.module.chart.beans.BGetGiftItem;
+import com.cd.xq.module.chart.network.ChatRequestApi;
 import com.cd.xq.module.chart.status.statusBeans.StatusMatchBean;
 import com.cd.xq.module.chart.status.statusBeans.StatusOnLookerEnterBean;
+import com.cd.xq.module.chart.utils.ChatTools;
 import com.cd.xq.module.util.Constant;
 import com.cd.xq.module.util.base.BaseFragment;
 import com.cd.xq.module.util.beans.EventBusParam;
@@ -37,8 +42,7 @@ import com.cd.xq.module.util.beans.jmessage.JMChartResp;
 import com.cd.xq.module.util.beans.jmessage.JMChartRoomSendBean;
 import com.cd.xq.module.util.beans.user.UserInfoBean;
 import com.cd.xq.module.util.common.MultiItemDivider;
-import com.cd.xq.module.util.glide.GlideCircleTransform;
-import com.cd.xq.module.util.glide.GlideRoundTransform;
+import com.cd.xq.module.util.interfaces.ICheckBlackListener;
 import com.cd.xq.module.util.jmessage.JMsgSender;
 import com.cd.xq.module.util.manager.DataManager;
 import com.cd.xq.module.util.network.NetWorkMg;
@@ -47,6 +51,7 @@ import com.cd.xq.module.util.status.BaseStatus;
 import com.cd.xq.module.util.tools.Log;
 import com.cd.xq.module.util.tools.Tools;
 import com.cd.xq.module.util.tools.XqErrorCode;
+import com.cd.xq.my.MyGiftBuyActivity;
 import com.cd.xq.network.XqRequestApi;
 import com.hjq.permissions.OnPermission;
 import com.hjq.permissions.Permission;
@@ -60,13 +65,7 @@ import com.stx.xhb.xbanner.XBanner;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
-import org.json.JSONObject;
-
-import java.io.UnsupportedEncodingException;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -75,11 +74,8 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.functions.Action;
 import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
-
-import static android.app.Activity.RESULT_OK;
 
 /**
  * Created by Administrator on 2018/11/11.
@@ -102,11 +98,7 @@ public class HomeFragment extends BaseFragment {
 
     private RequestApi mApi;
     private XqRequestApi mXqApi;
-
-    private String mTXPushAddress = "";
-    private String mTXPlayerAddress = "";
-    private int mPushAddressType = 0;
-    private int mPublic = 1;  // 1：公开    0：非公开
+    private ChatRequestApi mChatApi;
 
     private ArrayList<BGetArrays> m_roomList;
     private OnLookerRecyclerViewAdapter mOnLookerAdapter;
@@ -118,6 +110,9 @@ public class HomeFragment extends BaseFragment {
         mRootView = inflater.inflate(R.layout.tab_home, null);
         unbinder = ButterKnife.bind(this, mRootView);
         EventBus.getDefault().register(this);
+        mApi = NetWorkMg.newRetrofit().create(RequestApi.class);
+        mXqApi = NetWorkMg.newRetrofit().create(XqRequestApi.class);
+        mChatApi = NetWorkMg.newRetrofit().create(ChatRequestApi.class);
 
         init();
 
@@ -125,8 +120,6 @@ public class HomeFragment extends BaseFragment {
     }
 
     private void init() {
-        mApi = NetWorkMg.newRetrofit().create(RequestApi.class);
-        mXqApi = NetWorkMg.newRetrofit().create(XqRequestApi.class);
         m_roomList = new ArrayList<>();
         mOnLookerAdapter = new OnLookerRecyclerViewAdapter();
         homeOnLookerRecyclerView.setAdapter(mOnLookerAdapter);
@@ -196,18 +189,13 @@ public class HomeFragment extends BaseFragment {
                             return;
                         }
 
-                        UserInfoBean infoBean = DataManager.getInstance().getUserInfo();
-                        if (infoBean == null) {
-                            Tools.toast(getActivity(), "请先登录", false);
-                            return;
-                        }
-
-                        if (!infoBean.getRole_type().equals(Constant.ROLETYPE_GUEST)) {
+                        if (!DataManager.getInstance().getUserInfo().getRole_type().equals(Constant.ROLETYPE_GUEST)) {
                             Tools.toast(getActivity(), "您不是Guest", true);
                             return;
                         }
 
-                        joinChartRoom(Constant.ROOM_ROLETYPE_PARTICIPANTS, -1);
+                        //参与者加入房间
+                        toCommitJoinParticipant();
                     }
 
                     @Override
@@ -229,6 +217,11 @@ public class HomeFragment extends BaseFragment {
         EventBus.getDefault().unregister(this);
     }
 
+    /**
+     * 加入房间
+     * @param roomRoleType
+     * @param roomId
+     */
     private void joinChartRoom(int roomRoleType, long roomId) {
         if(!DataManager.getInstance().getUserInfo().isOnLine()) {
             Tools.toast(getActivity(), "请先登录...", true);
@@ -265,12 +258,7 @@ public class HomeFragment extends BaseFragment {
                         }
                         DataManager.getInstance().setChartData(jmChartResp.getData());
                         Intent intent = new Intent(getActivity(), ChartRoomActivity.class);
-                        if (DataManager.getInstance().getSelfMember().getRoomRoleType() ==
-                                Constant.ROOM_ROLETYPE_PARTICIPANTS) {
-                            getActivity().startActivityForResult(intent, AC_CHATROOM_REQUEST_CODE);
-                        } else {
-                            getActivity().startActivity(intent);
-                        }
+                        getActivity().startActivity(intent);
                         //发送聊天室信息
                         sendChartRoomMessage();
                     }
@@ -330,10 +318,12 @@ public class HomeFragment extends BaseFragment {
         });
     }
 
+    /**
+     * 发送加入房间的消息
+     */
     private void sendChartRoomMessage() {
         //发送聊天室信息
         Data data = DataManager.getInstance().getChartData();
-        UserInfoBean selfInfo = DataManager.getInstance().getUserInfo();
         JMChartRoomSendBean bean = null;
         if (DataManager.getInstance().getSelfMember().getRoomRoleType() == Constant
                 .ROOM_ROLETYPE_PARTICIPANTS) {
@@ -354,7 +344,6 @@ public class HomeFragment extends BaseFragment {
     public void onDestroyView() {
         super.onDestroyView();
         unbinder.unbind();
-        //getActivity().unregisterReceiver(mReceiver);
     }
 
     @Override
@@ -363,6 +352,10 @@ public class HomeFragment extends BaseFragment {
         setOnLookerRecyclerView();
     }
 
+    /**
+     * 申请权限
+     * @param onPermission
+     */
     private void requestPermission(OnPermission onPermission) {
         if (onPermission == null) {
             return;
@@ -420,19 +413,6 @@ public class HomeFragment extends BaseFragment {
                     }
                 });
     }
-
-//    @Override
-//    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-//        super.onActivityResult(requestCode, resultCode, data);
-//        if (requestCode == AC_CHATROOM_REQUEST_CODE && resultCode == RESULT_OK) {
-//            Tools.checkUserOrBlack(getActivity(), DataManager.getInstance().getUserInfo()
-//                    .getUser_name(), new BlackCheckListener() {
-//                @Override
-//                public void onResult(boolean isBlack) {
-//                }
-//            });
-//        }
-//    }
 
     private class OnLookerViewHolder extends RecyclerView.ViewHolder {
         public TextView textRoomId;
@@ -504,33 +484,191 @@ public class HomeFragment extends BaseFragment {
         }
     }
 
-    /*private class JPushMessageReceiver extends BroadcastReceiver {
-
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            Bundle bundle = intent.getExtras();
-            if (bundle != null) {
-                String message = bundle.getString("message");
-                try {
-                    JSONObject object = new JSONObject(message);
-                    if (object.getInt("type") == AppConstant.JPUSH_TYPE_CHAT_CREATE
-                            || object.getInt("type") == AppConstant.JPUSH_TYPE_CHAT_DELETE) {
-                        //更新聊天室列表
-                        setOnLookerRecyclerView();
-                    }
-                } catch (Exception e) {
-                    Log.e("JPushMessageReceiver--" + e.toString());
-                }
-            }
-        }
-    }*/
-
+    /**
+     * EventBus事件
+     * @param param
+     */
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onChatRoomUpdate(EventBusParam<BusChatRoomParam> param) {
         if(param.getEventBusCode() == EventBusParam.EVENT_BUS_CHATROOM_CREATE
                 || param.getEventBusCode() == EventBusParam.EVENT_BUS_CHATROOM_DELETE) {
             //更新聊天室列表
             setOnLookerRecyclerView();
+        }else if(param.getEventBusCode() == EventBusParam.EVENT_BUS_CHECK_BLACKUSER) {
+            //检查是否是黑名单
+            Tools.checkUserOrBlack(getActivity(), DataManager.getInstance().getUserInfo().getUser_name(), new BlackCheckListener() {
+                @Override
+                public void onResult(boolean isBlack) {
+
+                }
+            });
         }
+    }
+
+
+    /*******************参与者加入房间**************************/
+    private void toCommitJoinParticipant() {
+        //加入房间
+        mXqApi.checkRoomExpiry(DataManager.getInstance().getUserInfo().getUser_name(),2)
+                .compose(this.<NetResult<BCheckRoomExpiry>>bindToLifecycle())
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Consumer<NetResult<BCheckRoomExpiry>>() {
+                    @Override
+                    public void accept(NetResult<BCheckRoomExpiry> bCheckRoomExpiry) throws Exception {
+                        if(bCheckRoomExpiry.getStatus() != XqErrorCode.SUCCESS) {
+                            Tools.toast(getActivity().getApplicationContext(), bCheckRoomExpiry.getMsg(), false);
+                            Log.e("checkRoomExpiry--" + bCheckRoomExpiry.getMsg());
+                            return;
+                        }
+
+                        if(bCheckRoomExpiry.getData().getExpiry() != null) {
+                            //有使用中的卡,则直接创建房间
+                            String str = "您有使用中的" + bCheckRoomExpiry.getData().getExpiry().getName() +
+                                    ",可免费加入房间,剩余次数" + bCheckRoomExpiry.getData().getExpiry().getExpiry_num();
+                            Toast toast = Toast.makeText(getActivity().getApplicationContext(),str,Toast.LENGTH_LONG);
+                            toast.setGravity(Gravity.TOP,0,0);
+                            toast.show();
+
+                            //加入房间
+                            joinChartRoom(Constant.ROOM_ROLETYPE_PARTICIPANTS,-1);
+                        }else {
+                            if(bCheckRoomExpiry.getData().getHasCard() == 1) {
+                                //有未使用的卡，提示是否使用卡
+                                doCreateUseCardDialog(bCheckRoomExpiry.getData());
+                            }else {
+                                //没有卡，则提示是否使用钻石创建房间
+                                doCreateCoinDialog(bCheckRoomExpiry.getData());
+                            }
+                        }
+                    }
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Exception {
+                        Tools.toast(getActivity().getApplicationContext(), throwable.toString(), false);
+                        Log.e("checkRoomExpiry--" + throwable.toString());
+                    }
+                });
+    }
+
+    /**
+     * 去消费
+     * @param item
+     * @param handleType
+     */
+    private void doRequestConsumeGift(final BGetGiftItem item, int handleType) {
+        //用钻石消费
+        if(handleType == 1 && !ChatTools.checkBalance(getActivity(),item.getCoin())) return;
+        requestConsumeGift(item,handleType);
+    }
+
+    private void requestConsumeGift(final BGetGiftItem item, final int handleType) {
+        HashMap<String,Object> params = new HashMap<>();
+        params.put("userName", DataManager.getInstance().getUserInfo().getUser_name());
+        params.put("giftId",item.getGift_id());
+        params.put("coin",item.getCoin());
+        params.put("toUser",DataManager.getInstance().getUserInfo().getUser_name());
+        params.put("handleType",handleType);  //消费方式
+        mChatApi.consumeGift(params)
+                .compose(this.<NetResult<BConsumeGift>>bindToLifecycle())
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Consumer<NetResult<BConsumeGift>>() {
+                    @Override
+                    public void accept(NetResult<BConsumeGift> netResult) throws Exception {
+                        if (netResult.getStatus() != XqErrorCode.SUCCESS) {
+                            if(netResult.getStatus() == XqErrorCode.ERROR_LACK_STOCK) {
+                                //余额不足
+                                //更新余额
+                                DataManager.getInstance().getUserInfo().setBalance(netResult.getData().getBalance());
+                                doRequestConsumeGift(item,handleType);
+                            }else {
+                                Tools.toast(getActivity().getApplicationContext(), netResult.getMsg(), false);
+                            }
+                            Log.e("requestConsumeGift--" + netResult.getMsg());
+                            return;
+                        }
+
+                        //更新余额
+                        DataManager.getInstance().getUserInfo().setBalance(netResult.getData().getBalance());
+                        //加入房间
+                        joinChartRoom(Constant.ROOM_ROLETYPE_PARTICIPANTS,-1);
+                    }
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Exception {
+                        Tools.toast(getActivity().getApplicationContext(), throwable.toString(), false);
+                        Log.e("requestConsumeGift--" + throwable.toString());
+                    }
+                });
+    }
+
+    /**
+     * 创建是否使用建房卡
+     * @param checkRoomExpiry
+     */
+    private void doCreateUseCardDialog(final BCheckRoomExpiry checkRoomExpiry) {
+        String text = "您有未使用的" + checkRoomExpiry.getGift().getName() + ",使用后可免费加入房间"
+                + checkRoomExpiry.getGift().getValue() + "次"
+                + "，或者使用" + checkRoomExpiry.getTargetGift().getCoin() + "钻石";
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity())
+                .setTitle("提示")
+                .setMessage(text)
+                .setPositiveButton("使用卡", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        //使用卡,包裹使用
+                        doRequestConsumeGift(checkRoomExpiry.getGift(),2);
+                    }
+                })
+                .setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                    }
+                })
+                .setNeutralButton("使用钻石", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        //钻石消费
+                        doRequestConsumeGift(checkRoomExpiry.getTargetGift(),1);
+                    }
+                });
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+
+    /**
+     * 创建是否购买建房卡
+     * @param checkRoomExpiry
+     */
+    private void doCreateCoinDialog(final BCheckRoomExpiry checkRoomExpiry) {
+        String text = "您是否话费" + checkRoomExpiry.getGift().getCoin() + "钻石购买" + checkRoomExpiry.getGift().getName() + ",使用后可免费创建房间"
+                + checkRoomExpiry.getGift().getValue() + "次"
+                + "，或者使用" + checkRoomExpiry.getTargetGift().getCoin() + "钻石进入房间";
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity())
+                .setTitle("提示")
+                .setMessage(text)
+                .setPositiveButton("去购买", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        //购买卡，调转到购买页面
+                        Intent intent = new Intent(getActivity(), MyGiftBuyActivity.class);
+                        startActivity(intent);
+                    }
+                })
+                .setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                    }
+                })
+                .setNeutralButton("使用钻石", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        //钻石消费
+                        doRequestConsumeGift(checkRoomExpiry.getTargetGift(),1);
+                    }
+                });
+        AlertDialog dialog = builder.create();
+        dialog.show();
     }
 }

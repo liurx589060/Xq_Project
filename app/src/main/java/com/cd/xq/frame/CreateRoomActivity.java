@@ -58,8 +58,6 @@ import io.reactivex.schedulers.Schedulers;
  */
 
 public class CreateRoomActivity extends BaseActivity {
-    public static final int AC_CHATROOM_REQUEST_CODE = 1000;
-
     @BindView(R.id.btn_back)
     Button btnBack;
     @BindView(R.id.edit_title)
@@ -95,6 +93,7 @@ public class CreateRoomActivity extends BaseActivity {
     }
 
     private void init() {
+        editTitle.setHint("一起来相亲吧");
         radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
@@ -133,7 +132,7 @@ public class CreateRoomActivity extends BaseActivity {
                             //创建房间
                             createChartRoom();
                         }else {
-                            if(bCheckRoomExpiry.getData().getGift() != null) {
+                            if(bCheckRoomExpiry.getData().getHasCard() == 1) {
                                 //有未使用的卡，提示是否使用卡
                                 doCreateUseCardDialog(bCheckRoomExpiry.getData());
                             }else {
@@ -179,6 +178,8 @@ public class CreateRoomActivity extends BaseActivity {
                         if (netResult.getStatus() != XqErrorCode.SUCCESS) {
                             if(netResult.getStatus() == XqErrorCode.ERROR_LACK_STOCK) {
                                 //余额不足
+                                //更新余额
+                                DataManager.getInstance().getUserInfo().setBalance(netResult.getData().getBalance());
                                 doRequestConsumeGift(item,handleType);
                             }else {
                                 Tools.toast(getApplicationContext(), netResult.getMsg(), false);
@@ -187,8 +188,6 @@ public class CreateRoomActivity extends BaseActivity {
                             return;
                         }
 
-                        Tools.toast(getApplicationContext(), "你送出了" + item.getName()
-                                , false);
                         //更新余额
                         DataManager.getInstance().getUserInfo().setBalance(netResult.getData().getBalance());
                         //创建房间
@@ -208,8 +207,8 @@ public class CreateRoomActivity extends BaseActivity {
      * @param checkRoomExpiry
      */
     private void doCreateUseCardDialog(final BCheckRoomExpiry checkRoomExpiry) {
-        String text = "您有未使用的" + checkRoomExpiry.getExpiry().getName() + ",使用后可免费创建房间"
-                + checkRoomExpiry.getExpiry().getValue() + "小时"
+        String text = "您有未使用的" + checkRoomExpiry.getGift().getName() + ",使用后可免费创建房间"
+                + checkRoomExpiry.getGift().getValue() + "小时"
                 + "，或者使用" + checkRoomExpiry.getTargetGift().getCoin() + "钻石";
         AlertDialog.Builder builder = new AlertDialog.Builder(CreateRoomActivity.this)
                 .setTitle("提示")
@@ -242,9 +241,9 @@ public class CreateRoomActivity extends BaseActivity {
      * @param checkRoomExpiry
      */
     private void doCreateCoinDialog(final BCheckRoomExpiry checkRoomExpiry) {
-        String text = "您是否购买" + checkRoomExpiry.getExpiry().getName() + ",使用后可免费创建房间"
-                + checkRoomExpiry.getExpiry().getValue() + "小时"
-                + "，或者使用" + checkRoomExpiry.getTargetGift().getCoin() + "钻石";
+        String text = "您是否话费"+checkRoomExpiry.getGift().getCoin() + "钻石购买" + checkRoomExpiry.getGift().getName() + ",使用后可免费创建房间"
+                + checkRoomExpiry.getGift().getValue() + "小时"
+                + "，或者使用" + checkRoomExpiry.getTargetGift().getCoin() + "钻石创建房间";
         AlertDialog.Builder builder = new AlertDialog.Builder(CreateRoomActivity.this)
                 .setTitle("提示")
                 .setMessage(text)
@@ -360,10 +359,10 @@ public class CreateRoomActivity extends BaseActivity {
         params.put("pushAddress", Base64.encodeToString(mTXPushAddress.getBytes(), Base64.DEFAULT));
         params.put("playAddress", Base64.encodeToString(mTXPlayerAddress.getBytes(),
                 Base64.DEFAULT));
-        params.put("public", mIsPublic);
+        params.put("public", mIsPublic?1:0);
         String title = editTitle.getText().toString();
         if(TextUtils.isEmpty(title)) {
-            title = "一起来相亲吧";
+            title = editTitle.getHint().toString();
         }
         params.put("describe", title);
 
@@ -391,7 +390,9 @@ public class CreateRoomActivity extends BaseActivity {
                         }
                         DataManager.getInstance().setChartData(jmChartResp.getData());
                         Intent intent = new Intent(getApplicationContext(), ChartRoomActivity.class);
-                        startActivityForResult(intent, AC_CHATROOM_REQUEST_CODE);
+                        startActivity(intent);
+                        //退出Activity
+                        finish();
                     }
                 }, new Consumer<Throwable>() {
                     @Override

@@ -163,6 +163,8 @@ public class RecommendFragment extends InnerGiftFragment {
                         if (netResult.getStatus() != XqErrorCode.SUCCESS) {
                             if(netResult.getStatus() == XqErrorCode.ERROR_LACK_STOCK) {
                                 //余额不足
+                                //更新余额
+                                DataManager.getInstance().getUserInfo().setBalance(netResult.getData().getBalance());
                                 doRequestConsumeGift(item);
                             }else {
                                 Tools.toast(getActivity().getApplicationContext(), netResult.getMsg(), false);

@@ -8,9 +8,12 @@ import android.widget.FrameLayout;
 
 import com.cd.xq.module.chart.manager.XqStatusChartUIViewMg;
 import com.cd.xq.module.util.base.BaseActivity;
+import com.cd.xq.module.util.beans.EventBusParam;
 import com.cd.xq.module.util.manager.DataManager;
 import com.cd.xq_chart.module.R;
 import com.hc.lib.msc.MscDefaultSpeech;
+
+import org.greenrobot.eventbus.EventBus;
 
 /**
  * Created by Administrator on 2018/11/14.
@@ -67,7 +70,11 @@ public class ChartRoomActivity extends BaseActivity {
 
     @Override
     public void finish() {
-        setResult(RESULT_OK);
+        //检查是否是黑名单
+        EventBusParam param = new EventBusParam();
+        param.setEventBusCode(EventBusParam.EVENT_BUS_CHECK_BLACKUSER);
+        EventBus.getDefault().post(param);
+
         super.finish();
     }
 }

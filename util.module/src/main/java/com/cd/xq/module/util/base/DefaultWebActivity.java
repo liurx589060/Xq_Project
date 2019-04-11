@@ -31,12 +31,26 @@ public class DefaultWebActivity extends BaseActivity {
     private TextView mTextTitle;
     private String mWebUrl = "";
     private String mTitle = "";
+    private boolean mIsCache;
+
 
     public static void startWeb(Activity activity,String webUrl,String title) {
+        startWeb(activity,webUrl,title,false);
+    }
+
+    /**
+     * 默认不适用缓存
+     * @param activity
+     * @param webUrl
+     * @param title
+     * @param isUseCache
+     */
+    public static void startWeb(Activity activity,String webUrl,String title,boolean isUseCache) {
         Intent intent = new Intent(activity,DefaultWebActivity.class);
         Bundle bundle = new Bundle();
         bundle.putString("title",title);
         bundle.putString("url",webUrl);
+        bundle.putBoolean("isCache",isUseCache);
         intent.putExtras(bundle);
         activity.startActivity(intent);
     }
@@ -52,6 +66,7 @@ public class DefaultWebActivity extends BaseActivity {
         try{
             mTitle = getIntent().getExtras().getString("title");
             mWebUrl = getIntent().getExtras().getString("url");
+            mIsCache = getIntent().getExtras().getBoolean("isCache");
         }catch (Exception e) {
             Log.e("DefaultWebActivity connot find the mTitle,mWebUrl!");
         }
@@ -116,7 +131,9 @@ public class DefaultWebActivity extends BaseActivity {
         webSetting.setSupportMultipleWindows(false);
         // webSetting.setLoadWithOverviewMode(true);
         webSetting.setAppCacheEnabled(true);
-        webSetting.setCacheMode(WebSettings.LOAD_NO_CACHE); //不使用缓存
+        if(!mIsCache) {
+            webSetting.setCacheMode(WebSettings.LOAD_NO_CACHE); //不使用缓存
+        }
         // webSetting.setDatabaseEnabled(true);
         webSetting.setDomStorageEnabled(true);
         webSetting.setJavaScriptEnabled(true);
