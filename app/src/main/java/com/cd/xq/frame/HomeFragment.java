@@ -384,7 +384,7 @@ public class HomeFragment extends BaseFragment {
         mOnLookerAdapter.notifyDataSetChanged();*/
 
         //只获取公开的
-        mXqApi.getArrays(1)
+        mXqApi.getNowChatRoomList(1)
                 .subscribeOn(Schedulers.io())
                 .compose(this.<NetResult<List<BGetArrays>>>bindToLifecycle())
                 .observeOn(AndroidSchedulers.mainThread())

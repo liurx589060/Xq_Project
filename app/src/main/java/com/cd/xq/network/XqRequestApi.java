@@ -2,6 +2,7 @@ package com.cd.xq.network;
 
 import com.cd.xq.beans.BCheckRoomExpiry;
 import com.cd.xq.beans.BGetArrays;
+import com.cd.xq.beans.BGetChatRoomList;
 import com.cd.xq.beans.BGetConsumeHistory;
 import com.cd.xq.module.chart.beans.BGetGiftItem;
 import com.cd.xq.beans.BGetPayHistory;
@@ -19,8 +20,8 @@ import retrofit2.http.Query;
  */
 
 public interface XqRequestApi {
-    @GET("JMessage/getArrays")
-    Observable<NetResult<List<BGetArrays>>> getArrays(@Query("public") int isPublic);
+    @GET("JMessage/getNowChatRoomList")
+    Observable<NetResult<List<BGetArrays>>> getNowChatRoomList(@Query("public") int isPublic);
 
     @GET("JMessage/changePassword")
     Observable<NetResult<String>> changePassword(@Query("userName") String userName,@Query("password") String password);
@@ -38,4 +39,7 @@ public interface XqRequestApi {
     @GET("Pay/checkRoomExpiry")
     Observable<NetResult<BCheckRoomExpiry>> checkRoomExpiry(@Query("userName") String userName
             , @Query("handleType") int handleType);
+
+    @GET("JMessage/getChatRoomListByUser")
+    Observable<NetResult<List<BGetChatRoomList>>> getChatRoomListByUser(@Query("userName") String userName);
 }

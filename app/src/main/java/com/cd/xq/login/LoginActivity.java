@@ -207,6 +207,7 @@ public class LoginActivity extends BaseActivity {
                                     observableEmitter.onError(new Throwable("JMessage login fail--" + s + ">>>" + i));
                                 } else {
                                     observableEmitter.onNext(i);
+                                    saveUser(JMessageClient.getMyInfo().getUserName(), pss, JMessageClient.getMyInfo().getAppKey());
                                 }
                             }
                         });
@@ -234,7 +235,6 @@ public class LoginActivity extends BaseActivity {
                             DataManager.getInstance().setJmUserName(userName);
                             DataManager.getInstance().setUserInfo(userResp.getData());
                             mLoadingDialog.dismiss();
-                            saveUser(JMessageClient.getMyInfo().getUserName(), pss, JMessageClient.getMyInfo().getAppKey());
                             Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                             if (mFrom == FROM_WELCOME) {
                                 Tools.toast(getApplicationContext(), "登录成功", false);
@@ -283,6 +283,7 @@ public class LoginActivity extends BaseActivity {
                             public void gotResult(int i, String s) {
                                 if (i == 0 || i == 898001) {//成功或者已注册过
                                     observableEmitter.onNext(i);
+                                    saveUser(JMessageClient.getMyInfo().getUserName(), pss, JMessageClient.getMyInfo().getAppKey());
                                 } else {
                                     observableEmitter.onError(new Throwable("JMessage regist error"));
                                 }
