@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
@@ -16,8 +17,14 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.allenliu.versionchecklib.v2.AllenVersionChecker;
+import com.allenliu.versionchecklib.v2.builder.DownloadBuilder;
+import com.allenliu.versionchecklib.v2.builder.UIData;
+import com.allenliu.versionchecklib.v2.callback.ForceUpdateListener;
+import com.allenliu.versionchecklib.v2.callback.RequestVersionListener;
 import com.cd.xq.AppService;
 import com.cd.xq.R;
+import com.cd.xq.beans.BCheckUpdate;
 import com.cd.xq.login.BlackCheckListener;
 import com.cd.xq.login.RegisterActivity;
 import com.cd.xq.module.util.Constant;
@@ -25,12 +32,16 @@ import com.cd.xq.module.util.base.BaseActivity;
 import com.cd.xq.module.util.base.BaseFragment;
 import com.cd.xq.module.util.base.SlideViewPager;
 import com.cd.xq.module.util.beans.EventBusParam;
+import com.cd.xq.module.util.beans.NetResult;
 import com.cd.xq.module.util.beans.user.UserResp;
 import com.cd.xq.module.util.manager.DataManager;
 import com.cd.xq.module.util.network.NetWorkMg;
 import com.cd.xq.module.util.network.RequestApi;
+import com.cd.xq.module.util.tools.Log;
+import com.cd.xq.module.util.tools.SharedPreferenceUtil;
 import com.cd.xq.module.util.tools.Tools;
 import com.cd.xq.module.util.tools.XqErrorCode;
+import com.cd.xq.network.XqRequestApi;
 import com.cd.xq.utils.AppTools;
 import com.cd.xq.utils.CheckUtil;
 
@@ -40,6 +51,7 @@ import java.util.ArrayList;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import cn.jmessage.support.google.gson.Gson;
 import cn.jpush.im.android.api.JMessageClient;
 import cn.jpush.im.android.api.model.UserInfo;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -66,17 +78,21 @@ public class MainActivity extends BaseActivity {
     private final int F_NORMAL_TITLE_COLOR = Color.parseColor("#707070");
 
     private RequestApi mApi;
+    private XqRequestApi mXqApi;
+    private Handler mHandler;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
+        mHandler = new Handler();
+        mXqApi = NetWorkMg.newRetrofit().create(XqRequestApi.class);
 
-        if(getIsRemote()) {
+        if(SharedPreferenceUtil.getIsRemote(this)) {
             NetWorkMg.IP_ADDRESS = Constant.CONSTANT_REMOTE_IP;
         }else {
-            NetWorkMg.IP_ADDRESS = getSpIpAddress();
+            NetWorkMg.IP_ADDRESS = SharedPreferenceUtil.getSpIpAddress(this);
         }
 
         mApi = NetWorkMg.newRetrofit().create(RequestApi.class);
@@ -87,7 +103,57 @@ public class MainActivity extends BaseActivity {
             toAutoLogin();
         }
         init();
+
+        //检测是否更新
+        requestCheckUpdate();
     }
+
+    /**
+     * 检查更新
+     */
+    private void requestCheckUpdate() {
+        mXqApi.checkUpdate(Tools.getVersionCode(this))
+                .compose(this.<NetResult<BCheckUpdate>>bindToLifecycle())
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Consumer<NetResult<BCheckUpdate>>() {
+                    @Override
+                    public void accept(NetResult<BCheckUpdate> bCheckUpdateNetResult) throws Exception {
+                        BCheckUpdate bean = bCheckUpdateNetResult.getData();
+                        if(bean == null) return;
+                        UIData uiData = UIData.create();
+                        uiData.setTitle("检测到新版本");
+                        String content = bean.getMessage().replace("\\n","\n");
+                        uiData.setContent(content);
+                        uiData.setDownloadUrl(bean.getDown_url());
+                        DownloadBuilder builder=AllenVersionChecker
+                                .getInstance()
+                                .downloadOnly(uiData);
+                        builder.setNewestVersionCode(bean.getVersion_code());
+                        if(bean.getIs_force() == 1) {
+                            //强制更新
+                            builder.setForceUpdateListener(new ForceUpdateListener() {
+                                @Override
+                                public void onShouldForceUpdate() {
+                                }
+                            });
+                        }
+                        builder.executeMission(MainActivity.this);
+                    }
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Exception {
+                        Log.e("requestCheckUpdate--" + throwable.toString());
+                        mHandler.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                requestCheckUpdate();
+                            }
+                        },5000);
+                    }
+                });
+    }
+
 
     private void toAutoLogin() {
         SharedPreferences sp = getSharedPreferences(Constant.SP_NAME, Context.MODE_PRIVATE);
@@ -210,6 +276,7 @@ public class MainActivity extends BaseActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        AllenVersionChecker.getInstance().cancelAllMission(this);
         DataManager.getInstance().getUserInfo().setOnLine(false);
         Intent intent = new Intent(this, AppService.class);
         stopService(intent);
@@ -266,15 +333,5 @@ public class MainActivity extends BaseActivity {
                 mFragmentHolderList.get(i).mFragment.onActivityResult(requestCode,resultCode,data);
             }
         }
-    }
-
-    private String getSpIpAddress() {
-        SharedPreferences sp = getSharedPreferences(Constant.SP_NAME, Activity.MODE_PRIVATE);
-        return sp.getString("ipAddress",Constant.CONSTANT_LOCOL_IP);
-    }
-
-    private boolean getIsRemote() {
-        SharedPreferences sp = getSharedPreferences(Constant.SP_NAME, Activity.MODE_PRIVATE);
-        return sp.getBoolean("isRemote",false);
     }
 }

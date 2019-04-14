@@ -1,5 +1,6 @@
 package com.cd.xq.my;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -12,12 +13,14 @@ import android.widget.Button;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.base.bj.paysdk.listener.PayResultListener;
 import com.base.bj.paysdk.utils.TrPay;
 import com.cd.xq.R;
 import com.cd.xq.module.chart.beans.BGetPayItem;
 import com.cd.xq.module.chart.beans.BMakePayOrder;
 import com.cd.xq.module.chart.beans.BusPaySuccessParam;
 import com.cd.xq.module.chart.network.ChatRequestApi;
+import com.cd.xq.module.util.AppConfig;
 import com.cd.xq.module.util.base.BaseActivity;
 import com.cd.xq.module.util.beans.EventBusParam;
 import com.cd.xq.module.util.beans.NetResult;
@@ -44,6 +47,8 @@ import butterknife.OnClick;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
+
+import static com.base.bj.paysdk.domain.TrPayResult.RESULT_CODE_SUCC;
 
 /**
  * 余额
@@ -185,6 +190,7 @@ public class MyBalanceActivity extends BaseActivity {
                             Log.e("requestHandlePayCallback--" + netResult.getMsg());
                             return;
                         }
+                        Tools.toast(getApplicationContext(),"支付成功",false);
                     }
                 }, new Consumer<Throwable>() {
                     @Override
@@ -218,16 +224,44 @@ public class MyBalanceActivity extends BaseActivity {
                             return;
                         }
                         BMakePayOrder order = bMakePayOrderNetResult.getData();
-                        Tools.toast(getApplicationContext(),"下单成功",false);
+                        if(AppConfig.isTestPay) {
+                            //模拟支付回调
+                            requestHandlePayCallback(bMakePayOrderNetResult.getData());
+                            return;
+                        }
                         //调用TrPay支付
-//                        TrPay.getInstance(MyBalanceActivity.this).callPay(bean.getDescription(),
-//                                order.getOrder_id(),
-//                                order.getMoney(),
-//                                "",
-//                                "",
-//                                );
-                        //模拟支付回调
-                        requestHandlePayCallback(bMakePayOrderNetResult.getData());
+                        String callbackUrl = "http://" + NetWorkMg.IP_ADDRESS + "/thinkphp/Sample_Mjmz/Pay/handleTrPayCallback";
+                        TrPay.getInstance(MyBalanceActivity.this).callPay(bean.getDescription(),
+                                order.getOrder_id(),
+                                (long) bean.getMoney()/6,
+                                "",
+                                callbackUrl,
+                                DataManager.getInstance().getUserInfo().getUser_name(),
+                                new PayResultListener() {
+                                    @Override
+                                    public void onPayFinish(Context context, String outtradeno, int resultCode
+                                            , String resultString, int payType, Long amount, String tradename) {
+                                        if(resultCode == RESULT_CODE_SUCC.getId()) {
+                                            //成功
+                                            Tools.toast(getApplicationContext(),"支付成功",false);
+                                        }else {
+                                            Tools.toast(getApplicationContext(),"支付失败",false);
+                                        }
+                                        StringBuilder builder = new StringBuilder();
+                                        builder.append("outtradeno=" + outtradeno)
+                                                .append("\n")
+                                                .append("resultCode=" + resultCode)
+                                                .append("\n")
+                                                .append("resultString=" + resultString)
+                                                .append("\n")
+                                                .append("payType=" + payType)
+                                                .append("\n")
+                                                .append("amount=" + amount)
+                                                .append("\n")
+                                                .append("tradename=" + tradename);
+                                        Log.e("requestMakePayOrder--" + builder.toString());
+                                    }
+                                });
                     }
                 }, new Consumer<Throwable>() {
                     @Override

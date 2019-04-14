@@ -17,25 +17,21 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.cd.xq.module.util.AppConfig;
 import com.cd.xq.R;
-import com.cd.xq.login.LoginActivity;
 import com.cd.xq.login.RegisterActivity;
 import com.cd.xq.module.util.Constant;
 import com.cd.xq.module.util.base.BaseFragment;
-import com.cd.xq.module.util.beans.EventBusParam;
 import com.cd.xq.module.util.beans.user.UserInfoBean;
 import com.cd.xq.module.util.manager.DataManager;
 import com.cd.xq.module.util.network.NetWorkMg;
+import com.cd.xq.module.util.tools.SharedPreferenceUtil;
 import com.cd.xq.my.MyBalanceActivity;
 import com.cd.xq.my.MyCertificateActivity;
 import com.cd.xq.my.MyFootprinterActivity;
 import com.cd.xq.my.MyNotifyActivity;
 import com.cd.xq.my.MyProfitActivity;
 import com.cd.xq.my.MySettingsActivity;
-
-import org.greenrobot.eventbus.EventBus;
-import org.greenrobot.eventbus.Subscribe;
-import org.greenrobot.eventbus.ThreadMode;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -141,6 +137,10 @@ public class MyFragment extends BaseFragment {
     private void init() {
         setData();
 
+        ipEdit.setVisibility(View.GONE);
+        btnSave.setVisibility(View.GONE);
+        checkboxRemote.setVisibility(View.GONE);
+
         myImgNotifyDot.setVisibility(View.GONE);
         myTextEdit.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -180,13 +180,13 @@ public class MyFragment extends BaseFragment {
         final EditText editText = mRootView.findViewById(R.id.ip_edit);
         CheckBox checkBox = mRootView.findViewById(R.id.checkbox_remote);
         Button button = mRootView.findViewById(R.id.btn_save);
-        editText.setText(getSpIpAddress());
-        checkBox.setChecked(getIsRemote());
+        editText.setText(SharedPreferenceUtil.getSpIpAddress(getActivity()));
+        checkBox.setChecked(SharedPreferenceUtil.getIsRemote(getActivity()));
 
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                setSpIpAddress(editText.getText().toString());
+                SharedPreferenceUtil.setSpIpAddress(getActivity(),editText.getText().toString());
                 NetWorkMg.IP_ADDRESS = editText.getText().toString();
             }
         });
@@ -194,33 +194,9 @@ public class MyFragment extends BaseFragment {
         checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                setSpRemoteIpFlag(isChecked);
+                SharedPreferenceUtil.setSpRemoteIpFlag(getActivity(),isChecked);
             }
         });
-    }
-
-    private void setSpIpAddress(String ipAddress) {
-        SharedPreferences sp = getActivity().getSharedPreferences(Constant.SP_NAME, Activity
-                .MODE_PRIVATE);
-        sp.edit().putString("ipAddress", ipAddress).commit();
-    }
-
-    private void setSpRemoteIpFlag(boolean isRemote) {
-        SharedPreferences sp = getActivity().getSharedPreferences(Constant.SP_NAME, Activity
-                .MODE_PRIVATE);
-        sp.edit().putBoolean("isRemote", isRemote).commit();
-    }
-
-    private String getSpIpAddress() {
-        SharedPreferences sp = getActivity().getSharedPreferences(Constant.SP_NAME, Activity
-                .MODE_PRIVATE);
-        return sp.getString("ipAddress", Constant.CONSTANT_LOCOL_IP);
-    }
-
-    private boolean getIsRemote() {
-        SharedPreferences sp = getActivity().getSharedPreferences(Constant.SP_NAME, Activity
-                .MODE_PRIVATE);
-        return sp.getBoolean("isRemote", false);
     }
 
     @Override

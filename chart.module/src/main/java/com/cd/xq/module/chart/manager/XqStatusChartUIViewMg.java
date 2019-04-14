@@ -15,6 +15,7 @@ import android.os.Handler;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -43,6 +44,7 @@ import com.cd.xq.module.chart.status.statusBeans.StatusManSecondSelectBean;
 import com.cd.xq.module.util.Constant;
 import com.cd.xq.module.util.beans.JMNormalSendBean;
 import com.cd.xq.module.util.beans.NetResult;
+import com.cd.xq.module.util.beans.jmessage.Data;
 import com.cd.xq.module.util.beans.jmessage.JMChartResp;
 import com.cd.xq.module.util.beans.jmessage.JMChartRoomSendBean;
 import com.cd.xq.module.util.beans.jmessage.Member;
@@ -372,22 +374,31 @@ public class XqStatusChartUIViewMg extends AbsChartView{
                 JMChartRoomSendBean sendBean = status.getChartSendBeanWillSend(null,
                         BaseStatus.MessageType.TYPE_SEND);
                 String str = "";
+                String selfStr = "";
+                if(DataManager.getInstance().getUserInfo().getRole_type().equals(Constant.ROLRTYPE_ANGEL)) {
+                    selfStr = "爱心大使";
+                }else if(DataManager.getInstance().getUserInfo().getRole_type().equals(Constant.ROLETYPE_GUEST)){
+                    if(DataManager.getInstance().getUserInfo().getGender().equals(Constant.GENDER_MAN)) {
+                        selfStr = "男嘉宾";
+                    }else {
+                        selfStr = DataManager.getInstance().getSelfMember().getIndex() + "号嘉宾";
+                    }
+                }
                 if(item.getGift_id() == Constant.GIFT_ID_YANSHI) {
                     //延时卡
-                    str = DataManager.getInstance().getSelfMember().getIndex() + "号嘉宾使用了"
+                    str = selfStr + "使用了"
                             + item.getName() + ",讲话延时" + item.getValue() + "秒";
                     Tools.toast(mXqActivity.getApplicationContext(),str,false);
                 }else {
                     if(member.getUserInfo().getRole_type().equals(Constant.ROLRTYPE_ANGEL)) {
-                        str = DataManager.getInstance().getSelfMember().getIndex() + "号嘉宾送给"
+                        str = selfStr + "送给"
                                 + "爱心大使" + item.getName();
                     }else if(member.getUserInfo().getRole_type().equals(Constant.ROLETYPE_GUEST)){
                         if(member.getUserInfo().getGender().equals(Constant.GENDER_MAN)) {
-                            str = DataManager.getInstance().getSelfMember().getIndex() + "号嘉宾送给"
+                            str = selfStr + "送给"
                                     + "男嘉宾" + item.getName();
                         }else {
-                            str = DataManager.getInstance().getSelfMember().getIndex() + "号嘉宾送给"
-                                    + member.getIndex() + "嘉宾" + item.getName();
+                            str = selfStr + "送给" + member.getIndex() + "嘉宾" + item.getName();
                         }
                     }
                 }
@@ -1531,11 +1542,21 @@ public class XqStatusChartUIViewMg extends AbsChartView{
     }
 
     private void setHeadInfoData(final UserInfoBean bean) {
+        if(TextUtils.isEmpty(bean.getUser_name())) {
+            return;
+        }
         mHeadInfoBgRelayout.setVisibility(View.VISIBLE);
         mHeadInfoViewMg.setImgHead(bean.getHead_image());
         mHeadInfoViewMg.setSpecialInfo(bean.getSpecial_info());
         mHeadInfoViewMg.setNickName(bean.getNick_name());
         mHeadInfoViewMg.setSpecailInfoVisible(false);
+        if(bean.getUser_name().equals(DataManager.getInstance().getUserInfo().getUser_name())) {
+            mHeadInfoViewMg.mBtnGift.setVisibility(View.GONE);
+            mHeadInfoViewMg.mBtnReport.setVisibility(View.GONE);
+        }else {
+            mHeadInfoViewMg.mBtnGift.setVisibility(View.VISIBLE);
+            mHeadInfoViewMg.mBtnReport.setVisibility(View.VISIBLE);
+        }
         StringBuilder builder = new StringBuilder();
         builder.append("性别： ").append(bean.getGender()).append("        ")
                 .append("年龄： ").append(String.valueOf(bean.getAge())).append("\n\n")

@@ -23,6 +23,7 @@ import com.bumptech.glide.Glide;
 import com.cd.xq.R;
 import com.cd.xq.beans.BCheckRoomExpiry;
 import com.cd.xq.beans.BGetArrays;
+import com.cd.xq.beans.BGetBanner;
 import com.cd.xq.beans.BusChatRoomParam;
 import com.cd.xq.friend.FriendActivity;
 import com.cd.xq.login.BlackCheckListener;
@@ -102,6 +103,7 @@ public class HomeFragment extends BaseFragment {
 
     private ArrayList<BGetArrays> m_roomList;
     private OnLookerRecyclerViewAdapter mOnLookerAdapter;
+    private ArrayList<String> mImageList;
 
     @Nullable
     @Override
@@ -121,6 +123,7 @@ public class HomeFragment extends BaseFragment {
 
     private void init() {
         m_roomList = new ArrayList<>();
+        mImageList = new ArrayList<>();
         mOnLookerAdapter = new OnLookerRecyclerViewAdapter();
         homeOnLookerRecyclerView.setAdapter(mOnLookerAdapter);
         homeOnLookerRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -206,8 +209,8 @@ public class HomeFragment extends BaseFragment {
             }
         });
 
+        requestGetBanner();
         setOnLookerRecyclerView();
-        initXBanner();
         initSmartRefreshLayout();
     }
 
@@ -291,23 +294,39 @@ public class HomeFragment extends BaseFragment {
         homeRefreshLayout.setEnableLoadMore(false);
     }
 
-    private void initXBanner() {
-        ArrayList<String> images;
-        ArrayList<String> titles;
-        images = new ArrayList<>();
-        titles = new ArrayList<>();
-        images.add("https://gss1.bdstatic" +
-                ".com/9vo3dSag_xI4khGkpoWK1HF6hhy/baike/w%3D268%3Bg%3D0/sign" +
-                "=e9449e382d9759ee4a5067cd8ac0242b/94cad1c8a786c9179e80a80cc23d70cf3bc75700.jpg");
-        titles.add("这是第1张图片");
-        images.add("http://img.ivsky.com/img/bizhi/co/201711/27/nissan_vmotion2_0-001.jpg");
-        titles.add("这是第2张图片");
-        images.add("http://img.ivsky.com/img/tupian/co/201709/18/zise_huaduo.jpg");
-        titles.add("这是第3张图片");
-        images.add("http://img.ivsky.com/img/tupian/co/201709/16/dahailidehaiguitupian.jpg");
-        titles.add("这是第4张图片");
+    /**
+     * 获取Banner
+     */
+    private void requestGetBanner() {
+        mXqApi.getBanner()
+                .compose(this.<NetResult<List<BGetBanner>>>bindToLifecycle())
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Consumer<NetResult<List<BGetBanner>>>() {
+                    @Override
+                    public void accept(NetResult<List<BGetBanner>> bGetBannerNetResult) throws Exception {
+                        if(bGetBannerNetResult.getStatus() != XqErrorCode.SUCCESS) {
+                            Log.e("requestGetBanner--" + bGetBannerNetResult.getMsg());
+                            return;
+                        }
+                        mImageList.clear();
+                        for(int i = 0 ; i < bGetBannerNetResult.getData().size() ; i++) {
+                            mImageList.add(bGetBannerNetResult.getData().get(i).getImage());
+                        }
+                        initXBanner();
+                    }
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Exception {
+                        Tools.toast(getActivity().getApplicationContext(),throwable.toString(),false);
+                        Log.e("requestGetBanner--" + throwable.toString());
+                    }
+                });
+    }
 
-        homeXbanner.setData(images, titles);
+
+    private void initXBanner() {
+        homeXbanner.setData(mImageList, null);
         homeXbanner.loadImage(new XBanner.XBannerAdapter() {
             @Override
             public void loadBanner(XBanner banner, Object model, View view, int position) {
@@ -642,7 +661,7 @@ public class HomeFragment extends BaseFragment {
      * @param checkRoomExpiry
      */
     private void doCreateCoinDialog(final BCheckRoomExpiry checkRoomExpiry) {
-        String text = "您是否话费" + checkRoomExpiry.getGift().getCoin() + "钻石购买" + checkRoomExpiry.getGift().getName() + ",使用后可免费创建房间"
+        String text = "您是否花费" + checkRoomExpiry.getGift().getCoin() + "钻石购买" + checkRoomExpiry.getGift().getName() + ",使用后可免费创建房间"
                 + checkRoomExpiry.getGift().getValue() + "次"
                 + "，或者使用" + checkRoomExpiry.getTargetGift().getCoin() + "钻石进入房间";
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity())

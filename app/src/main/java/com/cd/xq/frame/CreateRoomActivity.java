@@ -241,7 +241,7 @@ public class CreateRoomActivity extends BaseActivity {
      * @param checkRoomExpiry
      */
     private void doCreateCoinDialog(final BCheckRoomExpiry checkRoomExpiry) {
-        String text = "您是否话费"+checkRoomExpiry.getGift().getCoin() + "钻石购买" + checkRoomExpiry.getGift().getName() + ",使用后可免费创建房间"
+        String text = "您是否花费"+checkRoomExpiry.getGift().getCoin() + "钻石购买" + checkRoomExpiry.getGift().getName() + ",使用后可免费创建房间"
                 + checkRoomExpiry.getGift().getValue() + "小时"
                 + "，或者使用" + checkRoomExpiry.getTargetGift().getCoin() + "钻石创建房间";
         AlertDialog.Builder builder = new AlertDialog.Builder(CreateRoomActivity.this)

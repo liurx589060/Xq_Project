@@ -1,5 +1,6 @@
 package com.cd.xq.module.util.tools;
 
+import com.cd.xq.module.util.AppConfig;
 import com.cd.xq.module.util.Constant;
 
 /**
@@ -7,7 +8,7 @@ import com.cd.xq.module.util.Constant;
  */
 
 public class Log {
-    private static boolean isDebug = true;
+    private static boolean isDebug = AppConfig.isDebug;
 
     public static void e(String tag,String message) {
         android.util.Log.e(tag,message);

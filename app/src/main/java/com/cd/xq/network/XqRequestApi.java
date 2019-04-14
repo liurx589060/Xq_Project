@@ -1,7 +1,9 @@
 package com.cd.xq.network;
 
 import com.cd.xq.beans.BCheckRoomExpiry;
+import com.cd.xq.beans.BCheckUpdate;
 import com.cd.xq.beans.BGetArrays;
+import com.cd.xq.beans.BGetBanner;
 import com.cd.xq.beans.BGetChatRoomList;
 import com.cd.xq.beans.BGetConsumeHistory;
 import com.cd.xq.module.chart.beans.BGetGiftItem;
@@ -42,4 +44,10 @@ public interface XqRequestApi {
 
     @GET("JMessage/getChatRoomListByUser")
     Observable<NetResult<List<BGetChatRoomList>>> getChatRoomListByUser(@Query("userName") String userName);
+
+    @GET("Api/checkUpdate")
+    Observable<NetResult<BCheckUpdate>> checkUpdate(@Query("versionCode") int versionCode);
+
+    @GET("Api/getBanner")
+    Observable<NetResult<List<BGetBanner>>> getBanner();
 }

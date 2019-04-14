@@ -24,7 +24,6 @@ import retrofit2.converter.scalars.ScalarsConverterFactory;
  */
 
 public class NetWorkMg {
-    //public static String IP_ADDRESS = Constant.CONSTANT_REMOTE_IP;
     public static String IP_ADDRESS = Constant.CONSTANT_LOCOL_IP;
     public static String GENDER = "男";
 
