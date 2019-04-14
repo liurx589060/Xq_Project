@@ -28,7 +28,7 @@ public class DataManager {
     }
 
     public void setUserInfo(UserInfoBean userInfo) {
-        if(userInfo != null) {
+        if(userInfo != null && this.userInfo != null) {
             userInfo.setManualOnLine(this.userInfo.isManualOnLine());
             setJmUserName(userInfo.getUser_name());
             userInfo.setOnLine(true);

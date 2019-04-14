@@ -88,12 +88,9 @@ public class MainActivity extends BaseActivity {
         ButterKnife.bind(this);
         mHandler = new Handler();
         mXqApi = NetWorkMg.newRetrofit().create(XqRequestApi.class);
-
-        if(SharedPreferenceUtil.getIsRemote(this)) {
-            NetWorkMg.IP_ADDRESS = Constant.CONSTANT_REMOTE_IP;
-        }else {
-            NetWorkMg.IP_ADDRESS = SharedPreferenceUtil.getSpIpAddress(this);
-        }
+        //启动AppService
+        Intent intent = new Intent(this, AppService.class);
+        startService(intent);
 
         mApi = NetWorkMg.newRetrofit().create(RequestApi.class);
         UserInfo userInfo = JMessageClient.getMyInfo();
@@ -184,6 +181,7 @@ public class MainActivity extends BaseActivity {
                     public void accept(UserResp userResp) throws Exception {
                         if(userResp.getStatus() == XqErrorCode.SUCCESS) {
                             DataManager.getInstance().setUserInfo(userResp.getData());
+                            DataManager.getInstance().getUserInfo().setOnLine(true);
                             for(int i = 0 ; i < mFragmentHolderList.size() ; i++) {
                                 if(mFragmentHolderList.get(i).mFragment != null) {
                                     mFragmentHolderList.get(i).mFragment.onLogin();

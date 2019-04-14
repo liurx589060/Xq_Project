@@ -27,6 +27,7 @@ import com.cd.xq.module.util.manager.DataManager;
 import com.cd.xq.module.util.network.NetWorkMg;
 import com.cd.xq.module.util.network.RequestApi;
 import com.cd.xq.module.util.tools.DialogFactory;
+import com.cd.xq.module.util.tools.SharedPreferenceUtil;
 import com.cd.xq.module.util.tools.Tools;
 import com.cd.xq.module.util.tools.XqErrorCode;
 
@@ -61,6 +62,12 @@ public class WelcomeActivity extends AppCompatActivity {
         if ((getIntent().getFlags() & Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT) != 0) {
             finish();
             return;
+        }
+
+        if(SharedPreferenceUtil.getIsRemote(this)) {
+            NetWorkMg.IP_ADDRESS = Constant.CONSTANT_REMOTE_IP;
+        }else {
+            NetWorkMg.IP_ADDRESS = SharedPreferenceUtil.getSpIpAddress(this);
         }
 
         //TrPay

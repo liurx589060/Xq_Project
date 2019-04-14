@@ -131,6 +131,7 @@ public class DefaultWebActivity extends BaseActivity {
         webSetting.setSupportMultipleWindows(false);
         // webSetting.setLoadWithOverviewMode(true);
         webSetting.setAppCacheEnabled(true);
+        webSetting.setCacheMode(WebSettings.LOAD_NO_CACHE); //不使用缓存
         if(!mIsCache) {
             webSetting.setCacheMode(WebSettings.LOAD_NO_CACHE); //不使用缓存
         }

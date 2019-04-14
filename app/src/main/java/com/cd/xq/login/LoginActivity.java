@@ -115,6 +115,7 @@ public class LoginActivity extends BaseActivity {
         });
 
         mBtnSetting = findViewById(R.id.Test);
+        mBtnSetting.setVisibility(View.GONE);
         mBtnSetting.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -228,12 +229,13 @@ public class LoginActivity extends BaseActivity {
                     public void accept(UserResp userResp) throws Exception {
                         mLoadingDialog.dismiss();
                         if (userResp.getStatus() == XqErrorCode.SUCCESS) {
-                            if(DataManager.getInstance().getUserInfo() != null) {
-                                AppTools.notifyFriendOnLine(false);
-                            }
+//                            if(DataManager.getInstance().getUserInfo() != null) {
+//                                AppTools.notifyFriendOnLine(false);
+//                            }
 
                             DataManager.getInstance().setJmUserName(userName);
                             DataManager.getInstance().setUserInfo(userResp.getData());
+                            DataManager.getInstance().getUserInfo().setOnLine(true);
                             mLoadingDialog.dismiss();
                             Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                             if (mFrom == FROM_WELCOME) {
@@ -266,6 +268,7 @@ public class LoginActivity extends BaseActivity {
                     public void accept(Throwable throwable) throws Exception {
                         mLoadingDialog.dismiss();
                         Tools.toast(getApplicationContext(), throwable.toString(), true);
+                        Log.e("login--" + throwable.toString());
                     }
                 });
     }
