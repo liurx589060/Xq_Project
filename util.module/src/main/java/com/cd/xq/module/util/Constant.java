@@ -14,11 +14,16 @@ public class Constant {
     public static String ROLRTYPE_ANGEL = "angel";
     public static String ROLETYPE_GUEST = "guest";
     public static String ROLETYPE_ALL = "guest|angel";
-    public static int ROLOE_MARRIED = 1;   //已婚
-    public static int ROLOE_UNMARRIED = 0;   //未婚
+    public static int ROLE_MARRIED = 2;   //已婚
+    public static int ROLE_UNMARRIED = 1;   //未婚
     public static int ROOM_ROLETYPE_PARTICIPANTS = 1;   //参与者
     public static int ROOM_ROLETYPE_ONLOOKER = 2;   //围观者
     public static int MAX_LADY_COUNT = 10;
+
+    public static String SCHOOL_BENKE_DOWN = "本科以下";
+    public static String SCHOOL_BENKE = "本科";
+    public static String SCHOOL_SHUOSHI = "硕士";
+    public static String SCHOOL_BOSHI_AND_UP = "博士及以上";
 
     public static String GENDER_MAN = "男";
     public static String GENDER_LADY = "女";

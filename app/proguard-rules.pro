@@ -347,3 +347,7 @@
 -keep class cn.finalteam.rxgalleryfinal.**{*;}
 -dontwarn uk.co.senab.photoview.**
 -keep class uk.co.senab.photoview.**{*;}
+
+#========================TimePickerDialog================================
+-dontwarn com.jzxiang.pickerview.**
+-keep com.jzxiang.pickerview.**{*;}

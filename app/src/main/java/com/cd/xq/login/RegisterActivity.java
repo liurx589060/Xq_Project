@@ -168,6 +168,8 @@ public class RegisterActivity extends BaseActivity {
         registerTextXueli.setText(userInfo.getScholling() + SUFFIX);
         registerTextZhiye.setText(userInfo.getProfessional() + SUFFIX);
         registerTextRole.setText(userInfo.getRole_type() + SUFFIX);
+        registerTextMarrage.setText((userInfo.getMarrige()==Constant.ROLE_MARRIED?"已婚":"未婚") + SUFFIX);
+        registerTextPhone.setText(userInfo.getPhone() + SUFFIX);
         registerEditPs.setText(userInfo.getSpecial_info());
     }
 
@@ -175,15 +177,32 @@ public class RegisterActivity extends BaseActivity {
             R.id.register_relayout_xueli, R.id.register_relayout_jiguan, R.id.register_relayout_zhiye, R.id.register_relayout_gzdd, R.id.register_img_head,
             R.id.register_relayout_marrage,R.id.register_relayout_phone})
     public void onViewClicked(View view) {
+        UserInfoBean userInfo = DataManager.getInstance().getUserInfo();
         switch (view.getId()) {
             case R.id.register_relayout_role:
-                showSelectDialog("角色", new String[]{"angel", "guest"}, registerTextRole);
+            {
+                int checkIndex = -1;
+                if(userInfo.getRole_type().equals(Constant.ROLRTYPE_ANGEL)) {
+                    checkIndex = 0;
+                }else if(userInfo.getRole_type().equals(Constant.ROLETYPE_GUEST)) {
+                    checkIndex = 1;
+                }
+                showSelectDialog("角色", new String[]{"angel", "guest"}, registerTextRole,checkIndex);
+            }
                 break;
             case R.id.register_relayout_nick:
                 showEditDialog("昵称", registerTextNick.getText().toString(), registerTextNick);
                 break;
             case R.id.register_relayout_gender:
-                showSelectDialog("性别", new String[]{"男", "女"}, registerTextGender);
+            {
+                int checkIndex = -1;
+                if(userInfo.getGender().equals(Constant.GENDER_MAN)) {
+                    checkIndex = 0;
+                }else if(userInfo.getGender().equals(Constant.GENDER_LADY)) {
+                    checkIndex = 1;
+                }
+                showSelectDialog("性别", new String[]{"男", "女"}, registerTextGender,checkIndex);
+            }
                 break;
             case R.id.register_relayout_age:
                 showEditDialog("年龄", registerTextAge.getText().toString(), registerTextAge);
@@ -192,13 +211,34 @@ public class RegisterActivity extends BaseActivity {
                 showEditDialog("手机号码", registerTextPhone.getText().toString(), registerTextPhone);
                 break;
             case R.id.register_relayout_marrage:
-                showSelectDialog("当前婚姻", new String[]{"已婚", "未婚"}, registerTextMarrage);
+            {
+                int checkIndex = -1;
+                if(userInfo.getMarrige() == Constant.ROLE_MARRIED) {
+                    checkIndex = 0;
+                }else if(userInfo.getMarrige() == Constant.ROLE_UNMARRIED){
+                    checkIndex = 1;
+                }
+                showSelectDialog("当前婚姻", new String[]{"已婚", "未婚"}, registerTextMarrage,checkIndex);
+            }
                 break;
             case R.id.register_relayout_tall:
                 showEditDialog("身高", registerTextTall.getText().toString(), registerTextTall);
                 break;
             case R.id.register_relayout_xueli:
-                showSelectDialog("学历", new String[]{"本科以下", "本科", "硕士", "博士及以上"}, registerTextXueli);
+            {
+                int checkIndex = -1;
+                if(userInfo.getScholling().equals(Constant.SCHOOL_BENKE_DOWN)) {
+                    checkIndex = 0;
+                }else if(userInfo.getScholling().equals(Constant.SCHOOL_BENKE)){
+                    checkIndex = 1;
+                }else if(userInfo.getScholling().equals(Constant.SCHOOL_SHUOSHI)) {
+                    checkIndex = 2;
+                }else if(userInfo.getScholling().equals(Constant.SCHOOL_BOSHI_AND_UP)){
+                    checkIndex = 3;
+                }
+                showSelectDialog("学历", new String[]{Constant.SCHOOL_BENKE_DOWN, Constant.SCHOOL_BENKE,
+                        Constant.SCHOOL_SHUOSHI, Constant.SCHOOL_BOSHI_AND_UP}, registerTextXueli,checkIndex);
+            }
                 break;
             case R.id.register_relayout_jiguan:
                 showEditDialog("籍贯", registerTextJiguan.getText().toString(), registerTextJiguan);
@@ -270,10 +310,10 @@ public class RegisterActivity extends BaseActivity {
         dialog.show();
     }
 
-    private void showSelectDialog(String title, final String[] items, final View view) {
+    private void showSelectDialog(String title, final String[] items, final View view,int checkedItem) {
         AlertDialog dialog = new AlertDialog.Builder(this)
                 .setTitle(title)//设置对话框的标题
-                .setSingleChoiceItems(items, -1, new DialogInterface.OnClickListener() {
+                .setSingleChoiceItems(items, checkedItem, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         if (view instanceof TextView) {
@@ -301,9 +341,9 @@ public class RegisterActivity extends BaseActivity {
         mUserInfo.setJob_address(registerTextGzdd.getText().toString().replace(SUFFIX, ""));
         int marrage = -1;
         if (registerTextMarrage.getText().toString().contains("已婚")) {
-            marrage = Constant.ROLOE_MARRIED;
+            marrage = Constant.ROLE_MARRIED;
         }else if(registerTextMarrage.getText().toString().contains("未婚")) {
-            marrage = Constant.ROLOE_UNMARRIED;
+            marrage = Constant.ROLE_UNMARRIED;
         }
         mUserInfo.setMarrige(marrage);
         mUserInfo.setPhone(registerTextPhone.getText().toString().replace(SUFFIX, ""));

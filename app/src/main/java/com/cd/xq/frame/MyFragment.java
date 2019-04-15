@@ -128,7 +128,12 @@ public class MyFragment extends BaseFragment {
         if (userInfo.getRole_type().equals(Constant.ROLRTYPE_ANGEL)) {
             myTextRole.setText("爱心大使");
         } else {
-            myTextRole.setText("嘉宾");
+            if(userInfo.getMarrige() == Constant.ROLE_MARRIED) {
+                //非未婚状态
+                myTextRole.setText("观众");
+            }else {
+                myTextRole.setText("嘉宾");
+            }
         }
         myTextNick.setText(userInfo.getNick_name());
         myTextId.setText("ID:" + userInfo.getUser_id());

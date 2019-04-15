@@ -85,7 +85,13 @@ dependencies {
     api 'com.belerweb:pinyin4j:2.5.0'
 
     //TrPay
-    compile(name:'paysdk-release-1.2.4',ext:'aar')
+    api(name:'paysdk-release-1.2.4',ext:'aar')
+
+    //TimePickerDialog
+    //api 'com.jzxiang.pickerview:TimePickerDialog:1.0.1'
+
+    //PickerView
+    api 'com.contrarywind:Android-PickerView:4.1.7'
 }
 
 //configurations.all {

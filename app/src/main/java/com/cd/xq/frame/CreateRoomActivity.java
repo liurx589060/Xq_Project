@@ -2,6 +2,7 @@ package com.cd.xq.frame;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
@@ -14,7 +15,9 @@ import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Toast;
-
+import com.bigkoo.pickerview.builder.TimePickerBuilder;
+import com.bigkoo.pickerview.listener.OnTimeSelectListener;
+import com.bigkoo.pickerview.view.TimePickerView;
 import com.cd.xq.AppConstant;
 import com.cd.xq.R;
 import com.cd.xq.beans.BCheckRoomExpiry;
@@ -31,6 +34,7 @@ import com.cd.xq.module.util.beans.user.UserInfoBean;
 import com.cd.xq.module.util.manager.DataManager;
 import com.cd.xq.module.util.network.NetWorkMg;
 import com.cd.xq.module.util.network.RequestApi;
+import com.cd.xq.module.util.tools.DateUtils;
 import com.cd.xq.module.util.tools.Log;
 import com.cd.xq.module.util.tools.Tools;
 import com.cd.xq.module.util.tools.XqErrorCode;
@@ -41,6 +45,7 @@ import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -71,11 +76,15 @@ public class CreateRoomActivity extends BaseActivity {
     Button btnCommit;
     @BindView(R.id.edit_lady_count)
     EditText editLadyCount;
+    @BindView(R.id.btn_start_time)
+    Button btnStartTime;
 
     private boolean mIsPublic = true;
     private XqRequestApi mApi;
     private RequestApi mCommonApi;
     private ChatRequestApi mChatApi;
+    private TimePickerView mDialogAll;
+    private String mStartTime;
 
     private String mTXPushAddress = "";
     private String mTXPlayerAddress = "";
@@ -105,9 +114,52 @@ public class CreateRoomActivity extends BaseActivity {
                 }
             }
         });
+        initTimeDialog();
+    }
+
+    /**
+     * 初始化TimeDialog
+     */
+    private void initTimeDialog() {
+        Calendar startDate = Calendar.getInstance();
+        Calendar endDate = Calendar.getInstance();
+        startDate.setTimeInMillis(System.currentTimeMillis());
+        endDate.setTimeInMillis(System.currentTimeMillis() + 20*60*1000);
+        mDialogAll = new TimePickerBuilder(this, new OnTimeSelectListener() {
+            @Override
+            public void onTimeSelect(Date date, View v) {
+                mStartTime = DateUtils.timeStampToStr(date.getTime()/1000,"yyyy-MM-dd HH:mm:00");
+                btnStartTime.setText("已预约的时间\n" + mStartTime);
+            }
+        })
+                .setType(new boolean[]{false, false, true, true, true, false})// 默认全部显示
+                .setCancelText("取消")//取消按钮文字
+                .setSubmitText("确认")//确认按钮文字
+                .setContentTextSize(getResources().getDimensionPixelOffset(R.dimen.sp_12))
+                .setTitleSize(getResources().getDimensionPixelOffset(R.dimen.sp_10))//标题文字大小
+                .setTitleText("")//标题文字
+                .setOutSideCancelable(false)//点击屏幕，点在控件外部范围时，是否取消显示
+                .isCyclic(false)//是否循环滚动
+                .setSubmitColor(Color.BLUE)//确定按钮文字颜色
+                .setCancelColor(Color.BLUE)//取消按钮文字颜色
+                .setTitleBgColor(Color.parseColor("#ffffff"))//标题背景颜色 Night mode
+                .setContentTextSize(getResources().getDimensionPixelOffset(R.dimen.sp_12))
+                .setTextColorCenter(Color.parseColor("#000000"))
+                .setTextColorOut(Color.parseColor("#666666"))
+                .setBgColor(Color.parseColor("#dddddd"))//滚轮背景颜色 Night mode
+                .setDate(startDate)// 如果不设置的话，默认是系统时间*/
+                .setRangDate(startDate,endDate)//起始终止年月日设定
+                .setLabel("年","月","日","时","分","秒")//默认设置为年月日时分秒
+                .isCenterLabel(false) //是否只显示中间选中项的label文字，false则每项item全部都带有label。
+                .isDialog(false)//是否显示为对话框样式
+                .build();
     }
 
     private void toCommit() {
+        if(TextUtils.isEmpty(mStartTime)) {
+            Tools.toast(getApplicationContext(),"请选择开始开始时间",false);
+            return;
+        }
         //创建房间
         mApi.checkRoomExpiry(DataManager.getInstance().getUserInfo().getUser_name(), 1)
                 .compose(this.<NetResult<BCheckRoomExpiry>>bindToLifecycle())
@@ -348,19 +400,19 @@ public class CreateRoomActivity extends BaseActivity {
         userInfo.setGender(DataManager.getInstance().getUserInfo().getGender());
         userInfo.setLevel(DataManager.getInstance().getUserInfo().getLevel());
         String ladyCount = editLadyCount.getText().toString();
-        try{
-            if(TextUtils.isEmpty(ladyCount)) {
+        try {
+            if (TextUtils.isEmpty(ladyCount)) {
                 userInfo.setLimitLady(AppConstant.CHATROOM_LIMIT_LADY_COUNT);
-            }else {
+            } else {
                 int count = Integer.parseInt(ladyCount);
-                if(count < 2 || count > 10) {
-                    Tools.toast(getApplicationContext(),"女嘉宾人数需是2--10人",true);
+                if (count < 2 || count > 10) {
+                    Tools.toast(getApplicationContext(), "女嘉宾人数需是2--10人", true);
                     return;
                 }
                 userInfo.setLimitLady(count);
             }
-        }catch (Exception e) {
-            Tools.toast(getApplicationContext(),"女嘉宾人数输入有误",true);
+        } catch (Exception e) {
+            Tools.toast(getApplicationContext(), "女嘉宾人数输入有误", true);
             Log.e("createChartRoom--" + e.toString());
             return;
         }
@@ -376,6 +428,7 @@ public class CreateRoomActivity extends BaseActivity {
         params.put("limitLady", userInfo.getLimitLady());
         params.put("limitMan", userInfo.getLimitMan());
         params.put("limitAngel", userInfo.getLimitAngel());
+        params.put("appointTime",mStartTime);
         params.put("pushAddress", Base64.encodeToString(mTXPushAddress.getBytes(), Base64.DEFAULT));
         params.put("playAddress", Base64.encodeToString(mTXPlayerAddress.getBytes(),
                 Base64.DEFAULT));
@@ -423,7 +476,7 @@ public class CreateRoomActivity extends BaseActivity {
                 });
     }
 
-    @OnClick({R.id.btn_back, R.id.btn_commit})
+    @OnClick({R.id.btn_back, R.id.btn_commit,R.id.btn_start_time})
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.btn_back:
@@ -431,6 +484,16 @@ public class CreateRoomActivity extends BaseActivity {
                 break;
             case R.id.btn_commit:
                 toCommit();
+                break;
+            case R.id.btn_start_time:
+                Calendar calendar = Calendar.getInstance();
+                if(TextUtils.isEmpty(mStartTime)) {
+                    calendar.setTimeInMillis(System.currentTimeMillis());
+                }else {
+                    calendar.setTimeInMillis(1000*DateUtils.getStringToDate(mStartTime,"yyyy-MM-dd HH:mm:ss"));
+                }
+                mDialogAll.setDate(calendar);
+                mDialogAll.show();
                 break;
         }
     }

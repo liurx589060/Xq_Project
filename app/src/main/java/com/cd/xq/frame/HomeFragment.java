@@ -197,9 +197,9 @@ public class HomeFragment extends BaseFragment {
                             return;
                         }
 
-                        if (DataManager.getInstance().getUserInfo().getMarrige() != 0) {
+                        if (DataManager.getInstance().getUserInfo().getMarrige() != Constant.ROLE_UNMARRIED) {
                             //不是未婚状态
-                            Tools.toast(getActivity(), "您已婚，只能围观房间不可参与！", true);
+                            Tools.toast(getActivity(), "您是观众身份只能围观房间不可参与", true);
                             return;
                         }
 

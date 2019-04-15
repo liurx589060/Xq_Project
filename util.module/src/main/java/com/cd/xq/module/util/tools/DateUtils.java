@@ -119,6 +119,7 @@ public class DateUtils {
 
     /**
      * 将日期格式转化为时间(秒数)
+     * 将日期格式转化为时间(秒数)
      *
      * @param time
      * @return

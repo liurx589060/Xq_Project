@@ -55,6 +55,19 @@
         android:padding="@dimen/dp_10"
         />
 
+    <Button
+        android:id="@+id/btn_start_time"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp_40"
+        android:layout_marginLeft="@dimen/dp_10"
+        android:layout_marginRight="@dimen/dp_10"
+        android:text="开始时间"
+        android:textSize="@dimen/sp_14"
+        android:textColor="#333333"
+        android:background="@drawable/selector_btn_create_room_appoint"
+        android:layout_marginTop="@dimen/dp_20"
+        />
+
     <RadioGroup
         android:id="@+id/radioGroup"
         android:layout_width="match_parent"
