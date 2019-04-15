@@ -28,7 +28,6 @@ import com.cd.xq.module.util.base.BaseActivity;
 import com.cd.xq.module.util.beans.NetResult;
 import com.cd.xq.module.util.beans.jmessage.JMChartResp;
 import com.cd.xq.module.util.beans.user.UserInfoBean;
-import com.cd.xq.module.util.interfaces.IDialogListener;
 import com.cd.xq.module.util.manager.DataManager;
 import com.cd.xq.module.util.network.NetWorkMg;
 import com.cd.xq.module.util.network.RequestApi;
@@ -70,6 +69,8 @@ public class CreateRoomActivity extends BaseActivity {
     RadioGroup radioGroup;
     @BindView(R.id.btn_commit)
     Button btnCommit;
+    @BindView(R.id.edit_lady_count)
+    EditText editLadyCount;
 
     private boolean mIsPublic = true;
     private XqRequestApi mApi;
@@ -97,9 +98,9 @@ public class CreateRoomActivity extends BaseActivity {
         radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
-                if(checkedId == R.id.radio_public) {
+                if (checkedId == R.id.radio_public) {
                     mIsPublic = true;
-                }else {
+                } else {
                     mIsPublic = false;
                 }
             }
@@ -108,34 +109,34 @@ public class CreateRoomActivity extends BaseActivity {
 
     private void toCommit() {
         //创建房间
-        mApi.checkRoomExpiry(DataManager.getInstance().getUserInfo().getUser_name(),1)
+        mApi.checkRoomExpiry(DataManager.getInstance().getUserInfo().getUser_name(), 1)
                 .compose(this.<NetResult<BCheckRoomExpiry>>bindToLifecycle())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Consumer<NetResult<BCheckRoomExpiry>>() {
                     @Override
                     public void accept(NetResult<BCheckRoomExpiry> bCheckRoomExpiry) throws Exception {
-                        if(bCheckRoomExpiry.getStatus() != XqErrorCode.SUCCESS) {
+                        if (bCheckRoomExpiry.getStatus() != XqErrorCode.SUCCESS) {
                             Tools.toast(getApplicationContext(), bCheckRoomExpiry.getMsg(), false);
                             Log.e("checkRoomExpiry--" + bCheckRoomExpiry.getMsg());
                             return;
                         }
 
-                        if(bCheckRoomExpiry.getData().getExpiry() != null) {
+                        if (bCheckRoomExpiry.getData().getExpiry() != null) {
                             //有使用中的卡,则直接创建房间
                             String str = "您有使用中的" + bCheckRoomExpiry.getData().getExpiry().getName() +
                                     ",可免费创建房间,截止至" + bCheckRoomExpiry.getData().getExpiry().getEnd_time();
-                            Toast toast = Toast.makeText(getApplication(),str,Toast.LENGTH_LONG);
-                            toast.setGravity(Gravity.TOP,0,0);
+                            Toast toast = Toast.makeText(getApplication(), str, Toast.LENGTH_LONG);
+                            toast.setGravity(Gravity.TOP, 0, 0);
                             toast.show();
 
                             //创建房间
                             createChartRoom();
-                        }else {
-                            if(bCheckRoomExpiry.getData().getHasCard() == 1) {
+                        } else {
+                            if (bCheckRoomExpiry.getData().getHasCard() == 1) {
                                 //有未使用的卡，提示是否使用卡
                                 doCreateUseCardDialog(bCheckRoomExpiry.getData());
-                            }else {
+                            } else {
                                 //没有卡，则提示是否使用钻石创建房间
                                 doCreateCoinDialog(bCheckRoomExpiry.getData());
                             }
@@ -152,22 +153,23 @@ public class CreateRoomActivity extends BaseActivity {
 
     /**
      * 去消费
+     *
      * @param item
      * @param handleType
      */
-    private void doRequestConsumeGift(final BGetGiftItem item,int handleType) {
+    private void doRequestConsumeGift(final BGetGiftItem item, int handleType) {
         //用钻石消费
-        if(handleType == 1 && !ChatTools.checkBalance(this,item.getCoin())) return;
-        requestConsumeGift(item,handleType);
+        if (handleType == 1 && !ChatTools.checkBalance(this, item.getCoin())) return;
+        requestConsumeGift(item, handleType);
     }
 
     private void requestConsumeGift(final BGetGiftItem item, final int handleType) {
-        HashMap<String,Object> params = new HashMap<>();
+        HashMap<String, Object> params = new HashMap<>();
         params.put("userName", DataManager.getInstance().getUserInfo().getUser_name());
-        params.put("giftId",item.getGift_id());
-        params.put("coin",item.getCoin());
-        params.put("toUser",DataManager.getInstance().getUserInfo().getUser_name());
-        params.put("handleType",handleType);  //消费方式
+        params.put("giftId", item.getGift_id());
+        params.put("coin", item.getCoin());
+        params.put("toUser", DataManager.getInstance().getUserInfo().getUser_name());
+        params.put("handleType", handleType);  //消费方式
         mChatApi.consumeGift(params)
                 .compose(this.<NetResult<BConsumeGift>>bindToLifecycle())
                 .subscribeOn(Schedulers.io())
@@ -176,12 +178,12 @@ public class CreateRoomActivity extends BaseActivity {
                     @Override
                     public void accept(NetResult<BConsumeGift> netResult) throws Exception {
                         if (netResult.getStatus() != XqErrorCode.SUCCESS) {
-                            if(netResult.getStatus() == XqErrorCode.ERROR_LACK_STOCK) {
+                            if (netResult.getStatus() == XqErrorCode.ERROR_LACK_STOCK) {
                                 //余额不足
                                 //更新余额
                                 DataManager.getInstance().getUserInfo().setBalance(netResult.getData().getBalance());
-                                doRequestConsumeGift(item,handleType);
-                            }else {
+                                doRequestConsumeGift(item, handleType);
+                            } else {
                                 Tools.toast(getApplicationContext(), netResult.getMsg(), false);
                             }
                             Log.e("requestConsumeGift--" + netResult.getMsg());
@@ -204,6 +206,7 @@ public class CreateRoomActivity extends BaseActivity {
 
     /**
      * 创建是否使用建房卡
+     *
      * @param checkRoomExpiry
      */
     private void doCreateUseCardDialog(final BCheckRoomExpiry checkRoomExpiry) {
@@ -217,7 +220,7 @@ public class CreateRoomActivity extends BaseActivity {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         //使用卡,包裹使用
-                        doRequestConsumeGift(checkRoomExpiry.getGift(),2);
+                        doRequestConsumeGift(checkRoomExpiry.getGift(), 2);
                     }
                 })
                 .setNegativeButton("取消", new DialogInterface.OnClickListener() {
@@ -229,7 +232,7 @@ public class CreateRoomActivity extends BaseActivity {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         //钻石消费
-                        doRequestConsumeGift(checkRoomExpiry.getTargetGift(),1);
+                        doRequestConsumeGift(checkRoomExpiry.getTargetGift(), 1);
                     }
                 });
         AlertDialog dialog = builder.create();
@@ -238,10 +241,11 @@ public class CreateRoomActivity extends BaseActivity {
 
     /**
      * 创建是否购买建房卡
+     *
      * @param checkRoomExpiry
      */
     private void doCreateCoinDialog(final BCheckRoomExpiry checkRoomExpiry) {
-        String text = "您是否花费"+checkRoomExpiry.getGift().getCoin() + "钻石购买" + checkRoomExpiry.getGift().getName() + ",使用后可免费创建房间"
+        String text = "您是否花费" + checkRoomExpiry.getGift().getCoin() + "钻石购买" + checkRoomExpiry.getGift().getName() + ",使用后可免费创建房间"
                 + checkRoomExpiry.getGift().getValue() + "小时"
                 + "，或者使用" + checkRoomExpiry.getTargetGift().getCoin() + "钻石创建房间";
         AlertDialog.Builder builder = new AlertDialog.Builder(CreateRoomActivity.this)
@@ -264,7 +268,7 @@ public class CreateRoomActivity extends BaseActivity {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         //钻石消费
-                        doRequestConsumeGift(checkRoomExpiry.getTargetGift(),1);
+                        doRequestConsumeGift(checkRoomExpiry.getTargetGift(), 1);
                     }
                 });
         AlertDialog dialog = builder.create();
@@ -285,7 +289,7 @@ public class CreateRoomActivity extends BaseActivity {
 
     /*
      * KEY+ stream_id + txTime
-	 */
+     */
     private void setLiveAddress() {
         if (mPushAddressType == 0) {
             //本地
@@ -343,7 +347,23 @@ public class CreateRoomActivity extends BaseActivity {
         userInfo.setRole_type(DataManager.getInstance().getUserInfo().getRole_type());
         userInfo.setGender(DataManager.getInstance().getUserInfo().getGender());
         userInfo.setLevel(DataManager.getInstance().getUserInfo().getLevel());
-        userInfo.setLimitLady(AppConstant.CHATROOM_LIMIT_LADY_COUNT);
+        String ladyCount = editLadyCount.getText().toString();
+        try{
+            if(TextUtils.isEmpty(ladyCount)) {
+                userInfo.setLimitLady(AppConstant.CHATROOM_LIMIT_LADY_COUNT);
+            }else {
+                int count = Integer.parseInt(ladyCount);
+                if(count < 2 || count > 10) {
+                    Tools.toast(getApplicationContext(),"女嘉宾人数需是2--10人",true);
+                    return;
+                }
+                userInfo.setLimitLady(count);
+            }
+        }catch (Exception e) {
+            Tools.toast(getApplicationContext(),"女嘉宾人数输入有误",true);
+            Log.e("createChartRoom--" + e.toString());
+            return;
+        }
         userInfo.setLimitLevel(-1);
 
         setLiveAddress();
@@ -359,9 +379,9 @@ public class CreateRoomActivity extends BaseActivity {
         params.put("pushAddress", Base64.encodeToString(mTXPushAddress.getBytes(), Base64.DEFAULT));
         params.put("playAddress", Base64.encodeToString(mTXPlayerAddress.getBytes(),
                 Base64.DEFAULT));
-        params.put("public", mIsPublic?1:0);
+        params.put("public", mIsPublic ? 1 : 0);
         String title = editTitle.getText().toString();
-        if(TextUtils.isEmpty(title)) {
+        if (TextUtils.isEmpty(title)) {
             title = editTitle.getHint().toString();
         }
         params.put("describe", title);

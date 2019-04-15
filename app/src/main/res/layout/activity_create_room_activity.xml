@@ -42,6 +42,19 @@
         android:layout_marginTop="@dimen/dp_20"
         android:padding="@dimen/dp_10"/>
 
+    <EditText
+        android:id="@+id/edit_lady_count"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="输入女嘉宾人数（2--10人，默认10人）"
+        android:textColorHint="#cccccc"
+        android:textSize="@dimen/sp_16"
+        android:textColor="#666666"
+        android:layout_gravity="center"
+        android:layout_marginTop="@dimen/dp_10"
+        android:padding="@dimen/dp_10"
+        />
+
     <RadioGroup
         android:id="@+id/radioGroup"
         android:layout_width="match_parent"

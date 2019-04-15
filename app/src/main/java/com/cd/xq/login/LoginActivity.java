@@ -115,7 +115,7 @@ public class LoginActivity extends BaseActivity {
         });
 
         mBtnSetting = findViewById(R.id.Test);
-        mBtnSetting.setVisibility(View.GONE);
+//        mBtnSetting.setVisibility(View.GONE);
         mBtnSetting.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

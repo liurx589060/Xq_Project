@@ -137,9 +137,9 @@ public class MyFragment extends BaseFragment {
     private void init() {
         setData();
 
-        ipEdit.setVisibility(View.GONE);
-        btnSave.setVisibility(View.GONE);
-        checkboxRemote.setVisibility(View.GONE);
+//        ipEdit.setVisibility(View.GONE);
+//        btnSave.setVisibility(View.GONE);
+//        checkboxRemote.setVisibility(View.GONE);
 
         myImgNotifyDot.setVisibility(View.GONE);
         myTextEdit.setOnClickListener(new View.OnClickListener() {

@@ -4,7 +4,6 @@ import android.annotation.TargetApi;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -19,10 +18,10 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.cd.xq.R;
 import com.cd.xq.frame.MainActivity;
+import com.cd.xq.module.util.Constant;
 import com.cd.xq.module.util.base.BaseActivity;
 import com.cd.xq.module.util.beans.user.UserInfoBean;
 import com.cd.xq.module.util.beans.user.UserResp;
-import com.cd.xq.module.util.glide.GlideCircleBorderTransform;
 import com.cd.xq.module.util.glide.GlideCircleTransform;
 import com.cd.xq.module.util.manager.DataManager;
 import com.cd.xq.module.util.network.NetWorkMg;
@@ -64,6 +63,14 @@ public class RegisterActivity extends BaseActivity {
     public static final int FROM_MY = 1; //从我的来
     public static final int FROM_LOGIN = 2;//从登陆页面来
     public static final int FROM_LEAK_INFO = 3;//确实信息
+    @BindView(R.id.register_relayout_marrage)
+    RelativeLayout registerRelayoutMarrage;
+    @BindView(R.id.register_text_marrage)
+    TextView registerTextMarrage;
+    @BindView(R.id.register_text_phone)
+    TextView registerTextPhone;
+    @BindView(R.id.register_relayout_phone)
+    RelativeLayout registerRelayoutPhone;
     private int mFrom = FROM_LOGIN;
     private RequestApi mApi;
     private boolean isUpdate;
@@ -164,7 +171,9 @@ public class RegisterActivity extends BaseActivity {
         registerEditPs.setText(userInfo.getSpecial_info());
     }
 
-    @OnClick({R.id.register_relayout_role, R.id.register_relayout_nick, R.id.register_relayout_gender, R.id.register_relayout_age, R.id.register_relayout_tall, R.id.register_relayout_xueli, R.id.register_relayout_jiguan, R.id.register_relayout_zhiye, R.id.register_relayout_gzdd})
+    @OnClick({R.id.register_relayout_role, R.id.register_relayout_nick, R.id.register_relayout_gender, R.id.register_relayout_age, R.id.register_relayout_tall,
+            R.id.register_relayout_xueli, R.id.register_relayout_jiguan, R.id.register_relayout_zhiye, R.id.register_relayout_gzdd, R.id.register_img_head,
+            R.id.register_relayout_marrage,R.id.register_relayout_phone})
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.register_relayout_role:
@@ -178,6 +187,12 @@ public class RegisterActivity extends BaseActivity {
                 break;
             case R.id.register_relayout_age:
                 showEditDialog("年龄", registerTextAge.getText().toString(), registerTextAge);
+                break;
+            case R.id.register_relayout_phone:
+                showEditDialog("手机号码", registerTextPhone.getText().toString(), registerTextPhone);
+                break;
+            case R.id.register_relayout_marrage:
+                showSelectDialog("当前婚姻", new String[]{"已婚", "未婚"}, registerTextMarrage);
                 break;
             case R.id.register_relayout_tall:
                 showEditDialog("身高", registerTextTall.getText().toString(), registerTextTall);
@@ -208,11 +223,6 @@ public class RegisterActivity extends BaseActivity {
             setResult(RESULT_OK);
         }
         this.finish();
-    }
-
-    @OnClick(R.id.register_img_head)
-    public void onViewClicked() {
-        openImageSelector();
     }
 
     private void showEditDialog(String title, String hintText, final View view) {
@@ -289,13 +299,15 @@ public class RegisterActivity extends BaseActivity {
         mUserInfo.setAge(parseInt(registerTextAge.getText().toString().replace(SUFFIX, "")));
         mUserInfo.setGender(registerTextGender.getText().toString().replace(SUFFIX, ""));
         mUserInfo.setJob_address(registerTextGzdd.getText().toString().replace(SUFFIX, ""));
-        int marrige = 0;
-//        if(mEditMarrige.getText().toString().contains("已婚")) {
-//            marrige = 1;
-//        }
-        mUserInfo.setMarrige(marrige);
+        int marrage = -1;
+        if (registerTextMarrage.getText().toString().contains("已婚")) {
+            marrage = Constant.ROLOE_MARRIED;
+        }else if(registerTextMarrage.getText().toString().contains("未婚")) {
+            marrage = Constant.ROLOE_UNMARRIED;
+        }
+        mUserInfo.setMarrige(marrage);
+        mUserInfo.setPhone(registerTextPhone.getText().toString().replace(SUFFIX, ""));
         mUserInfo.setNative_place(registerTextJiguan.getText().toString().replace(SUFFIX, ""));
-        mUserInfo.setPhone("");
         mUserInfo.setProfessional(registerTextZhiye.getText().toString().replace(SUFFIX, ""));
         mUserInfo.setScholling(registerTextXueli.getText().toString().replace(SUFFIX, ""));
         mUserInfo.setTall(parseInt(registerTextTall.getText().toString().replace("cm", "").replace(SUFFIX, "")));
@@ -312,6 +324,7 @@ public class RegisterActivity extends BaseActivity {
         params.put("professional", mUserInfo.getProfessional());
         params.put("native_place", mUserInfo.getNative_place());
         params.put("marrige", mUserInfo.getMarrige());
+        params.put("phone", mUserInfo.getPhone());
         params.put("job_address", mUserInfo.getJob_address());
         params.put("phone", mUserInfo.getPhone());
         params.put("role_type", mUserInfo.getRole_type());
@@ -446,5 +459,9 @@ public class RegisterActivity extends BaseActivity {
             Log.e("yy", e.toString());
         }
         return result;
+    }
+
+    @OnClick(R.id.register_relayout_marrage)
+    public void onViewClicked() {
     }
 }

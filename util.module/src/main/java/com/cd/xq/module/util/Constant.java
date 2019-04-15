@@ -14,6 +14,8 @@ public class Constant {
     public static String ROLRTYPE_ANGEL = "angel";
     public static String ROLETYPE_GUEST = "guest";
     public static String ROLETYPE_ALL = "guest|angel";
+    public static int ROLOE_MARRIED = 1;   //已婚
+    public static int ROLOE_UNMARRIED = 0;   //未婚
     public static int ROOM_ROLETYPE_PARTICIPANTS = 1;   //参与者
     public static int ROOM_ROLETYPE_ONLOOKER = 2;   //围观者
     public static int MAX_LADY_COUNT = 10;

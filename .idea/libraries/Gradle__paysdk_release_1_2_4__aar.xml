@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="Gradle: paysdk-release-1.2.4:@aar">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-1/files-1.1/paysdk-release-1.2.4.aar/e85edee683fb3a80f0bc579d3ae6a206/jars/classes.jar!/" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-1/files-1.1/paysdk-release-1.2.4.aar/e85edee683fb3a80f0bc579d3ae6a206/res" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

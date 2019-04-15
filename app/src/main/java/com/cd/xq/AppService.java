@@ -109,6 +109,8 @@ public class AppService extends Service {
                     @Override
                     public void accept(NetResult<List<UserInfoBean>> listNetResult) throws
                             Exception {
+                        //先清空好友列表
+                        AppDataManager.getInstance().getFriendList().clear();
                         if (listNetResult.getStatus() != XqErrorCode.SUCCESS && listNetResult.getStatus() !=
                                 XqErrorCode.ERROR_NO_DATA) {
                             Log.e(PRE ,"getFriendList--" + listNetResult.getMsg());
@@ -130,7 +132,6 @@ public class AppService extends Service {
                                 newList.add(listNetResult.getData().get(i));
                             }
                         }
-                        AppDataManager.getInstance().getFriendList().clear();
                         AppDataManager.getInstance().getFriendList().addAll(newList);
                         //获取好友在线状态
                         userStat();

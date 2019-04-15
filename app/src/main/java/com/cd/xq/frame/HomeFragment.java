@@ -197,6 +197,12 @@ public class HomeFragment extends BaseFragment {
                             return;
                         }
 
+                        if (DataManager.getInstance().getUserInfo().getMarrige() != 0) {
+                            //不是未婚状态
+                            Tools.toast(getActivity(), "您已婚，只能围观房间不可参与！", true);
+                            return;
+                        }
+
                         //参与者加入房间
                         toCommitJoinParticipant();
                     }
