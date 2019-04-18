@@ -121,7 +121,8 @@
         android:layout_alignParentRight="true"
         android:layout_alignParentBottom="true"
         android:layout_marginRight="@dimen/dp_20"
-        android:layout_marginBottom="@dimen/dp_20">
+        android:layout_marginBottom="@dimen/dp_20"
+        android:visibility="gone">
 
         <ImageView
             android:layout_width="@dimen/dp_45"
@@ -134,7 +135,8 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:text="30分15秒"
-            android:textSize="@dimen/sp_10"/>
+            android:textSize="@dimen/sp_10"
+            android:textColor="#333333"/>
 
     </LinearLayout>
 

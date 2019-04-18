@@ -32,7 +32,7 @@ public class StatusManFirstQuestionBean extends StatusManIntroBean {
 
     @Override
     public int getNextIndex(JMChartRoomSendBean receiveBean) {
-        int index = (receiveBean.getIndexNext() + 1)%mData.getLimitMan();
+        int index = (receiveBean.getIndexNext() + 1)%mData.getLimit_man();
         return index;
     }
 
@@ -53,7 +53,7 @@ public class StatusManFirstQuestionBean extends StatusManIntroBean {
 
     @Override
     public boolean isLast(int completeCount, JMChartRoomSendBean receiveBean) {
-        int allCount = mData.getLimitMan();
+        int allCount = mData.getLimit_man();
         boolean isLast = completeCount>=allCount?true:false;
         return isLast;
     }

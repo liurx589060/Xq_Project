@@ -8,25 +8,20 @@ import java.util.List;
 
 public class Data {
 
-    private long roomId;
-    private int limitLevel;
-    private int limitLady;
-    private int limitMan;
-    private int limitAngel;
-    private String pushAddress = "";
-    private String playAddress = "";
+    private long room_id;
+    private int limit_level;
+    private int limit_lady;
+    private int limit_man;
+    private int limit_angel;
+    private String push_address = "";
+    private String play_address = "";
     private List<Member> members;
     private List<Member> onLookers;
     private String creater = "";
     private String appoint_time = "";
     private String title = "";
     private String describe = "";
-    public void setRoomId(long roomId) {
-         this.roomId = roomId;
-     }
-     public long getRoomId() {
-         return roomId;
-     }
+    private int work = 2;  //默认结束
 
     public void setMembers(List<Member> members) {
          this.members = members;
@@ -37,54 +32,6 @@ public class Data {
         }
         return members;
      }
-
-    public int getLimitLevel() {
-        return limitLevel;
-    }
-
-    public void setLimitLevel(int limitLevel) {
-        this.limitLevel = limitLevel;
-    }
-
-    public int getLimitLady() {
-        return limitLady;
-    }
-
-    public void setLimitLady(int limitLady) {
-        this.limitLady = limitLady;
-    }
-
-    public int getLimitMan() {
-        return limitMan;
-    }
-
-    public void setLimitMan(int limitMan) {
-        this.limitMan = limitMan;
-    }
-
-    public int getLimitAngel() {
-        return limitAngel;
-    }
-
-    public void setLimitAngel(int limitAngel) {
-        this.limitAngel = limitAngel;
-    }
-
-    public String getPushAddress() {
-        return pushAddress;
-    }
-
-    public void setPushAddress(String pushAddress) {
-        this.pushAddress = pushAddress;
-    }
-
-    public String getPlayAddress() {
-        return playAddress;
-    }
-
-    public void setPlayAddress(String playAddress) {
-        this.playAddress = playAddress;
-    }
 
     public List<Member> getOnLookers() {
         if(onLookers == null) {
@@ -127,5 +74,69 @@ public class Data {
 
     public void setDescribe(String describe) {
         this.describe = describe;
+    }
+
+    public long getRoom_id() {
+        return room_id;
+    }
+
+    public void setRoom_id(long room_id) {
+        this.room_id = room_id;
+    }
+
+    public int getLimit_level() {
+        return limit_level;
+    }
+
+    public void setLimit_level(int limit_level) {
+        this.limit_level = limit_level;
+    }
+
+    public int getLimit_lady() {
+        return limit_lady;
+    }
+
+    public void setLimit_lady(int limit_lady) {
+        this.limit_lady = limit_lady;
+    }
+
+    public int getLimit_man() {
+        return limit_man;
+    }
+
+    public void setLimit_man(int limit_man) {
+        this.limit_man = limit_man;
+    }
+
+    public int getLimit_angel() {
+        return limit_angel;
+    }
+
+    public void setLimit_angel(int limit_angel) {
+        this.limit_angel = limit_angel;
+    }
+
+    public String getPush_address() {
+        return push_address;
+    }
+
+    public void setPush_address(String push_address) {
+        this.push_address = push_address;
+    }
+
+    public String getPlay_address() {
+        return play_address;
+    }
+
+    public void setPlay_address(String play_address) {
+        this.play_address = play_address;
+    }
+
+    public int getWork() {
+        return work;
+    }
+
+    public void setWork(int work) {
+        this.work = work;
     }
 }

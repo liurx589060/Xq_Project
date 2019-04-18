@@ -32,7 +32,7 @@ public class StatusAngelChartBean extends ChatBaseStatus {
 
     @Override
     public int getNextIndex(JMChartRoomSendBean receiveBean) {
-        int index = (receiveBean.getIndexNext() + 1)%mData.getLimitAngel();
+        int index = (receiveBean.getIndexNext() + 1)%mData.getLimit_angel();
         return index;
     }
 
@@ -53,7 +53,7 @@ public class StatusAngelChartBean extends ChatBaseStatus {
 
     @Override
     public boolean isLast(int completeCount, JMChartRoomSendBean receiveBean) {
-        int allCount = mData.getLimitAngel();
+        int allCount = mData.getLimit_angel();
         boolean isLast = completeCount>=allCount?true:false;
         return isLast;
     }

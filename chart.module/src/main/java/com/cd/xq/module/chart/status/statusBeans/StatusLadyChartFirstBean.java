@@ -34,7 +34,7 @@ public class StatusLadyChartFirstBean extends ChatBaseStatus {
 
     @Override
     public int getNextIndex(JMChartRoomSendBean receiveBean) {
-        int index = (receiveBean.getIndexNext() + 1)%mData.getLimitLady();
+        int index = (receiveBean.getIndexNext() + 1)%mData.getLimit_lady();
         return index;
     }
 
@@ -55,7 +55,7 @@ public class StatusLadyChartFirstBean extends ChatBaseStatus {
 
     @Override
     public boolean isLast(int completeCount, JMChartRoomSendBean receiveBean) {
-        int allCount = mData.getLimitLady();
+        int allCount = mData.getLimit_lady();
         boolean isLast = completeCount>=allCount?true:false;
         return isLast;
     }

@@ -84,7 +84,7 @@ public class StatusLadyFirstSelectBean extends ChatBaseStatus {
         super.onPostHandler(resp,receiveBean);
         if(receiveBean.getMessageType() == MessageType.TYPE_RESPONSE) {
             mCompleteCount ++;
-            int allCount = mData.getLimitLady();
+            int allCount = mData.getLimit_lady();
             boolean isLast = mCompleteCount>=allCount?true:false;
             resp.setLast(isLast);
             if(isLast) {

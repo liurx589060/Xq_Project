@@ -42,6 +42,7 @@ import com.cd.xq.module.util.tools.Tools;
 import com.cd.xq.module.util.tools.XqErrorCode;
 import com.cd.xq.my.MyGiftBuyActivity;
 import com.cd.xq.network.XqRequestApi;
+import com.google.gson.Gson;
 
 import org.greenrobot.eventbus.EventBus;
 
@@ -453,11 +454,11 @@ public class CreateRoomActivity extends BaseActivity {
 
         mCommonApi.appointChatRoom(params)
                 .subscribeOn(Schedulers.io())
-                .compose(this.<NetResult>bindToLifecycle())
+                .compose(this.<JMChartResp>bindToLifecycle())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<NetResult>() {
+                .subscribe(new Consumer<JMChartResp>() {
                     @Override
-                    public void accept(NetResult jmChartResp) throws Exception {
+                    public void accept(JMChartResp jmChartResp) throws Exception {
                         if (jmChartResp == null) {
                             Log.e("jmChartResp is null");
                             Tools.toast(getApplicationContext(), "jmChartResp is null", true);
@@ -468,12 +469,13 @@ public class CreateRoomActivity extends BaseActivity {
                             Tools.toast(getApplicationContext(), jmChartResp.getMsg(), true);
                             return;
                         }
+
                         //退出Activity
+                        finish();
+
                         EventBusParam busParam = new EventBusParam();
                         busParam.setEventBusCode(EventBusParam.EVENT_BUS_CHATROOM_APPOINT);
                         EventBus.getDefault().post(busParam);
-
-                        finish();
                     }
                 }, new Consumer<Throwable>() {
                     @Override

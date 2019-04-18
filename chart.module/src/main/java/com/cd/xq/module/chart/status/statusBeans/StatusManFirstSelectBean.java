@@ -76,7 +76,7 @@ public class StatusManFirstSelectBean extends ChatBaseStatus {
         super.onPostHandler(resp,receiveBean);
         if(receiveBean.getMessageType() == MessageType.TYPE_RESPONSE) {
             mCompleteCount ++;
-            int allCount = mData.getLimitMan();
+            int allCount = mData.getLimit_man();
             boolean isLast = mCompleteCount>=allCount?true:false;
             resp.setLast(isLast);
             if(isLast) {

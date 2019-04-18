@@ -4,12 +4,14 @@ import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -49,11 +51,13 @@ import com.cd.xq.module.util.manager.DataManager;
 import com.cd.xq.module.util.network.NetWorkMg;
 import com.cd.xq.module.util.network.RequestApi;
 import com.cd.xq.module.util.status.BaseStatus;
+import com.cd.xq.module.util.tools.DateUtils;
 import com.cd.xq.module.util.tools.Log;
 import com.cd.xq.module.util.tools.Tools;
 import com.cd.xq.module.util.tools.XqErrorCode;
 import com.cd.xq.my.MyGiftBuyActivity;
 import com.cd.xq.network.XqRequestApi;
+import com.google.gson.Gson;
 import com.hjq.permissions.OnPermission;
 import com.hjq.permissions.Permission;
 import com.hjq.permissions.XXPermissions;
@@ -112,6 +116,9 @@ public class HomeFragment extends BaseFragment {
     private ArrayList<String> mImageList;
     private Dialog mRoomFloatDialog;
     private RoomFloatViewHolder mFloatViewHolder;
+    private JMChartResp mJmChartResp;
+    private Runnable mTimeDownRunnable;
+    private Handler mHandler;
 
     @Nullable
     @Override
@@ -123,6 +130,7 @@ public class HomeFragment extends BaseFragment {
         mApi = NetWorkMg.newRetrofit().create(RequestApi.class);
         mXqApi = NetWorkMg.newRetrofit().create(XqRequestApi.class);
         mChatApi = NetWorkMg.newRetrofit().create(ChatRequestApi.class);
+        mHandler = new Handler();
 
         init();
 
@@ -240,7 +248,11 @@ public class HomeFragment extends BaseFragment {
 
     private void toShowFloatBtn() {
         //判断是否要显示
-        linearLayoutFloatRoom.setVisibility(View.VISIBLE);
+        if(mJmChartResp != null) {
+            linearLayoutFloatRoom.setVisibility(View.VISIBLE);
+        }else {
+            linearLayoutFloatRoom.setVisibility(View.GONE);
+        }
     }
 
     private void initRoomFloatDialog() {
@@ -248,6 +260,7 @@ public class HomeFragment extends BaseFragment {
         View rootView = LayoutInflater.from(getActivity()).inflate(R.layout.layout_home_float_room, null);
         mFloatViewHolder = new RoomFloatViewHolder();
         mFloatViewHolder.rootView = rootView;
+        mFloatViewHolder.viewBtnLayout = rootView.findViewById(R.id.linearLayout_room_btn);
         mFloatViewHolder.textAppointTime = rootView.findViewById(R.id.text_room_appoint_time);
         mFloatViewHolder.textCount = rootView.findViewById(R.id.text_room_count);
         mFloatViewHolder.textCountDownTime = rootView.findViewById(R.id.text_room_time_count_down);
@@ -265,12 +278,26 @@ public class HomeFragment extends BaseFragment {
                 mRoomFloatDialog.dismiss();
             }
         });
+        mFloatViewHolder.btnExit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                requestExitChatRoom(-1); //预约退出的
+            }
+        });
         mRoomFloatDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
             @Override
             public void onDismiss(DialogInterface dialogInterface) {
                 toShowFloatBtn();
             }
         });
+
+        mTimeDownRunnable = new Runnable() {
+            @Override
+            public void run() {
+                calcFloatTimeDown();
+                mHandler.postDelayed(this,1000);
+            }
+        };
     }
 
     @Override
@@ -382,6 +409,146 @@ public class HomeFragment extends BaseFragment {
                         Log.e("requestGetBanner--" + throwable.toString());
                     }
                 });
+   }
+
+    /**
+     * 获取房间
+     */
+    private void requestGetChatRoomByUser() {
+        mApi.getChatRoomByUser(DataManager.getInstance().getUserInfo().getUser_name())
+                .compose(this.<JMChartResp>bindToLifecycle())
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Consumer<JMChartResp>() {
+                    @Override
+                    public void accept(JMChartResp netResult) throws Exception {
+                        if (netResult.getStatus() != XqErrorCode.SUCCESS) {
+                            Log.e("requestGetChatRoomByUser--" + netResult.getMsg());
+                            return;
+                        }
+
+                        if(netResult.getData() != null) {
+                            mJmChartResp = netResult;
+                            setFloatViewInfo();
+                            mRoomFloatDialog.show();
+                            mRoomFloatDialog.getWindow().setContentView(mFloatViewHolder.rootView);
+                        }
+                    }
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Exception {
+                        Log.e("requestGetChatRoomByUser--" + throwable.toString());
+                        Tools.toast(getActivity().getApplicationContext(),throwable.toString(),false);
+                    }
+                });
+    }
+
+    /**
+     * 退出房间
+     */
+   private void requestExitChatRoom(final int status) {
+       HashMap<String,Object> param = new HashMap<>();
+       param.put("userName",DataManager.getInstance().getUserInfo().getUser_name());
+       param.put("roomId",mJmChartResp.getData().getRoom_id());
+       param.put("status",status); //失败
+        mApi.exitChatRoom(param)
+                .compose(this.<NetResult>bindToLifecycle())
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Consumer<NetResult>() {
+                    @Override
+                    public void accept(NetResult netResult) throws Exception {
+                        if (netResult.getStatus() != XqErrorCode.SUCCESS) {
+                            Log.e("requestCancelChatRoom--" + netResult.getMsg());
+                            return;
+                        }
+
+                        mJmChartResp = null;
+                        mHandler.removeCallbacks(mTimeDownRunnable);
+                        mRoomFloatDialog.dismiss();
+                        if(status == -1) {
+                            Tools.toast(getActivity().getApplicationContext(),"退出房间成功",false);
+                        }
+                    }
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Exception {
+                        Log.e("requestCancelChatRoom--" + throwable.toString());
+                        Tools.toast(getActivity().getApplicationContext(),throwable.toString(),false);
+                    }
+                });
+   }
+
+    /**
+     * 设置float view info
+     */
+    private void setFloatViewInfo() {
+        if(mJmChartResp == null) return;
+        mHandler.removeCallbacks(mTimeDownRunnable);
+
+        mFloatViewHolder.textAppointTime.setText("开始时间：" + mJmChartResp.getData().getAppoint_time());
+        mFloatViewHolder.textCount.setText("人数：" + String.valueOf(mJmChartResp.getData().getLimit_angel()
+                + mJmChartResp.getData().getLimit_lady() + mJmChartResp.getData().getLimit_man()));
+        if(TextUtils.isEmpty(mJmChartResp.getData().getDescribe())) {
+            mFloatViewHolder.textDescription.setVisibility(View.GONE);
+        }else {
+            mFloatViewHolder.textDescription.setVisibility(View.VISIBLE);
+            mFloatViewHolder.textDescription.setText("描述：" + "\n" + mJmChartResp.getData().getDescribe());
+        }
+        mFloatViewHolder.textRoomID.setText("房间ID：" + String.valueOf(mJmChartResp.getData().getRoom_id()));
+        mFloatViewHolder.textTitle.setText("主题：" + mJmChartResp.getData().getTitle());
+
+        mHandler.post(mTimeDownRunnable);
+    }
+
+    private void calcFloatTimeDown() {
+        if(mJmChartResp == null) return;
+        long delta = -(System.currentTimeMillis() - DateUtils.getStringToDate(mJmChartResp.getData().getAppoint_time(),
+                "yyyy-MM-dd HH:mm:ss")*1000)/1000;
+        boolean isReturn = false;
+        String returnStr = "";
+        if(delta <= 0) {
+            isReturn = true;
+            returnStr = "已经开始";
+        }
+        if(mJmChartResp.getData().getWork() == 2) {
+            //房间结束
+            isReturn = true;
+            returnStr = "已结束";
+            mRoomFloatDialog.setCanceledOnTouchOutside(false);
+            mFloatViewHolder.viewBtnLayout.setVisibility(View.GONE);
+            mRoomFloatDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                @Override
+                public void onDismiss(DialogInterface dialog) {
+                    requestExitChatRoom(0); //结束，标识为失败
+                }
+            });
+        }
+
+        if(isReturn) {
+            mHandler.removeCallbacks(mTimeDownRunnable);
+            mFloatViewHolder.textCountDownTime.setText(returnStr);
+            textTimeCountDown.setText(returnStr);
+            return;
+        }
+
+        mFloatViewHolder.viewBtnLayout.setVisibility(View.VISIBLE);
+        int hour = (int) (delta/(60*60));
+        int min = (int) ((delta-hour*60*60)/60);
+        int sec = (int) ((delta - hour*60*60 - min*60));
+        String str = "";
+        if(hour > 0) {
+            str += hour+"时";
+        }
+        if(min > 0) {
+            str += min + "分";
+        }
+        if(sec > 0) {
+            str += sec + "秒";
+        }
+        String timeCount = "倒计时：" + str;
+        mFloatViewHolder.textCountDownTime.setText(timeCount);
+        textTimeCountDown.setText(str);
     }
 
 
@@ -423,20 +590,15 @@ public class HomeFragment extends BaseFragment {
     public void onDestroyView() {
         super.onDestroyView();
         unbinder.unbind();
+        mHandler.removeCallbacks(mTimeDownRunnable);
     }
 
     @Override
     public void onLogin() {
         super.onLogin();
         setOnLookerRecyclerView();
-    }
-
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onEventBus(EventBusParam param) {
-        if(param.getEventBusCode() == EventBusParam.EVENT_BUS_CHATROOM_APPOINT) {
-            //房间预约
-            Log.e("yy","预约成功");
-        }
+        //获取房间
+        requestGetChatRoomByUser();
     }
 
     /**
@@ -578,7 +740,7 @@ public class HomeFragment extends BaseFragment {
      * @param param
      */
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onChatRoomUpdate(EventBusParam<BusChatRoomParam> param) {
+    public void onChatRoomUpdate(EventBusParam param) {
         if (param.getEventBusCode() == EventBusParam.EVENT_BUS_CHATROOM_CREATE
                 || param.getEventBusCode() == EventBusParam.EVENT_BUS_CHATROOM_DELETE) {
             //更新聊天室列表
@@ -591,6 +753,9 @@ public class HomeFragment extends BaseFragment {
 
                 }
             });
+        }else if(param.getEventBusCode() == EventBusParam.EVENT_BUS_CHATROOM_APPOINT) {
+            //房间预约,更新我的房间
+            requestGetChatRoomByUser();
         }
     }
 
@@ -770,6 +935,7 @@ public class HomeFragment extends BaseFragment {
      */
     private class RoomFloatViewHolder {
         public View rootView;
+        public View viewBtnLayout;
         public TextView textTitle;
         public TextView textRoomID;
         public TextView textCount;

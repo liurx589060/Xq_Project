@@ -437,7 +437,7 @@ public class XqStatusChartUIViewMg extends AbsChartView{
         params.put("userName",reportUserInfo.getUser_name());
         params.put("reportType",reportType);
         params.put("reportMsg",reportMsg);
-        params.put("roomId",DataManager.getInstance().getChartData().getRoomId());
+        params.put("roomId",DataManager.getInstance().getChartData().getRoom_id());
         mChatApi.reportUser(params)
                 .subscribeOn(Schedulers.io())
                 .compose(mXqActivity.<NetResult<String>>bindToLifecycle())
@@ -581,14 +581,14 @@ public class XqStatusChartUIViewMg extends AbsChartView{
     private void initAndSetContentView() {
         //摄像头推送
         mXqCameraViewMg = new XqTxPushViewMg();
-        String pushAddress = new String(Base64.decode(DataManager.getInstance().getChartData().getPushAddress().getBytes(),Base64.DEFAULT));
+        String pushAddress = new String(Base64.decode(DataManager.getInstance().getChartData().getPush_address().getBytes(),Base64.DEFAULT));
         mXqCameraViewMg.init(mXqActivity,pushAddress);
         Log.i("yy","pushAddress=" + pushAddress);
         mXqCameraViewMg.setVisible(false);
 
         //摄像头播放
         mXqPlayerViewMg = new XqTxPlayerViewMg();
-        String playAddress = new String(Base64.decode(DataManager.getInstance().getChartData().getPlayAddress().getBytes(),Base64.DEFAULT));
+        String playAddress = new String(Base64.decode(DataManager.getInstance().getChartData().getPlay_address().getBytes(),Base64.DEFAULT));
         mXqPlayerViewMg.init(mXqActivity,playAddress);
         Log.i("yy","playAddress=" + playAddress);
         mXqPlayerViewMg.setVisible(false);
@@ -608,7 +608,7 @@ public class XqStatusChartUIViewMg extends AbsChartView{
     }
 
     public void updateChatRoomMembersList() {
-        getChartRoomMembersList(DataManager.getInstance().getChartData().getRoomId());
+        getChartRoomMembersList(DataManager.getInstance().getChartData().getRoom_id());
     }
 
 //    public void updateMember() {
@@ -660,7 +660,7 @@ public class XqStatusChartUIViewMg extends AbsChartView{
 
     private void deleteChartRoom() {
         HashMap<String,Object> params = new HashMap<>();
-        params.put("roomId",DataManager.getInstance().getChartData().getRoomId());
+        params.put("roomId",DataManager.getInstance().getChartData().getRoom_id());
         params.put("userName",DataManager.getInstance().getUserInfo().getUser_name());
         params.put("status",mIsRoomMatchSuccess?1:0);
         mApi.deleteChartRoom(params)
@@ -692,7 +692,7 @@ public class XqStatusChartUIViewMg extends AbsChartView{
     @SuppressLint("CheckResult")
     private void exitChartRoom() {
         HashMap<String,Object> params = new HashMap<>();
-        params.put("roomId",DataManager.getInstance().getChartData().getRoomId());
+        params.put("roomId",DataManager.getInstance().getChartData().getRoom_id());
         params.put("userName",DataManager.getInstance().getUserInfo().getUser_name());
         params.put("roomRoleType",DataManager.getInstance().getSelfMember().getRoomRoleType());
         params.put("status",mIsSelefMatchSuccess?1:0);
@@ -731,7 +731,7 @@ public class XqStatusChartUIViewMg extends AbsChartView{
                                 normalSendBean.setCode(progressStatus);
                                 normalSendBean.setTargetUserName(member.getUserInfo().getUser_name());
                                 normalSendBean.setTime(Tools.getCurrentDateTime());
-                                normalSendBean.setRoomId(DataManager.getInstance().getChartData().getRoomId());
+                                normalSendBean.setRoomId(DataManager.getInstance().getChartData().getRoom_id());
                                 normalSendBean.setMsg(DataManager.getInstance().getUserInfo().getNick_name() + "--离开房间");
                                 JMsgSender.sendNomalMessage(normalSendBean);
                             }
@@ -756,7 +756,7 @@ public class XqStatusChartUIViewMg extends AbsChartView{
             if(!member.getUserInfo().getUser_name().equals(DataManager.getInstance().getUserInfo().getUser_name())) {
                 JMNormalSendBean normalSendBean = new JMNormalSendBean();
                 normalSendBean.setCode(code);
-                normalSendBean.setRoomId(DataManager.getInstance().getChartData().getRoomId());
+                normalSendBean.setRoomId(DataManager.getInstance().getChartData().getRoom_id());
                 normalSendBean.setTargetUserName(member.getUserInfo().getUser_name());
                 JMsgSender.sendNomalMessage(normalSendBean);
             }
@@ -790,7 +790,7 @@ public class XqStatusChartUIViewMg extends AbsChartView{
             }catch (Exception e) {
 
             }
-            sendBean1.setRoomId(DataManager.getInstance().getChartData().getRoomId());
+            sendBean1.setRoomId(DataManager.getInstance().getChartData().getRoom_id());
             sendBean1.setTargetUserName(targetBean.getUser_name());
             sendBean1.setExtra(extraStr);
             JMsgSender.sendNomalMessage(sendBean1);
@@ -1301,7 +1301,7 @@ public class XqStatusChartUIViewMg extends AbsChartView{
                 return;
             }
             JMChartRoomSendBean chartRoomSendBean = new Gson().fromJson(text,JMChartRoomSendBean.class);
-            if(chartRoomSendBean.getRoomId() != DataManager.getInstance().getChartData().getRoomId())
+            if(chartRoomSendBean.getRoomId() != DataManager.getInstance().getChartData().getRoom_id())
             {
                 return;
             }
@@ -1334,7 +1334,7 @@ public class XqStatusChartUIViewMg extends AbsChartView{
         }
 
         JMNormalSendBean normalSendBean = new Gson().fromJson(text,JMNormalSendBean.class);
-        if(normalSendBean.getRoomId() != DataManager.getInstance().getChartData().getRoomId())
+        if(normalSendBean.getRoomId() != DataManager.getInstance().getChartData().getRoom_id())
         {
             return;
         }
@@ -1415,7 +1415,7 @@ public class XqStatusChartUIViewMg extends AbsChartView{
         JMNormalSendBean sendBean = new JMNormalSendBean();
         sendBean.setCode(JMChartRoomSendBean.CHART_ONLOOKER_ENTER_STATUS);
         sendBean.setTargetUserName(userName);
-        sendBean.setRoomId(DataManager.getInstance().getChartData().getRoomId());
+        sendBean.setRoomId(DataManager.getInstance().getChartData().getRoom_id());
         JSONObject object = new JSONObject();
         try {
             ArrayList<String> manList = new ArrayList<>();

@@ -56,7 +56,7 @@ public class StatusMatchBean extends ChatBaseStatus {
 
     @Override
     public boolean isLast(int completeCount,JMChartRoomSendBean receiveBean) {
-        int allCount = mData.getLimitAngel() + mData.getLimitMan() + mData.getLimitLady();
+        int allCount = mData.getLimit_angel() + mData.getLimit_man() + mData.getLimit_lady();
         boolean isLast = receiveBean.getCurrentCount()>=allCount?true:false;
         return isLast;
     }

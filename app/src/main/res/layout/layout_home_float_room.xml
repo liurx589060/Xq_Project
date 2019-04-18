@@ -65,6 +65,7 @@
             android:layout_marginTop="@dimen/dp_10"/>
 
         <LinearLayout
+            android:id="@+id/linearLayout_room_btn"
             android:layout_width="match_parent"
             android:layout_height="@dimen/dp_30"
             android:orientation="horizontal"

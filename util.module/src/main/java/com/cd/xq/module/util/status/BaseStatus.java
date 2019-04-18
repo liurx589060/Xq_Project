@@ -240,7 +240,7 @@ public abstract class BaseStatus {
         bean.setGender(selfInfo.getGender());
         bean.setCurrentCount(data.getMembers().size());
         bean.setIndexSelf(DataManager.getInstance().getSelfMember().getIndex());
-        bean.setRoomId(data.getRoomId());
+        bean.setRoomId(data.getRoom_id());
         bean.setTime(Tools.getCurrentDateTime());
         bean.setUserName(selfInfo.getUser_name());
         bean.setProcessStatus(getStatus());
