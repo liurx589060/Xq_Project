@@ -7,6 +7,7 @@ package com.cd.xq.module.util.beans;
 public class EventBusParam<T> {
     public static final int EVENT_BUS_CHATROOM_CREATE = 1;  //创建房间
     public static final int EVENT_BUS_CHATROOM_DELETE = 2;  //删除房间
+    public static final int EVENT_BUS_CHATROOM_APPOINT = 3;  //预约房间
 
     public static final int EVENT_BUS_PAY_SUCCESS = 100; //订单支付成功
 

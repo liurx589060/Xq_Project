@@ -1,6 +1,6 @@
 package com.cd.xq.frame;
 
-import android.app.Activity;
+import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -16,6 +16,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -43,7 +44,6 @@ import com.cd.xq.module.util.beans.jmessage.JMChartResp;
 import com.cd.xq.module.util.beans.jmessage.JMChartRoomSendBean;
 import com.cd.xq.module.util.beans.user.UserInfoBean;
 import com.cd.xq.module.util.common.MultiItemDivider;
-import com.cd.xq.module.util.interfaces.ICheckBlackListener;
 import com.cd.xq.module.util.jmessage.JMsgSender;
 import com.cd.xq.module.util.manager.DataManager;
 import com.cd.xq.module.util.network.NetWorkMg;
@@ -66,6 +66,7 @@ import com.stx.xhb.xbanner.XBanner;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -73,6 +74,7 @@ import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import butterknife.Unbinder;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.functions.Consumer;
@@ -96,6 +98,10 @@ public class HomeFragment extends BaseFragment {
     SmartRefreshLayout homeRefreshLayout;
     @BindView(R.id.home_btn_friend)
     Button homeBtnFriend;
+    @BindView(R.id.text_time_count_down)
+    TextView textTimeCountDown;
+    @BindView(R.id.linearLayout_float_room)
+    LinearLayout linearLayoutFloatRoom;
 
     private RequestApi mApi;
     private XqRequestApi mXqApi;
@@ -104,6 +110,8 @@ public class HomeFragment extends BaseFragment {
     private ArrayList<BGetArrays> m_roomList;
     private OnLookerRecyclerViewAdapter mOnLookerAdapter;
     private ArrayList<String> mImageList;
+    private Dialog mRoomFloatDialog;
+    private RoomFloatViewHolder mFloatViewHolder;
 
     @Nullable
     @Override
@@ -136,7 +144,7 @@ public class HomeFragment extends BaseFragment {
         homeBtnFriend.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(!DataManager.getInstance().getUserInfo().isOnLine()) {
+                if (!DataManager.getInstance().getUserInfo().isOnLine()) {
                     Tools.toast(getActivity(), "请先登录...", true);
                     return;
                 }
@@ -158,7 +166,7 @@ public class HomeFragment extends BaseFragment {
                             return;
                         }
 
-                        if(!DataManager.getInstance().getUserInfo().isOnLine()) {
+                        if (!DataManager.getInstance().getUserInfo().isOnLine()) {
                             Tools.toast(getActivity(), "请先登录...", true);
                             return;
                         }
@@ -168,7 +176,7 @@ public class HomeFragment extends BaseFragment {
                             return;
                         }
 
-                        Intent intent = new Intent(getActivity(),CreateRoomActivity.class);
+                        Intent intent = new Intent(getActivity(), CreateRoomActivity.class);
                         getActivity().startActivity(intent);
                     }
 
@@ -215,9 +223,54 @@ public class HomeFragment extends BaseFragment {
             }
         });
 
+        linearLayoutFloatRoom.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                linearLayoutFloatRoom.setVisibility(View.GONE);
+                mRoomFloatDialog.show();
+                mRoomFloatDialog.getWindow().setContentView(mFloatViewHolder.rootView);
+            }
+        });
+
         requestGetBanner();
         setOnLookerRecyclerView();
         initSmartRefreshLayout();
+        initRoomFloatDialog();
+    }
+
+    private void toShowFloatBtn() {
+        //判断是否要显示
+        linearLayoutFloatRoom.setVisibility(View.VISIBLE);
+    }
+
+    private void initRoomFloatDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        View rootView = LayoutInflater.from(getActivity()).inflate(R.layout.layout_home_float_room, null);
+        mFloatViewHolder = new RoomFloatViewHolder();
+        mFloatViewHolder.rootView = rootView;
+        mFloatViewHolder.textAppointTime = rootView.findViewById(R.id.text_room_appoint_time);
+        mFloatViewHolder.textCount = rootView.findViewById(R.id.text_room_count);
+        mFloatViewHolder.textCountDownTime = rootView.findViewById(R.id.text_room_time_count_down);
+        mFloatViewHolder.textDescription = rootView.findViewById(R.id.text_room_description);
+        mFloatViewHolder.textRoomID = rootView.findViewById(R.id.text_room_id);
+        mFloatViewHolder.textTitle = rootView.findViewById(R.id.text_room_title);
+        mFloatViewHolder.btnEnter = rootView.findViewById(R.id.btn_room_enter);
+        mFloatViewHolder.btnExit = rootView.findViewById(R.id.btn_room_exit);
+        mFloatViewHolder.imageClose = rootView.findViewById(R.id.image_room_close);
+
+        mRoomFloatDialog = builder.create();
+        mFloatViewHolder.imageClose.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mRoomFloatDialog.dismiss();
+            }
+        });
+        mRoomFloatDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialogInterface) {
+                toShowFloatBtn();
+            }
+        });
     }
 
     @Override
@@ -228,11 +281,12 @@ public class HomeFragment extends BaseFragment {
 
     /**
      * 加入房间
+     *
      * @param roomRoleType
      * @param roomId
      */
     private void joinChartRoom(int roomRoleType, long roomId) {
-        if(!DataManager.getInstance().getUserInfo().isOnLine()) {
+        if (!DataManager.getInstance().getUserInfo().isOnLine()) {
             Tools.toast(getActivity(), "请先登录...", true);
             return;
         }
@@ -311,12 +365,12 @@ public class HomeFragment extends BaseFragment {
                 .subscribe(new Consumer<NetResult<List<BGetBanner>>>() {
                     @Override
                     public void accept(NetResult<List<BGetBanner>> bGetBannerNetResult) throws Exception {
-                        if(bGetBannerNetResult.getStatus() != XqErrorCode.SUCCESS) {
+                        if (bGetBannerNetResult.getStatus() != XqErrorCode.SUCCESS) {
                             Log.e("requestGetBanner--" + bGetBannerNetResult.getMsg());
                             return;
                         }
                         mImageList.clear();
-                        for(int i = 0 ; i < bGetBannerNetResult.getData().size() ; i++) {
+                        for (int i = 0; i < bGetBannerNetResult.getData().size(); i++) {
                             mImageList.add(bGetBannerNetResult.getData().get(i).getImage());
                         }
                         initXBanner();
@@ -324,7 +378,7 @@ public class HomeFragment extends BaseFragment {
                 }, new Consumer<Throwable>() {
                     @Override
                     public void accept(Throwable throwable) throws Exception {
-                        Tools.toast(getActivity().getApplicationContext(),throwable.toString(),false);
+                        Tools.toast(getActivity().getApplicationContext(), throwable.toString(), false);
                         Log.e("requestGetBanner--" + throwable.toString());
                     }
                 });
@@ -377,8 +431,17 @@ public class HomeFragment extends BaseFragment {
         setOnLookerRecyclerView();
     }
 
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onEventBus(EventBusParam param) {
+        if(param.getEventBusCode() == EventBusParam.EVENT_BUS_CHATROOM_APPOINT) {
+            //房间预约
+            Log.e("yy","预约成功");
+        }
+    }
+
     /**
      * 申请权限
+     *
      * @param onPermission
      */
     private void requestPermission(OnPermission onPermission) {
@@ -463,7 +526,7 @@ public class HomeFragment extends BaseFragment {
         public OnLookerViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
             OnLookerViewHolder holder = new OnLookerViewHolder(LayoutInflater.from(getActivity())
                     .inflate(
-                    R.layout.layout_home_onlooker_recycler_item, null));
+                            R.layout.layout_home_onlooker_recycler_item, null));
             return holder;
         }
 
@@ -511,15 +574,16 @@ public class HomeFragment extends BaseFragment {
 
     /**
      * EventBus事件
+     *
      * @param param
      */
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onChatRoomUpdate(EventBusParam<BusChatRoomParam> param) {
-        if(param.getEventBusCode() == EventBusParam.EVENT_BUS_CHATROOM_CREATE
+        if (param.getEventBusCode() == EventBusParam.EVENT_BUS_CHATROOM_CREATE
                 || param.getEventBusCode() == EventBusParam.EVENT_BUS_CHATROOM_DELETE) {
             //更新聊天室列表
             setOnLookerRecyclerView();
-        }else if(param.getEventBusCode() == EventBusParam.EVENT_BUS_CHECK_BLACKUSER) {
+        } else if (param.getEventBusCode() == EventBusParam.EVENT_BUS_CHECK_BLACKUSER) {
             //检查是否是黑名单
             Tools.checkUserOrBlack(getActivity(), DataManager.getInstance().getUserInfo().getUser_name(), new BlackCheckListener() {
                 @Override
@@ -534,34 +598,34 @@ public class HomeFragment extends BaseFragment {
     /*******************参与者加入房间**************************/
     private void toCommitJoinParticipant() {
         //加入房间
-        mXqApi.checkRoomExpiry(DataManager.getInstance().getUserInfo().getUser_name(),2)
+        mXqApi.checkRoomExpiry(DataManager.getInstance().getUserInfo().getUser_name(), 2)
                 .compose(this.<NetResult<BCheckRoomExpiry>>bindToLifecycle())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Consumer<NetResult<BCheckRoomExpiry>>() {
                     @Override
                     public void accept(NetResult<BCheckRoomExpiry> bCheckRoomExpiry) throws Exception {
-                        if(bCheckRoomExpiry.getStatus() != XqErrorCode.SUCCESS) {
+                        if (bCheckRoomExpiry.getStatus() != XqErrorCode.SUCCESS) {
                             Tools.toast(getActivity().getApplicationContext(), bCheckRoomExpiry.getMsg(), false);
                             Log.e("checkRoomExpiry--" + bCheckRoomExpiry.getMsg());
                             return;
                         }
 
-                        if(bCheckRoomExpiry.getData().getExpiry() != null) {
+                        if (bCheckRoomExpiry.getData().getExpiry() != null) {
                             //有使用中的卡,则直接创建房间
                             String str = "您有使用中的" + bCheckRoomExpiry.getData().getExpiry().getName() +
                                     ",可免费加入房间,剩余次数" + bCheckRoomExpiry.getData().getExpiry().getExpiry_num();
-                            Toast toast = Toast.makeText(getActivity().getApplicationContext(),str,Toast.LENGTH_LONG);
-                            toast.setGravity(Gravity.TOP,0,0);
+                            Toast toast = Toast.makeText(getActivity().getApplicationContext(), str, Toast.LENGTH_LONG);
+                            toast.setGravity(Gravity.TOP, 0, 0);
                             toast.show();
 
                             //加入房间
-                            joinChartRoom(Constant.ROOM_ROLETYPE_PARTICIPANTS,-1);
-                        }else {
-                            if(bCheckRoomExpiry.getData().getHasCard() == 1) {
+                            joinChartRoom(Constant.ROOM_ROLETYPE_PARTICIPANTS, -1);
+                        } else {
+                            if (bCheckRoomExpiry.getData().getHasCard() == 1) {
                                 //有未使用的卡，提示是否使用卡
                                 doCreateUseCardDialog(bCheckRoomExpiry.getData());
-                            }else {
+                            } else {
                                 //没有卡，则提示是否使用钻石创建房间
                                 doCreateCoinDialog(bCheckRoomExpiry.getData());
                             }
@@ -578,22 +642,23 @@ public class HomeFragment extends BaseFragment {
 
     /**
      * 去消费
+     *
      * @param item
      * @param handleType
      */
     private void doRequestConsumeGift(final BGetGiftItem item, int handleType) {
         //用钻石消费
-        if(handleType == 1 && !ChatTools.checkBalance(getActivity(),item.getCoin())) return;
-        requestConsumeGift(item,handleType);
+        if (handleType == 1 && !ChatTools.checkBalance(getActivity(), item.getCoin())) return;
+        requestConsumeGift(item, handleType);
     }
 
     private void requestConsumeGift(final BGetGiftItem item, final int handleType) {
-        HashMap<String,Object> params = new HashMap<>();
+        HashMap<String, Object> params = new HashMap<>();
         params.put("userName", DataManager.getInstance().getUserInfo().getUser_name());
-        params.put("giftId",item.getGift_id());
-        params.put("coin",item.getCoin());
-        params.put("toUser",DataManager.getInstance().getUserInfo().getUser_name());
-        params.put("handleType",handleType);  //消费方式
+        params.put("giftId", item.getGift_id());
+        params.put("coin", item.getCoin());
+        params.put("toUser", DataManager.getInstance().getUserInfo().getUser_name());
+        params.put("handleType", handleType);  //消费方式
         mChatApi.consumeGift(params)
                 .compose(this.<NetResult<BConsumeGift>>bindToLifecycle())
                 .subscribeOn(Schedulers.io())
@@ -602,12 +667,12 @@ public class HomeFragment extends BaseFragment {
                     @Override
                     public void accept(NetResult<BConsumeGift> netResult) throws Exception {
                         if (netResult.getStatus() != XqErrorCode.SUCCESS) {
-                            if(netResult.getStatus() == XqErrorCode.ERROR_LACK_STOCK) {
+                            if (netResult.getStatus() == XqErrorCode.ERROR_LACK_STOCK) {
                                 //余额不足
                                 //更新余额
                                 DataManager.getInstance().getUserInfo().setBalance(netResult.getData().getBalance());
-                                doRequestConsumeGift(item,handleType);
-                            }else {
+                                doRequestConsumeGift(item, handleType);
+                            } else {
                                 Tools.toast(getActivity().getApplicationContext(), netResult.getMsg(), false);
                             }
                             Log.e("requestConsumeGift--" + netResult.getMsg());
@@ -617,7 +682,7 @@ public class HomeFragment extends BaseFragment {
                         //更新余额
                         DataManager.getInstance().getUserInfo().setBalance(netResult.getData().getBalance());
                         //加入房间
-                        joinChartRoom(Constant.ROOM_ROLETYPE_PARTICIPANTS,-1);
+                        joinChartRoom(Constant.ROOM_ROLETYPE_PARTICIPANTS, -1);
                     }
                 }, new Consumer<Throwable>() {
                     @Override
@@ -630,6 +695,7 @@ public class HomeFragment extends BaseFragment {
 
     /**
      * 创建是否使用建房卡
+     *
      * @param checkRoomExpiry
      */
     private void doCreateUseCardDialog(final BCheckRoomExpiry checkRoomExpiry) {
@@ -643,7 +709,7 @@ public class HomeFragment extends BaseFragment {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         //使用卡,包裹使用
-                        doRequestConsumeGift(checkRoomExpiry.getGift(),2);
+                        doRequestConsumeGift(checkRoomExpiry.getGift(), 2);
                     }
                 })
                 .setNegativeButton("取消", new DialogInterface.OnClickListener() {
@@ -655,7 +721,7 @@ public class HomeFragment extends BaseFragment {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         //钻石消费
-                        doRequestConsumeGift(checkRoomExpiry.getTargetGift(),1);
+                        doRequestConsumeGift(checkRoomExpiry.getTargetGift(), 1);
                     }
                 });
         AlertDialog dialog = builder.create();
@@ -664,6 +730,7 @@ public class HomeFragment extends BaseFragment {
 
     /**
      * 创建是否购买建房卡
+     *
      * @param checkRoomExpiry
      */
     private void doCreateCoinDialog(final BCheckRoomExpiry checkRoomExpiry) {
@@ -690,10 +757,27 @@ public class HomeFragment extends BaseFragment {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         //钻石消费
-                        doRequestConsumeGift(checkRoomExpiry.getTargetGift(),1);
+                        doRequestConsumeGift(checkRoomExpiry.getTargetGift(), 1);
                     }
                 });
         AlertDialog dialog = builder.create();
         dialog.show();
+    }
+
+
+    /**
+     * Float room viewHolder右下角房间按钮
+     */
+    private class RoomFloatViewHolder {
+        public View rootView;
+        public TextView textTitle;
+        public TextView textRoomID;
+        public TextView textCount;
+        public TextView textAppointTime;
+        public TextView textCountDownTime;
+        public TextView textDescription;
+        public Button btnExit;
+        public Button btnEnter;
+        public ImageView imageClose;
     }
 }

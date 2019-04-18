@@ -19,6 +19,8 @@ public class Data {
     private List<Member> onLookers;
     private String creater = "";
     private String appoint_time = "";
+    private String title = "";
+    private String describe = "";
     public void setRoomId(long roomId) {
          this.roomId = roomId;
      }
@@ -109,5 +111,21 @@ public class Data {
 
     public void setAppoint_time(String appoint_time) {
         this.appoint_time = appoint_time;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getDescribe() {
+        return describe;
+    }
+
+    public void setDescribe(String describe) {
+        this.describe = describe;
     }
 }

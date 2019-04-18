@@ -46,8 +46,8 @@ public interface RequestApi {
     @GET("JMessage/getChartRoomMemeberList")
     Observable<JMChartResp> getChartMembersByUserName(@Query("userName") String userName);
 
-    @GET("JMessage/createChartRoom")
-    Observable<JMChartResp> createChartRoom(@QueryMap Map<String, Object> map);
+    @GET("JMessage/appointChatRoom")
+    Observable<NetResult> appointChatRoom(@QueryMap Map<String, Object> map);
 
     @GET("JMessage/exitChartRoom")
     Observable<JMChartResp> exitChartRoom(@QueryMap Map<String, Object> map);

@@ -15,6 +15,7 @@ import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Toast;
+
 import com.bigkoo.pickerview.builder.TimePickerBuilder;
 import com.bigkoo.pickerview.listener.OnTimeSelectListener;
 import com.bigkoo.pickerview.view.TimePickerView;
@@ -28,6 +29,7 @@ import com.cd.xq.module.chart.network.ChatRequestApi;
 import com.cd.xq.module.chart.utils.ChatTools;
 import com.cd.xq.module.util.Constant;
 import com.cd.xq.module.util.base.BaseActivity;
+import com.cd.xq.module.util.beans.EventBusParam;
 import com.cd.xq.module.util.beans.NetResult;
 import com.cd.xq.module.util.beans.jmessage.JMChartResp;
 import com.cd.xq.module.util.beans.user.UserInfoBean;
@@ -40,6 +42,8 @@ import com.cd.xq.module.util.tools.Tools;
 import com.cd.xq.module.util.tools.XqErrorCode;
 import com.cd.xq.my.MyGiftBuyActivity;
 import com.cd.xq.network.XqRequestApi;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
@@ -78,6 +82,8 @@ public class CreateRoomActivity extends BaseActivity {
     EditText editLadyCount;
     @BindView(R.id.btn_start_time)
     Button btnStartTime;
+    @BindView(R.id.edit_description)
+    EditText editDescription;
 
     private boolean mIsPublic = true;
     private XqRequestApi mApi;
@@ -124,11 +130,11 @@ public class CreateRoomActivity extends BaseActivity {
         Calendar startDate = Calendar.getInstance();
         Calendar endDate = Calendar.getInstance();
         startDate.setTimeInMillis(System.currentTimeMillis());
-        endDate.setTimeInMillis(System.currentTimeMillis() + 20*60*1000);
+        endDate.setTimeInMillis(System.currentTimeMillis() + 20 * 60 * 1000);
         mDialogAll = new TimePickerBuilder(this, new OnTimeSelectListener() {
             @Override
             public void onTimeSelect(Date date, View v) {
-                mStartTime = DateUtils.timeStampToStr(date.getTime()/1000,"yyyy-MM-dd HH:mm:00");
+                mStartTime = DateUtils.timeStampToStr(date.getTime() / 1000, "yyyy-MM-dd HH:mm:00");
                 btnStartTime.setText("已预约的时间\n" + mStartTime);
             }
         })
@@ -148,16 +154,16 @@ public class CreateRoomActivity extends BaseActivity {
                 .setTextColorOut(Color.parseColor("#666666"))
                 .setBgColor(Color.parseColor("#dddddd"))//滚轮背景颜色 Night mode
                 .setDate(startDate)// 如果不设置的话，默认是系统时间*/
-                .setRangDate(startDate,endDate)//起始终止年月日设定
-                .setLabel("年","月","日","时","分","秒")//默认设置为年月日时分秒
+                .setRangDate(startDate, endDate)//起始终止年月日设定
+                .setLabel("年", "月", "日", "时", "分", "秒")//默认设置为年月日时分秒
                 .isCenterLabel(false) //是否只显示中间选中项的label文字，false则每项item全部都带有label。
                 .isDialog(false)//是否显示为对话框样式
                 .build();
     }
 
     private void toCommit() {
-        if(TextUtils.isEmpty(mStartTime)) {
-            Tools.toast(getApplicationContext(),"请选择开始开始时间",false);
+        if (TextUtils.isEmpty(mStartTime)) {
+            Tools.toast(getApplicationContext(), "请选择开始开始时间", false);
             return;
         }
         //创建房间
@@ -428,7 +434,7 @@ public class CreateRoomActivity extends BaseActivity {
         params.put("limitLady", userInfo.getLimitLady());
         params.put("limitMan", userInfo.getLimitMan());
         params.put("limitAngel", userInfo.getLimitAngel());
-        params.put("appointTime",mStartTime);
+        params.put("appointTime", mStartTime);
         params.put("pushAddress", Base64.encodeToString(mTXPushAddress.getBytes(), Base64.DEFAULT));
         params.put("playAddress", Base64.encodeToString(mTXPlayerAddress.getBytes(),
                 Base64.DEFAULT));
@@ -437,20 +443,21 @@ public class CreateRoomActivity extends BaseActivity {
         if (TextUtils.isEmpty(title)) {
             title = editTitle.getHint().toString();
         }
-        params.put("describe", title);
+        params.put("title", title);
+        params.put("describe", editDescription.getText().toString());
 
         if (userInfo.getLimitLady() % 2 != 0) {
             Tools.toast(getApplicationContext(), "请输入偶数", true);
             return;
         }
 
-        mCommonApi.createChartRoom(params)
+        mCommonApi.appointChatRoom(params)
                 .subscribeOn(Schedulers.io())
-                .compose(this.<JMChartResp>bindToLifecycle())
+                .compose(this.<NetResult>bindToLifecycle())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<JMChartResp>() {
+                .subscribe(new Consumer<NetResult>() {
                     @Override
-                    public void accept(JMChartResp jmChartResp) throws Exception {
+                    public void accept(NetResult jmChartResp) throws Exception {
                         if (jmChartResp == null) {
                             Log.e("jmChartResp is null");
                             Tools.toast(getApplicationContext(), "jmChartResp is null", true);
@@ -461,10 +468,11 @@ public class CreateRoomActivity extends BaseActivity {
                             Tools.toast(getApplicationContext(), jmChartResp.getMsg(), true);
                             return;
                         }
-                        DataManager.getInstance().setChartData(jmChartResp.getData());
-                        Intent intent = new Intent(getApplicationContext(), ChartRoomActivity.class);
-                        startActivity(intent);
                         //退出Activity
+                        EventBusParam busParam = new EventBusParam();
+                        busParam.setEventBusCode(EventBusParam.EVENT_BUS_CHATROOM_APPOINT);
+                        EventBus.getDefault().post(busParam);
+
                         finish();
                     }
                 }, new Consumer<Throwable>() {
@@ -476,7 +484,7 @@ public class CreateRoomActivity extends BaseActivity {
                 });
     }
 
-    @OnClick({R.id.btn_back, R.id.btn_commit,R.id.btn_start_time})
+    @OnClick({R.id.btn_back, R.id.btn_commit, R.id.btn_start_time})
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.btn_back:
@@ -487,10 +495,10 @@ public class CreateRoomActivity extends BaseActivity {
                 break;
             case R.id.btn_start_time:
                 Calendar calendar = Calendar.getInstance();
-                if(TextUtils.isEmpty(mStartTime)) {
+                if (TextUtils.isEmpty(mStartTime)) {
                     calendar.setTimeInMillis(System.currentTimeMillis());
-                }else {
-                    calendar.setTimeInMillis(1000*DateUtils.getStringToDate(mStartTime,"yyyy-MM-dd HH:mm:ss"));
+                } else {
+                    calendar.setTimeInMillis(1000 * DateUtils.getStringToDate(mStartTime, "yyyy-MM-dd HH:mm:ss"));
                 }
                 mDialogAll.setDate(calendar);
                 mDialogAll.show();

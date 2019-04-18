@@ -55,6 +55,23 @@
         android:padding="@dimen/dp_10"
         />
 
+    <EditText
+        android:id="@+id/edit_description"
+        android:layout_toRightOf="@+id/register_img_head"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="@dimen/dp_10"
+        android:layout_marginRight="@dimen/dp_5"
+        android:layout_marginLeft="@dimen/dp_5"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp_90"
+        android:hint="房间说明（如：广东地区）(选填)"
+        android:textSize="@dimen/sp_14"
+        android:textColor="#333333"
+        android:gravity="top"
+        android:padding="@dimen/dp_6"
+        android:background="@drawable/shape_register_text_ps_bg"
+        />
+
     <Button
         android:id="@+id/btn_start_time"
         android:layout_width="match_parent"

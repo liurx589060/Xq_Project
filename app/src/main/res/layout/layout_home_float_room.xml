@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="@dimen/dp_20"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/text_room_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="主题：Hello World!"
+            android:textColor="#aaaaaa"
+            android:textSize="@dimen/sp_14"/>
+
+        <TextView
+            android:id="@+id/text_room_id"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="房间ID：123456"
+            android:textColor="#aaaaaa"
+            android:textSize="@dimen/sp_14"
+            android:layout_marginTop="@dimen/dp_5"
+            android:textIsSelectable="true"/>
+
+        <TextView
+            android:id="@+id/text_room_count"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="参与人数：12"
+            android:textColor="#aaaaaa"
+            android:textSize="@dimen/sp_14"
+            android:layout_marginTop="@dimen/dp_5"
+            android:textIsSelectable="true"/>
+
+        <TextView
+            android:id="@+id/text_room_appoint_time"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="开始时间：2019-04-18 14:42"
+            android:textColor="#aaaaaa"
+            android:textSize="@dimen/sp_14"
+            android:layout_marginTop="@dimen/dp_5"/>
+
+        <TextView
+            android:id="@+id/text_room_description"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="房间描述:"
+            android:textColor="#aaaaaa"
+            android:textSize="@dimen/sp_14"
+            android:layout_marginTop="@dimen/dp_5"/>
+
+        <TextView
+            android:id="@+id/text_room_time_count_down"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="倒计时：30分15秒"
+            android:textStyle="bold"
+            android:textColor="#E9967A"
+            android:textSize="@dimen/sp_16"
+            android:layout_marginTop="@dimen/dp_10"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/dp_30"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:layout_marginTop="@dimen/dp_20">
+
+            <Button
+                android:id="@+id/btn_room_exit"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:text="退出"
+                android:textSize="@dimen/sp_16"
+                android:textColor="#ffffff"
+                android:background="#E9967A"/>
+
+            <Button
+                android:id="@+id/btn_room_enter"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:text="进入"
+                android:textSize="@dimen/sp_16"
+                android:textColor="#ffffff"
+                android:background="#E9967A"
+                android:layout_marginLeft="@dimen/dp_30"/>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <ImageView
+        android:id="@+id/image_room_close"
+        android:layout_width="@dimen/dp_20"
+        android:layout_height="@dimen/dp_20"
+        android:src="@drawable/btn_close_round"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="@dimen/dp_10"
+        android:layout_marginRight="@dimen/dp_10"/>
+
+</RelativeLayout>
