@@ -23,11 +23,11 @@ public class JMSendBean {
         this.code = code;
     }
 
-//    public T getData() {
+//    public T getBChatRoom() {
 //        return data;
 //    }
 //
-//    public void setData(T data) {
+//    public void setBChatRoom(T data) {
 //        this.data = data;
 //    }
 

@@ -4,7 +4,7 @@ import android.app.Activity;
 
 import com.cd.xq.module.chart.manager.StatusManager;
 import com.cd.xq.module.chart.manager.XqStatusChartUIViewMg;
-import com.cd.xq.module.util.beans.jmessage.Data;
+import com.cd.xq.module.util.beans.jmessage.BChatRoom;
 import com.cd.xq.module.util.beans.jmessage.JMChartRoomSendBean;
 import com.cd.xq.module.util.beans.jmessage.Member;
 import com.cd.xq.module.util.beans.user.UserInfoBean;
@@ -21,7 +21,7 @@ public abstract class ChatBaseStatus extends BaseStatus {
     protected Activity activity;
     protected XqStatusChartUIViewMg chartUIViewMg;
     protected UserInfoBean selfUserInfoBean;
-    protected Data chatRoomData;
+    protected BChatRoom chatRoomBChatRoom;
     protected Member selfMember;
 
     public void setStatusManager(StatusManager statusManager) {
@@ -30,7 +30,7 @@ public abstract class ChatBaseStatus extends BaseStatus {
         chartUIViewMg = statusManager.getmChatUIViewMg();
 
         selfUserInfoBean = DataManager.getInstance().getUserInfo();
-        chatRoomData = DataManager.getInstance().getChartData();
+        chatRoomBChatRoom = DataManager.getInstance().getChartBChatRoom();
         selfMember = DataManager.getInstance().getSelfMember();
     }
 

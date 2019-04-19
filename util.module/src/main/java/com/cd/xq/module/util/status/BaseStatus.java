@@ -1,6 +1,6 @@
 package com.cd.xq.module.util.status;
 
-import com.cd.xq.module.util.beans.jmessage.Data;
+import com.cd.xq.module.util.beans.jmessage.BChatRoom;
 import com.cd.xq.module.util.beans.jmessage.JMChartRoomSendBean;
 import com.cd.xq.module.util.beans.jmessage.Member;
 import com.cd.xq.module.util.beans.user.UserInfoBean;
@@ -59,7 +59,7 @@ public abstract class BaseStatus {
     }
 
     private int mCompleteCount = 0;
-    protected Data mData ;
+    protected BChatRoom mBChatRoom;
     protected UserInfoBean mUserInfo;
     protected Member mSelfMember;
     private int mOrder = -1;//流程序号
@@ -68,7 +68,7 @@ public abstract class BaseStatus {
     private BaseStatus mNextStatus;
 
     public BaseStatus() {
-        mData = DataManager.getInstance().getChartData();
+        mBChatRoom = DataManager.getInstance().getChartBChatRoom();
         mUserInfo = DataManager.getInstance().getUserInfo();
         mSelfMember = DataManager.getInstance().getSelfMember();
 
@@ -235,12 +235,12 @@ public abstract class BaseStatus {
      */
     public JMChartRoomSendBean createBaseChartRoomSendBean() {
         JMChartRoomSendBean bean = new JMChartRoomSendBean();
-        Data data = DataManager.getInstance().getChartData();
+        BChatRoom BChatRoom = DataManager.getInstance().getChartBChatRoom();
         UserInfoBean selfInfo = DataManager.getInstance().getUserInfo();
         bean.setGender(selfInfo.getGender());
-        bean.setCurrentCount(data.getMembers().size());
+        bean.setCurrentCount(BChatRoom.getMembers().size());
         bean.setIndexSelf(DataManager.getInstance().getSelfMember().getIndex());
-        bean.setRoomId(data.getRoom_id());
+        bean.setRoomId(BChatRoom.getRoom_id());
         bean.setTime(Tools.getCurrentDateTime());
         bean.setUserName(selfInfo.getUser_name());
         bean.setProcessStatus(getStatus());

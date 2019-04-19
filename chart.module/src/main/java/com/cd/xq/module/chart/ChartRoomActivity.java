@@ -37,7 +37,7 @@ public class ChartRoomActivity extends BaseActivity {
         mXqStatusChartUIViewMg.onDestroy();
 
         //重置roomId
-        DataManager.getInstance().getChartData().setRoom_id(0);
+        DataManager.getInstance().getChartBChatRoom().setRoom_id(0);
         MscDefaultSpeech.getInstance().destroy();
     }
 

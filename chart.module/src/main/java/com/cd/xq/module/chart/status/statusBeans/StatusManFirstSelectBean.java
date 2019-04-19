@@ -2,7 +2,6 @@ package com.cd.xq.module.chart.status.statusBeans;
 
 import com.cd.xq.module.util.Constant;
 import com.cd.xq.module.util.beans.jmessage.JMChartRoomSendBean;
-import com.cd.xq.module.util.status.BaseStatus;
 import com.cd.xq.module.util.status.StatusResp;
 
 /**
@@ -76,7 +75,7 @@ public class StatusManFirstSelectBean extends ChatBaseStatus {
         super.onPostHandler(resp,receiveBean);
         if(receiveBean.getMessageType() == MessageType.TYPE_RESPONSE) {
             mCompleteCount ++;
-            int allCount = mData.getLimit_man();
+            int allCount = mBChatRoom.getLimit_man();
             boolean isLast = mCompleteCount>=allCount?true:false;
             resp.setLast(isLast);
             if(isLast) {

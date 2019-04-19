@@ -2,6 +2,7 @@ package com.cd.xq.module.util.network;
 
 import com.cd.xq.module.util.beans.BaseResp;
 import com.cd.xq.module.util.beans.NetResult;
+import com.cd.xq.module.util.beans.jmessage.BChatRoom;
 import com.cd.xq.module.util.beans.jmessage.JMChartResp;
 import com.cd.xq.module.util.beans.user.BBlackUser;
 import com.cd.xq.module.util.beans.user.UserResp;
@@ -64,8 +65,8 @@ public interface RequestApi {
     @GET("JMessage/deleteChartRoom")
     Observable<JMChartResp> deleteChartRoom(@QueryMap Map<String, Object> map);
 
-    @GET("JMessage/joinChartRoom")
-    Observable<JMChartResp> joinChartRoom(@QueryMap Map<String, Object> map);
+    @GET("JMessage/joinChatRoom")
+    Observable<NetResult<BChatRoom>> joinChatRoom(@QueryMap Map<String, Object> map);
 
     @GET("User/getBlackUserByName")
     Observable<NetResult<BBlackUser>> getBlackUserByName(@QueryMap Map<String, Object> map);

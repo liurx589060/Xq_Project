@@ -350,4 +350,10 @@
 
 #========================TimePickerDialog================================
 -dontwarn com.jzxiang.pickerview.**
--keep com.jzxiang.pickerview.**{*;}
+-keep class com.jzxiang.pickerview.**{*;}
+
+#========================Android-PickerView================================
+-dontwarn com.bigkoo.pickerview.**
+-keep class com.bigkoo.pickerview.**{*;}
+-dontwarn com.contrarywind.**
+-keep class com.contrarywind.**{*;}

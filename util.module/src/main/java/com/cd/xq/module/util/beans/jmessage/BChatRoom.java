@@ -6,7 +6,7 @@ package com.cd.xq.module.util.beans.jmessage;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Data {
+public class BChatRoom {
 
     private long room_id;
     private int limit_level;

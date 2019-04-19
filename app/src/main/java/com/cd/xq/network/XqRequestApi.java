@@ -9,21 +9,25 @@ import com.cd.xq.beans.BGetConsumeHistory;
 import com.cd.xq.module.chart.beans.BGetGiftItem;
 import com.cd.xq.beans.BGetPayHistory;
 import com.cd.xq.module.util.beans.NetResult;
+import com.cd.xq.module.util.beans.jmessage.BChatRoom;
+import com.cd.xq.module.util.beans.jmessage.JMChartResp;
 import com.cd.xq.module.util.beans.user.UserInfoBean;
 
 import java.util.List;
+import java.util.Map;
 
 import io.reactivex.Observable;
 import retrofit2.http.GET;
 import retrofit2.http.Query;
+import retrofit2.http.QueryMap;
 
 /**
  * Created by Administrator on 2018/12/9.
  */
 
 public interface XqRequestApi {
-    @GET("JMessage/getNowChatRoomList")
-    Observable<NetResult<List<BGetArrays>>> getNowChatRoomList(@Query("public") int isPublic);
+    @GET("JMessage/getChatRoomList")
+    Observable<NetResult<List<BChatRoom>>> getChatRoomList(@QueryMap Map<String, Object> map);
 
     @GET("JMessage/changePassword")
     Observable<NetResult<String>> changePassword(@Query("userName") String userName,@Query("password") String password);

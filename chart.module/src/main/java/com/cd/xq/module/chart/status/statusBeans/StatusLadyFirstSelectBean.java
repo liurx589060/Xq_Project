@@ -2,10 +2,8 @@ package com.cd.xq.module.chart.status.statusBeans;
 
 import com.cd.xq.module.util.Constant;
 import com.cd.xq.module.util.beans.jmessage.JMChartRoomSendBean;
-import com.cd.xq.module.util.status.BaseStatus;
 import com.cd.xq.module.util.status.StatusResp;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -84,7 +82,7 @@ public class StatusLadyFirstSelectBean extends ChatBaseStatus {
         super.onPostHandler(resp,receiveBean);
         if(receiveBean.getMessageType() == MessageType.TYPE_RESPONSE) {
             mCompleteCount ++;
-            int allCount = mData.getLimit_lady();
+            int allCount = mBChatRoom.getLimit_lady();
             boolean isLast = mCompleteCount>=allCount?true:false;
             resp.setLast(isLast);
             if(isLast) {

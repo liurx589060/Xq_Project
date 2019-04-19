@@ -25,9 +25,7 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.cd.xq.R;
 import com.cd.xq.beans.BCheckRoomExpiry;
-import com.cd.xq.beans.BGetArrays;
 import com.cd.xq.beans.BGetBanner;
-import com.cd.xq.beans.BusChatRoomParam;
 import com.cd.xq.friend.FriendActivity;
 import com.cd.xq.login.BlackCheckListener;
 import com.cd.xq.module.chart.ChartRoomActivity;
@@ -40,12 +38,15 @@ import com.cd.xq.module.chart.utils.ChatTools;
 import com.cd.xq.module.util.Constant;
 import com.cd.xq.module.util.base.BaseFragment;
 import com.cd.xq.module.util.beans.EventBusParam;
+import com.cd.xq.module.util.beans.JMRoomSendParam;
+import com.cd.xq.module.util.beans.JMSingleSendParam;
 import com.cd.xq.module.util.beans.NetResult;
-import com.cd.xq.module.util.beans.jmessage.Data;
+import com.cd.xq.module.util.beans.jmessage.BChatRoom;
 import com.cd.xq.module.util.beans.jmessage.JMChartResp;
 import com.cd.xq.module.util.beans.jmessage.JMChartRoomSendBean;
 import com.cd.xq.module.util.beans.user.UserInfoBean;
 import com.cd.xq.module.util.common.MultiItemDivider;
+import com.cd.xq.module.util.gson.ParameterizedTypeImpl;
 import com.cd.xq.module.util.jmessage.JMsgSender;
 import com.cd.xq.module.util.manager.DataManager;
 import com.cd.xq.module.util.network.NetWorkMg;
@@ -70,7 +71,10 @@ import com.stx.xhb.xbanner.XBanner;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
+import org.json.JSONObject;
 
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -78,8 +82,10 @@ import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
 import butterknife.Unbinder;
+import cn.jpush.im.android.api.event.ChatRoomMessageEvent;
+import cn.jpush.im.android.api.event.MessageEvent;
+import cn.jpush.im.android.api.model.Message;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
@@ -111,7 +117,7 @@ public class HomeFragment extends BaseFragment {
     private XqRequestApi mXqApi;
     private ChatRequestApi mChatApi;
 
-    private ArrayList<BGetArrays> m_roomList;
+    private ArrayList<BChatRoom> m_roomList;
     private OnLookerRecyclerViewAdapter mOnLookerAdapter;
     private ArrayList<String> mImageList;
     private Dialog mRoomFloatDialog;
@@ -119,6 +125,8 @@ public class HomeFragment extends BaseFragment {
     private JMChartResp mJmChartResp;
     private Runnable mTimeDownRunnable;
     private Handler mHandler;
+    private boolean mIsMatch;
+    private long mRoomID;
 
     @Nullable
     @Override
@@ -220,6 +228,8 @@ public class HomeFragment extends BaseFragment {
                         }
 
                         //参与者加入房间
+                        mIsMatch = true;
+                        mRoomID = -1;
                         toCommitJoinParticipant();
                     }
 
@@ -312,7 +322,7 @@ public class HomeFragment extends BaseFragment {
      * @param roomRoleType
      * @param roomId
      */
-    private void joinChartRoom(int roomRoleType, long roomId) {
+    private void joinChartRoom(int roomRoleType, long roomId,boolean isMatch) {
         if (!DataManager.getInstance().getUserInfo().isOnLine()) {
             Tools.toast(getActivity(), "请先登录...", true);
             return;
@@ -326,31 +336,42 @@ public class HomeFragment extends BaseFragment {
         params.put("level", userInfo.getLevel());
         params.put("roleType", userInfo.getRole_type());
         params.put("roomRoleType", roomRoleType);
-        if ((Integer) params.get("roomRoleType") == Constant.ROOM_ROLETYPE_ONLOOKER) {
-            params.put("roomId", roomId);
+        params.put("roomId",roomId);
+        if(isMatch) {
+            //匹配模式
+            params.put("handleType",1);
+        }else {
+            //指定模式
+            params.put("handleType",2);
         }
-        mApi.joinChartRoom(params)
+        mApi.joinChatRoom(params)
                 .subscribeOn(Schedulers.io())
-                .compose(this.<JMChartResp>bindToLifecycle())
+                .compose(this.<NetResult<BChatRoom>>bindToLifecycle())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<JMChartResp>() {
+                .subscribe(new Consumer<NetResult<BChatRoom>>() {
                     @Override
-                    public void accept(JMChartResp jmChartResp) throws Exception {
+                    public void accept(NetResult<BChatRoom> jmChartResp) throws Exception {
                         if (jmChartResp == null) {
                             Log.e("jmChartResp is null");
-                            Tools.toast(getActivity(), "jmChartResp is null", true);
                             return;
                         }
                         if (jmChartResp.getStatus() != XqErrorCode.SUCCESS) {
+                            if(jmChartResp.getStatus() == XqErrorCode.ERROR_FULL_CHATROOM) {
+                                Tools.toast(getActivity(), "房间已满员", false);
+                            }else if(jmChartResp.getStatus() == XqErrorCode.ERROR_ALREADY_START_CHATROOM) {
+                                Tools.toast(getActivity(), "房间已开始", false);
+                            }else if(jmChartResp.getStatus() == XqErrorCode.ERROR_NOT_FIND_CHATROOM) {
+                                Tools.toast(getActivity(), "未找到房间", false);
+                            }else {
+                                Tools.toast(getActivity(), jmChartResp.getMsg(), false);
+                            }
                             Log.e(jmChartResp.getMsg());
-                            Tools.toast(getActivity(), jmChartResp.getMsg(), true);
                             return;
                         }
-                        DataManager.getInstance().setChartData(jmChartResp.getData());
-                        Intent intent = new Intent(getActivity(), ChartRoomActivity.class);
-                        getActivity().startActivity(intent);
-                        //发送聊天室信息
-                        sendChartRoomMessage();
+                        //发送加入房间的消息
+                        JMRoomSendParam param = new JMRoomSendParam();
+                        param.setCode(JM_ROOM_CODE_JOIN); //加入的消息
+                        sendJMRoomMessage(param,true);
                     }
                 }, new Consumer<Throwable>() {
                     @Override
@@ -569,7 +590,7 @@ public class HomeFragment extends BaseFragment {
      */
     private void sendChartRoomMessage() {
         //发送聊天室信息
-        Data data = DataManager.getInstance().getChartData();
+        BChatRoom BChatRoom = DataManager.getInstance().getChartBChatRoom();
         JMChartRoomSendBean bean = null;
         if (DataManager.getInstance().getSelfMember().getRoomRoleType() == Constant
                 .ROOM_ROLETYPE_PARTICIPANTS) {
@@ -580,7 +601,7 @@ public class HomeFragment extends BaseFragment {
             bean = new StatusOnLookerEnterBean().getChartSendBeanWillSend(null, BaseStatus
                     .MessageType.TYPE_SEND);
         }
-        bean.setCurrentCount(data.getMembers().size());
+        bean.setCurrentCount(BChatRoom.getMembers().size());
         bean.setIndexNext(DataManager.getInstance().getSelfMember().getIndex());
 
         JMsgSender.sendRoomMessage(bean);
@@ -634,13 +655,27 @@ public class HomeFragment extends BaseFragment {
         mOnLookerAdapter.notifyDataSetChanged();*/
 
         //只获取公开的
-        mXqApi.getNowChatRoomList(1)
+        HashMap<String,Object> param = new HashMap<>();
+        param.put("public",1);
+        if(DataManager.getInstance().getUserInfo().getRole_type().equals(Constant.ROLETYPE_GUEST)) {
+            if(DataManager.getInstance().getUserInfo().getMarrige() == Constant.ROLE_UNMARRIED) {
+                //未婚
+                param.put("work",0);  //进行中
+            }else {
+                param.put("work",1);  //预约状态的
+            }
+        }else {
+            param.put("work",0);
+        }
+//        param.put("work",-1);  //进行中
+//        param.put("status",-2);
+        mXqApi.getChatRoomList(param)
                 .subscribeOn(Schedulers.io())
-                .compose(this.<NetResult<List<BGetArrays>>>bindToLifecycle())
+                .compose(this.<NetResult<List<BChatRoom>>>bindToLifecycle())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<NetResult<List<BGetArrays>>>() {
+                .subscribe(new Consumer<NetResult<List<BChatRoom>>>() {
                     @Override
-                    public void accept(NetResult<List<BGetArrays>> bGetArraysNetResult) throws
+                    public void accept(NetResult<List<BChatRoom>> bGetArraysNetResult) throws
                             Exception {
                         if (bGetArraysNetResult.getStatus() != XqErrorCode.SUCCESS
                                 && bGetArraysNetResult.getStatus() != XqErrorCode.ERROR_NO_DATA) {
@@ -665,21 +700,27 @@ public class HomeFragment extends BaseFragment {
     }
 
     private class OnLookerViewHolder extends RecyclerView.ViewHolder {
-        public TextView textRoomId;
-        public TextView textCreater;
-        public TextView textDescibe;
-        private View.OnClickListener listener;
+        public View viewBtnLayout;
+        public TextView textTitle;
+        public TextView textRoomID;
+        public TextView textCount;
+        public TextView textAppointTime;
+        public TextView textCountDownTime;
+        public TextView textDescription;
+        public Button btnExit;
+        public Button btnEnter;
 
-        public OnLookerViewHolder(View itemView) {
-            super(itemView);
-            textCreater = itemView.findViewById(R.id.home_onlooker_recycler_item_creater);
-            textDescibe = itemView.findViewById(R.id.home_onlooker_recycler_item_describe);
-            textRoomId = itemView.findViewById(R.id.home_onlooker_recycler_item_roomId);
-        }
-
-        public void setListener(View.OnClickListener listener) {
-            this.listener = listener;
-            itemView.setOnClickListener(listener);
+        public OnLookerViewHolder(View rootView) {
+            super(rootView);
+            viewBtnLayout = rootView.findViewById(R.id.linearLayout_room_btn);
+            textAppointTime = rootView.findViewById(R.id.text_room_appoint_time);
+            textCount = rootView.findViewById(R.id.text_room_count);
+            textCountDownTime = rootView.findViewById(R.id.text_room_time_count_down);
+            textDescription = rootView.findViewById(R.id.text_room_description);
+            textRoomID = rootView.findViewById(R.id.text_room_id);
+            textTitle = rootView.findViewById(R.id.text_room_title);
+            btnEnter = rootView.findViewById(R.id.btn_room_enter);
+            btnExit = rootView.findViewById(R.id.btn_room_exit);
         }
     }
 
@@ -687,43 +728,51 @@ public class HomeFragment extends BaseFragment {
         @Override
         public OnLookerViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
             OnLookerViewHolder holder = new OnLookerViewHolder(LayoutInflater.from(getActivity())
-                    .inflate(
-                            R.layout.layout_home_onlooker_recycler_item, null));
+                    .inflate(R.layout.layout_home_onlooker_recycler_item, null));
             return holder;
         }
 
         @Override
         public void onBindViewHolder(OnLookerViewHolder holder, int position) {
-            final BGetArrays info = m_roomList.get(position);
-            holder.textRoomId.setText(String.valueOf(info.getRoomId()));
-            holder.textDescibe.setText(info.getDescribe());
-            holder.textCreater.setText("创建者：" + info.getCreater());
-            holder.setListener(new View.OnClickListener() {
+            final BChatRoom resp = m_roomList.get(position);
+            if(resp == null) return;
+            holder.textAppointTime.setText("开始时间：" + resp.getAppoint_time());
+            holder.textCount.setText("人数：" + String.valueOf(resp.getLimit_angel()
+                    + resp.getLimit_lady() + resp.getLimit_man()));
+            if(TextUtils.isEmpty(resp.getDescribe())) {
+                holder.textDescription.setVisibility(View.GONE);
+            }else {
+                holder.textDescription.setVisibility(View.VISIBLE);
+                holder.textDescription.setText("描述：" + "\n" + resp.getDescribe());
+            }
+            holder.textRoomID.setText("房间ID：" + String.valueOf(resp.getRoom_id()));
+            holder.textTitle.setText("主题：" + resp.getTitle());
+            holder.textCountDownTime.setVisibility(View.GONE);
+            if(DataManager.getInstance().getUserInfo().getRole_type().equals(Constant.ROLRTYPE_ANGEL)) {
+                holder.viewBtnLayout.setVisibility(View.GONE);
+            }else {
+                if(DataManager.getInstance().getUserInfo().getMarrige() == Constant.ROLE_UNMARRIED) {
+                    holder.btnExit.setText("围观");
+                    holder.btnEnter.setText("加入");
+                }else {
+                    holder.btnExit.setText("围观");
+                    holder.btnEnter.setVisibility(View.GONE);
+                }
+            }
+            holder.btnExit.setOnClickListener(new View.OnClickListener() {
                 @Override
-                public void onClick(View v) {
-                    requestPermission(new OnPermission() {
-                        @Override
-                        public void hasPermission(List<String> granted, boolean isAll) {
-                            if (!isAll) {
-                                Tools.toast(getActivity(), "请同意权限", false);
-                                XXPermissions.gotoPermissionSettings(getActivity());
-                                return;
-                            }
-
-                            UserInfoBean infoBean = DataManager.getInstance().getUserInfo();
-                            if (infoBean == null) {
-                                Tools.toast(getActivity(), "请先登录", false);
-                                return;
-                            }
-
-                            joinChartRoom(Constant.ROOM_ROLETYPE_ONLOOKER, info.getRoomId());
-                        }
-
-                        @Override
-                        public void noPermission(List<String> denied, boolean quick) {
-
-                        }
-                    });
+                public void onClick(View view) {
+                    //围观
+                    joinChartRoom(Constant.ROOM_ROLETYPE_ONLOOKER,resp.getRoom_id(),false);
+                }
+            });
+            holder.btnEnter.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    //参与者
+                    mIsMatch = false;
+                    mRoomID = resp.getRoom_id();
+                    toCommitJoinParticipant();
                 }
             });
         }
@@ -785,7 +834,7 @@ public class HomeFragment extends BaseFragment {
                             toast.show();
 
                             //加入房间
-                            joinChartRoom(Constant.ROOM_ROLETYPE_PARTICIPANTS, -1);
+                            joinChartRoom(Constant.ROOM_ROLETYPE_PARTICIPANTS, mRoomID,mIsMatch);
                         } else {
                             if (bCheckRoomExpiry.getData().getHasCard() == 1) {
                                 //有未使用的卡，提示是否使用卡
@@ -847,7 +896,7 @@ public class HomeFragment extends BaseFragment {
                         //更新余额
                         DataManager.getInstance().getUserInfo().setBalance(netResult.getData().getBalance());
                         //加入房间
-                        joinChartRoom(Constant.ROOM_ROLETYPE_PARTICIPANTS, -1);
+                        joinChartRoom(Constant.ROOM_ROLETYPE_PARTICIPANTS, mRoomID,mIsMatch);
                     }
                 }, new Consumer<Throwable>() {
                     @Override
@@ -945,5 +994,85 @@ public class HomeFragment extends BaseFragment {
         public Button btnExit;
         public Button btnEnter;
         public ImageView imageClose;
+    }
+
+    /****************************JM 房间信息处理*********************************************/
+    private final int JM_ROOM_CODE_JOIN = 1;
+
+    private void sendJMRoomMessage(JMRoomSendParam param,boolean isHanldeSelf) {
+        JMsgSender.sendJMRoomMessage(param);
+        if(isHanldeSelf) {
+            handleJMRoomMessage(param);
+        }
+    }
+
+    private void sendJMSingleMessage(JMSingleSendParam param,boolean isHanldeSelf) {
+        JMsgSender.sendJMSigleMessage(param);
+        if(isHanldeSelf) {
+            handleJMSingleMessage(param);
+        }
+    }
+
+    /**
+     * 处理聊天室的消息
+     * @param param
+     */
+    private void handleJMRoomMessage(JMRoomSendParam param) {
+        if(param.getCode() == JM_ROOM_CODE_JOIN) {
+            //有人加入房间，更新自己的房间
+            requestGetChatRoomByUser();
+        }
+    }
+
+    /**
+     * 处理单个的消息
+     * @param param
+     */
+    private void handleJMSingleMessage(JMSingleSendParam param) {
+
+    }
+
+
+
+    /**
+     * 接收聊天室消息
+     * @param event
+     */
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onEventMainThread(ChatRoomMessageEvent event) {
+        List<Message> msgs = event.getMessages();
+        for (Message msg : msgs) {
+            //这个页面仅仅展示聊天室会话的消息
+            String jsonStr = msg.getContent().toJson();
+            String text = null;
+            try {
+                JSONObject object = new JSONObject(jsonStr);
+                text = object.getString("text");
+                JMRoomSendParam chartRoomSendBean = new Gson().fromJson(text,JMRoomSendParam.class);
+                handleJMRoomMessage(chartRoomSendBean);
+            }catch (Exception e) {
+                Log.e("yy",e.toString());
+                return;
+            }
+        }
+    }
+
+    /**
+     * 接收普通消息
+     * @param event
+     */
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onEventMainThread(MessageEvent event) {
+        String message = event.getMessage().getContent().toJson();
+        String text = null;
+        try {
+            JSONObject object = new JSONObject(message);
+            text = object.getString("text");
+            JMSingleSendParam chartRoomSendBean = new Gson().fromJson(text,JMSingleSendParam.class);
+            handleJMSingleMessage(chartRoomSendBean);
+        }catch (Exception e) {
+            Log.e("yy",e.toString());
+            return;
+        }
     }
 }

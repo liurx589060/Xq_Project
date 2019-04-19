@@ -1,6 +1,6 @@
 package com.cd.xq.module.util.manager;
 
-import com.cd.xq.module.util.beans.jmessage.Data;
+import com.cd.xq.module.util.beans.jmessage.BChatRoom;
 import com.cd.xq.module.util.beans.jmessage.Member;
 import com.cd.xq.module.util.beans.user.UserInfoBean;
 
@@ -11,7 +11,7 @@ import com.cd.xq.module.util.beans.user.UserInfoBean;
 public class DataManager {
     private static DataManager instance = new DataManager();
     private UserInfoBean userInfo;
-    private Data chartData;
+    private BChatRoom chartBChatRoom;
     private String jmUserName;
 
     private DataManager(){}
@@ -36,19 +36,19 @@ public class DataManager {
         this.userInfo = userInfo;
     }
 
-    public Data getChartData() {
-        if(chartData == null) {
-            chartData = new Data();
+    public BChatRoom getChartBChatRoom() {
+        if(chartBChatRoom == null) {
+            chartBChatRoom = new BChatRoom();
         }
-        return chartData;
+        return chartBChatRoom;
     }
 
-    public void setChartData(Data chartData) {
-        this.chartData = chartData;
+    public void setChartBChatRoom(BChatRoom chartBChatRoom) {
+        this.chartBChatRoom = chartBChatRoom;
     }
 
     public Member getSelfMember() {
-        for(Member member:getChartData().getMembers()) {
+        for(Member member: getChartBChatRoom().getMembers()) {
             if(member.getUserInfo().getUser_name().equals(getUserInfo().getUser_name())) {
                 return member;
             }

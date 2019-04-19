@@ -2,7 +2,6 @@ package com.cd.xq.module.chart.status.statusBeans;
 
 import com.cd.xq.module.util.Constant;
 import com.cd.xq.module.util.beans.jmessage.JMChartRoomSendBean;
-import com.cd.xq.module.util.status.BaseStatus;
 import com.cd.xq.module.util.status.StatusResp;
 
 /**
@@ -32,7 +31,7 @@ public class StatusManIntroBean extends ChatBaseStatus {
 
     @Override
     public int getNextIndex(JMChartRoomSendBean receiveBean) {
-        int index = (receiveBean.getIndexNext() + 1)%mData.getLimit_man();
+        int index = (receiveBean.getIndexNext() + 1)% mBChatRoom.getLimit_man();
         return index;
     }
 
@@ -53,7 +52,7 @@ public class StatusManIntroBean extends ChatBaseStatus {
 
     @Override
     public boolean isLast(int completeCount, JMChartRoomSendBean receiveBean) {
-        int allCount = mData.getLimit_man();
+        int allCount = mBChatRoom.getLimit_man();
         boolean isLast = completeCount>=allCount?true:false;
         return isLast;
     }

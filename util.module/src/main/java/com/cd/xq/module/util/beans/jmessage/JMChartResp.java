@@ -7,13 +7,13 @@ import com.cd.xq.module.util.beans.BaseResp;
  */
 
 public class JMChartResp extends BaseResp {
-    private Data data;
+    private BChatRoom data;
 
-    public Data getData() {
+    public BChatRoom getData() {
         return data;
     }
 
-    public void setData(Data data) {
+    public void setData(BChatRoom data) {
         this.data = data;
     }
 }

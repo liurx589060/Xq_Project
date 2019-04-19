@@ -3,7 +3,6 @@ package com.cd.xq.module.chart.status.statusBeans;
 
 import com.cd.xq.module.util.Constant;
 import com.cd.xq.module.util.beans.jmessage.JMChartRoomSendBean;
-import com.cd.xq.module.util.status.BaseStatus;
 import com.cd.xq.module.util.status.StatusResp;
 
 import static com.cd.xq.module.util.status.BaseStatus.HandleType.HANDLE_MATCH;
@@ -56,7 +55,7 @@ public class StatusMatchBean extends ChatBaseStatus {
 
     @Override
     public boolean isLast(int completeCount,JMChartRoomSendBean receiveBean) {
-        int allCount = mData.getLimit_angel() + mData.getLimit_man() + mData.getLimit_lady();
+        int allCount = mBChatRoom.getLimit_angel() + mBChatRoom.getLimit_man() + mBChatRoom.getLimit_lady();
         boolean isLast = receiveBean.getCurrentCount()>=allCount?true:false;
         return isLast;
     }

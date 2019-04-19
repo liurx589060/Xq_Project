@@ -1,6 +1,8 @@
 package com.cd.xq.module.util.jmessage;
 
 import com.cd.xq.module.util.beans.JMNormalSendBean;
+import com.cd.xq.module.util.beans.JMRoomSendParam;
+import com.cd.xq.module.util.beans.JMSingleSendParam;
 import com.cd.xq.module.util.beans.jmessage.JMChartRoomSendBean;
 import com.cd.xq.module.util.beans.jmessage.JMSendBean;
 import com.cd.xq.module.util.tools.Log;
@@ -90,5 +92,52 @@ public class JMsgSender {
             }
         });
         JMessageClient.sendMessage(msg);
+    }
+
+    /************************************************************************************/
+    /**
+     * 发送通用聊天室信息
+     * @param jmSendParam
+     */
+    public static void sendJMRoomMessage(final JMRoomSendParam jmSendParam) {
+        if(jmSendParam == null) return;
+        Conversation conv = JMessageClient.getChatRoomConversation(jmSendParam.getRoomId());
+        if (null == conv) {
+            conv = Conversation.createChatRoomConversation(jmSendParam.getRoomId());
+        }
+        final Message msg = conv.createSendTextMessage(new Gson().toJson(jmSendParam));
+        msg.setOnSendCompleteCallback(new BasicCallback() {
+            @Override
+            public void gotResult(int responseCode, String responseMessage) {
+                if (0 == responseCode) {
+                    Log.i("yy","sendRoomMessage success --" + jmSendParam.getRoomId());
+                } else {
+                    Log.e("yy","sendRoomMessage failed --" + jmSendParam.getRoomId());
+                }
+            }
+        });
+        JMessageClient.sendMessage(msg);
+    }
+
+    /**
+     * 发送通用单人聊天室信息
+     * @param jmSendParam
+     */
+    public static void sendJMSigleMessage(final JMSingleSendParam jmSendParam) {
+        if(jmSendParam == null) return;
+        Message message = JMessageClient.createSingleTextMessage(jmSendParam.getTargetUser(),new Gson().toJson(jmSendParam));
+        message.setOnSendCompleteCallback(new BasicCallback() {
+            @Override
+            public void gotResult(int i, String s) {
+                if (0 == i) {
+                    Log.i("yy","sendNormalMessage success --");
+                } else {
+                    Log.e("yy","sendRoomMessage failed --");
+                }
+            }
+        });
+        MessageSendingOptions options = new MessageSendingOptions();
+        options.setShowNotification(false);
+        JMessageClient.sendMessage(message,options);
     }
 }

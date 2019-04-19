@@ -2,8 +2,6 @@ package com.cd.xq.module.chart.status.statusBeans;
 
 import com.cd.xq.module.util.Constant;
 import com.cd.xq.module.util.beans.jmessage.JMChartRoomSendBean;
-import com.cd.xq.module.util.status.BaseStatus;
-import com.cd.xq.module.util.status.StatusResp;
 
 /**
  * Created by Administrator on 2018/9/27.
@@ -33,7 +31,7 @@ public class StatusLadyFirstQuestionBean extends StatusLadyChartFirstBean {
 
     @Override
     public int getNextIndex(JMChartRoomSendBean receiveBean) {
-        int index = (receiveBean.getIndexNext() + 1)%mData.getLimit_lady();
+        int index = (receiveBean.getIndexNext() + 1)% mBChatRoom.getLimit_lady();
         return index;
     }
 
@@ -54,7 +52,7 @@ public class StatusLadyFirstQuestionBean extends StatusLadyChartFirstBean {
 
     @Override
     public boolean isLast(int completeCount, JMChartRoomSendBean receiveBean) {
-        int allCount = mData.getLimit_lady();
+        int allCount = mBChatRoom.getLimit_lady();
         boolean isLast = completeCount>=allCount?true:false;
         return isLast;
     }
