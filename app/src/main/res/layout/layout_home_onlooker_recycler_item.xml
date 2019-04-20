@@ -13,7 +13,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="主题：Hello World!"
-            android:textColor="#aaaaaa"
+            android:textColor="#888888"
             android:textSize="@dimen/sp_14"/>
 
         <TextView
@@ -21,27 +21,44 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="房间ID：123456"
-            android:textColor="#aaaaaa"
+            android:textColor="#888888"
             android:textSize="@dimen/sp_14"
             android:layout_marginTop="@dimen/dp_5"
             android:textIsSelectable="true"/>
 
-        <TextView
-            android:id="@+id/text_room_count"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="参与人数：12"
-            android:textColor="#aaaaaa"
-            android:textSize="@dimen/sp_14"
-            android:layout_marginTop="@dimen/dp_5"
-            android:textIsSelectable="true"/>
+            android:orientation="horizontal"
+            android:layout_marginTop="@dimen/dp_5">
+
+            <TextView
+                android:id="@+id/text_room_count"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="参与人数：12"
+                android:textColor="#888888"
+                android:textSize="@dimen/sp_14"
+                />
+
+            <TextView
+                android:id="@+id/text_room_current_num"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="当前人数：10"
+                android:textColor="#E9967A"
+                android:textSize="@dimen/sp_14"
+                android:layout_marginLeft="@dimen/dp_40"
+                />
+
+        </LinearLayout>
 
         <TextView
             android:id="@+id/text_room_appoint_time"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="开始时间：2019-04-18 14:42"
-            android:textColor="#aaaaaa"
+            android:textColor="#888888"
             android:textSize="@dimen/sp_14"
             android:layout_marginTop="@dimen/dp_5"/>
 
@@ -50,7 +67,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="房间描述:"
-            android:textColor="#aaaaaa"
+            android:textColor="#888888"
             android:textSize="@dimen/sp_14"
             android:layout_marginTop="@dimen/dp_5"/>
 
@@ -59,6 +76,16 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="倒计时：30分15秒"
+            android:textStyle="bold"
+            android:textColor="#E9967A"
+            android:textSize="@dimen/sp_16"
+            android:layout_marginTop="@dimen/dp_10"/>
+
+        <TextView
+            android:id="@+id/text_room_status"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="未开始"
             android:textStyle="bold"
             android:textColor="#E9967A"
             android:textSize="@dimen/sp_16"
@@ -80,7 +107,8 @@
                 android:text="退出"
                 android:textSize="@dimen/sp_16"
                 android:textColor="#ffffff"
-                android:background="#E9967A"/>
+                android:background="#E9967A"
+                android:layout_marginRight="@dimen/dp_30"/>
 
             <Button
                 android:id="@+id/btn_room_enter"
@@ -91,7 +119,7 @@
                 android:textSize="@dimen/sp_16"
                 android:textColor="#ffffff"
                 android:background="#E9967A"
-                android:layout_marginLeft="@dimen/dp_30"/>
+                />
 
         </LinearLayout>
 

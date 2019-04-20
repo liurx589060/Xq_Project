@@ -15,7 +15,7 @@ import com.cd.xq.module.util.base.BaseActivity;
 import com.cd.xq.module.util.beans.JMNormalSendBean;
 import com.cd.xq.module.util.beans.user.UserInfoBean;
 import com.cd.xq.module.util.glide.GlideCircleTransform;
-import com.cd.xq.module.util.jmessage.JMsgSender;
+import com.cd.xq.module.util.jmessage.JMsgUtil;
 import com.cd.xq.module.util.manager.DataManager;
 import com.cd.xq.module.util.tools.Log;
 import com.cd.xq.module.util.tools.Tools;
@@ -308,7 +308,7 @@ public class DoubleRoomActivity extends BaseActivity {
         JMNormalSendBean sendBean = new JMNormalSendBean();
         sendBean.setCode(EXIT);
         sendBean.setTargetUserName(mTargetInfoBean.getUser_name());
-        JMsgSender.sendNomalMessage(sendBean);
+        JMsgUtil.sendNomalMessage(sendBean);
         finish();
     }
 

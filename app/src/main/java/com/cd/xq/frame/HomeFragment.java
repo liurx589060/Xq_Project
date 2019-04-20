@@ -46,8 +46,7 @@ import com.cd.xq.module.util.beans.jmessage.JMChartResp;
 import com.cd.xq.module.util.beans.jmessage.JMChartRoomSendBean;
 import com.cd.xq.module.util.beans.user.UserInfoBean;
 import com.cd.xq.module.util.common.MultiItemDivider;
-import com.cd.xq.module.util.gson.ParameterizedTypeImpl;
-import com.cd.xq.module.util.jmessage.JMsgSender;
+import com.cd.xq.module.util.jmessage.JMsgUtil;
 import com.cd.xq.module.util.manager.DataManager;
 import com.cd.xq.module.util.network.NetWorkMg;
 import com.cd.xq.module.util.network.RequestApi;
@@ -73,8 +72,6 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 import org.json.JSONObject;
 
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -83,6 +80,7 @@ import java.util.Map;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
+import cn.jpush.im.android.api.JMessageClient;
 import cn.jpush.im.android.api.event.ChatRoomMessageEvent;
 import cn.jpush.im.android.api.event.MessageEvent;
 import cn.jpush.im.android.api.model.Message;
@@ -122,11 +120,13 @@ public class HomeFragment extends BaseFragment {
     private ArrayList<String> mImageList;
     private Dialog mRoomFloatDialog;
     private RoomFloatViewHolder mFloatViewHolder;
-    private JMChartResp mJmChartResp;
+    private BChatRoom mJmChartResp;
     private Runnable mTimeDownRunnable;
     private Handler mHandler;
     private boolean mIsMatch;
     private long mRoomID;
+    private EventBusHelp mEventBusHelp;
+    private boolean mIsSelfRoomDelete;
 
     @Nullable
     @Override
@@ -134,7 +134,8 @@ public class HomeFragment extends BaseFragment {
             Bundle savedInstanceState) {
         mRootView = inflater.inflate(R.layout.tab_home, null);
         unbinder = ButterKnife.bind(this, mRootView);
-        EventBus.getDefault().register(this);
+        JMessageClient.registerEventReceiver(this);
+        mEventBusHelp = new EventBusHelp();
         mApi = NetWorkMg.newRetrofit().create(RequestApi.class);
         mXqApi = NetWorkMg.newRetrofit().create(XqRequestApi.class);
         mChatApi = NetWorkMg.newRetrofit().create(ChatRequestApi.class);
@@ -251,7 +252,6 @@ public class HomeFragment extends BaseFragment {
         });
 
         requestGetBanner();
-        setOnLookerRecyclerView();
         initSmartRefreshLayout();
         initRoomFloatDialog();
     }
@@ -277,6 +277,9 @@ public class HomeFragment extends BaseFragment {
         mFloatViewHolder.textDescription = rootView.findViewById(R.id.text_room_description);
         mFloatViewHolder.textRoomID = rootView.findViewById(R.id.text_room_id);
         mFloatViewHolder.textTitle = rootView.findViewById(R.id.text_room_title);
+        mFloatViewHolder.textStatus = rootView.findViewById(R.id.text_room_status);
+        mFloatViewHolder.textCurrentNum = rootView.findViewById(R.id.text_room_current_num);
+        mFloatViewHolder.textRoomRole = rootView.findViewById(R.id.text_room_role);
         mFloatViewHolder.btnEnter = rootView.findViewById(R.id.btn_room_enter);
         mFloatViewHolder.btnExit = rootView.findViewById(R.id.btn_room_exit);
         mFloatViewHolder.imageClose = rootView.findViewById(R.id.image_room_close);
@@ -288,10 +291,11 @@ public class HomeFragment extends BaseFragment {
                 mRoomFloatDialog.dismiss();
             }
         });
-        mFloatViewHolder.btnExit.setOnClickListener(new View.OnClickListener() {
+        mFloatViewHolder.btnEnter.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                requestExitChatRoom(-1); //预约退出的
+                //进入房间
+                requestEnterChatRoom();
             }
         });
         mRoomFloatDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
@@ -313,7 +317,8 @@ public class HomeFragment extends BaseFragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        EventBus.getDefault().unregister(this);
+        mEventBusHelp.onDestroy();
+        JMessageClient.registerEventReceiver(this);
     }
 
     /**
@@ -362,6 +367,8 @@ public class HomeFragment extends BaseFragment {
                                 Tools.toast(getActivity(), "房间已开始", false);
                             }else if(jmChartResp.getStatus() == XqErrorCode.ERROR_NOT_FIND_CHATROOM) {
                                 Tools.toast(getActivity(), "未找到房间", false);
+                            }else if(jmChartResp.getStatus() == XqErrorCode.ERROR_ALREADY_JOIN_CHATROOM) {
+                                Tools.toast(getActivity(), "你已加入过其他房间", false);
                             }else {
                                 Tools.toast(getActivity(), jmChartResp.getMsg(), false);
                             }
@@ -371,6 +378,7 @@ public class HomeFragment extends BaseFragment {
                         //发送加入房间的消息
                         JMRoomSendParam param = new JMRoomSendParam();
                         param.setCode(JM_ROOM_CODE_JOIN); //加入的消息
+                        param.setRoomId(jmChartResp.getData().getRoom_id());
                         sendJMRoomMessage(param,true);
                     }
                 }, new Consumer<Throwable>() {
@@ -437,23 +445,21 @@ public class HomeFragment extends BaseFragment {
      */
     private void requestGetChatRoomByUser() {
         mApi.getChatRoomByUser(DataManager.getInstance().getUserInfo().getUser_name())
-                .compose(this.<JMChartResp>bindToLifecycle())
+                .compose(this.<NetResult<BChatRoom>>bindToLifecycle())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<JMChartResp>() {
+                .subscribe(new Consumer<NetResult<BChatRoom>>() {
                     @Override
-                    public void accept(JMChartResp netResult) throws Exception {
+                    public void accept(NetResult<BChatRoom> netResult) throws Exception {
                         if (netResult.getStatus() != XqErrorCode.SUCCESS) {
                             Log.e("requestGetChatRoomByUser--" + netResult.getMsg());
                             return;
                         }
 
-                        if(netResult.getData() != null) {
-                            mJmChartResp = netResult;
-                            setFloatViewInfo();
-                            mRoomFloatDialog.show();
-                            mRoomFloatDialog.getWindow().setContentView(mFloatViewHolder.rootView);
-                        }
+                        mJmChartResp = netResult.getData();
+                        setFloatViewInfo();
+                        //获取下方列表
+                        setOnLookerRecyclerView();
                     }
                 }, new Consumer<Throwable>() {
                     @Override
@@ -465,31 +471,120 @@ public class HomeFragment extends BaseFragment {
     }
 
     /**
-     * 退出房间
+     * 进入房间
      */
-   private void requestExitChatRoom(final int status) {
-       HashMap<String,Object> param = new HashMap<>();
-       param.put("userName",DataManager.getInstance().getUserInfo().getUser_name());
-       param.put("roomId",mJmChartResp.getData().getRoom_id());
-       param.put("status",status); //失败
-        mApi.exitChatRoom(param)
-                .compose(this.<NetResult>bindToLifecycle())
+    private void requestEnterChatRoom() {
+        if(mJmChartResp == null) return;
+        mApi.enterChatRoom(mJmChartResp.getRoom_id())
+                .compose(this.<NetResult<BChatRoom>>bindToLifecycle())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<NetResult>() {
+                .subscribe(new Consumer<NetResult<BChatRoom>>() {
                     @Override
-                    public void accept(NetResult netResult) throws Exception {
+                    public void accept(NetResult<BChatRoom> netResult) throws Exception {
+                        if (netResult.getStatus() != XqErrorCode.SUCCESS) {
+                            Log.e("requestEnterChatRoom--" + netResult.getMsg());
+                            return;
+                        }
+
+                        if(netResult.getData() != null) {
+                            //设置到全局中
+                            DataManager.getInstance().setChartBChatRoom(netResult.getData());
+                            //进入到聊天页面
+                            mRoomFloatDialog.dismiss();
+                            Intent intent = new Intent(getActivity(),ChartRoomActivity.class);
+                            getActivity().startActivity(intent);
+                        }else {
+                            Log.e("requestEnterChatRoom--Data is null");
+                        }
+
+                    }
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Exception {
+                        Log.e("requestEnterChatRoom--" + throwable.toString());
+                        Tools.toast(getActivity().getApplicationContext(),throwable.toString(),false);
+                    }
+                });
+
+    }
+
+    /**
+     * 删除房间
+     */
+    private void requestDeleteChatRoom(final int status) {
+        if(mJmChartResp == null) return;
+        //发送聊天室删除消息
+        JMRoomSendParam sendParam = new JMRoomSendParam();
+        sendParam.setCode(JM_ROOM_CODE_DELETE); //加入的消息
+        sendParam.setRoomId(mJmChartResp.getRoom_id());
+        sendJMRoomMessage(sendParam,false);
+
+        HashMap<String,Object> param = new HashMap<>();
+        param.put("userName",DataManager.getInstance().getUserInfo().getUser_name());
+        param.put("roomId",mJmChartResp.getRoom_id());
+        param.put("status",status); //失败
+        mApi.deleteChatRoom(param)
+                .compose(this.<NetResult<BChatRoom>>bindToLifecycle())
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Consumer<NetResult<BChatRoom>>() {
+                    @Override
+                    public void accept(NetResult<BChatRoom> netResult) throws Exception {
                         if (netResult.getStatus() != XqErrorCode.SUCCESS) {
                             Log.e("requestCancelChatRoom--" + netResult.getMsg());
                             return;
                         }
 
                         mJmChartResp = null;
-                        mHandler.removeCallbacks(mTimeDownRunnable);
-                        mRoomFloatDialog.dismiss();
+                        setFloatViewInfo();
+                        Tools.toast(getActivity().getApplicationContext(),"房间已删除",false);
+                    }
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Exception {
+                        Log.e("requestCancelChatRoom--" + throwable.toString());
+                        Tools.toast(getActivity().getApplicationContext(),throwable.toString(),false);
+                    }
+                });
+    }
+
+    /**
+     * 退出房间
+     */
+   private void requestExitChatRoom(final int status) {
+       if(mJmChartResp == null) return;
+
+       HashMap<String,Object> param = new HashMap<>();
+       param.put("userName",DataManager.getInstance().getUserInfo().getUser_name());
+       param.put("roomId",mJmChartResp.getRoom_id());
+       param.put("status",status); //失败
+       mApi.exitChatRoom(param)
+                .compose(this.<NetResult<BChatRoom>>bindToLifecycle())
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Consumer<NetResult<BChatRoom>>() {
+                    @Override
+                    public void accept(NetResult<BChatRoom> netResult) throws Exception {
+                        if (netResult.getStatus() != XqErrorCode.SUCCESS) {
+                            Log.e("requestCancelChatRoom--" + netResult.getMsg());
+                            return;
+                        }
+
+                        mJmChartResp = null;
+                        setFloatViewInfo();
+                        //发送退出房间的消息
+                        JMRoomSendParam sendParam = new JMRoomSendParam();
+                        sendParam.setCode(JM_ROOM_CODE_EXIT); //加入的消息
+                        sendParam.setRoomId(netResult.getData().getRoom_id());
+                        sendJMRoomMessage(sendParam,true);
+                        //退出聊天室
+                        JMsgUtil.exitJMChatRoom(netResult.getData().getRoom_id(),null);
+
                         if(status == -1) {
                             Tools.toast(getActivity().getApplicationContext(),"退出房间成功",false);
                         }
+
                     }
                 }, new Consumer<Throwable>() {
                     @Override
@@ -504,35 +599,97 @@ public class HomeFragment extends BaseFragment {
      * 设置float view info
      */
     private void setFloatViewInfo() {
-        if(mJmChartResp == null) return;
         mHandler.removeCallbacks(mTimeDownRunnable);
+        if(mJmChartResp == null) {
+            mRoomFloatDialog.dismiss();
+            linearLayoutFloatRoom.setVisibility(View.GONE);
+            return;
+        }
 
-        mFloatViewHolder.textAppointTime.setText("开始时间：" + mJmChartResp.getData().getAppoint_time());
-        mFloatViewHolder.textCount.setText("人数：" + String.valueOf(mJmChartResp.getData().getLimit_angel()
-                + mJmChartResp.getData().getLimit_lady() + mJmChartResp.getData().getLimit_man()));
-        if(TextUtils.isEmpty(mJmChartResp.getData().getDescribe())) {
+        mFloatViewHolder.textAppointTime.setText("开始时间：" + mJmChartResp.getAppoint_time());
+        int currentNum = mJmChartResp.getCount_angel() + mJmChartResp.getCount_lady()
+                + mJmChartResp.getCount_man();
+        int limitNum = mJmChartResp.getLimit_angel()
+                + mJmChartResp.getLimit_lady() + mJmChartResp.getLimit_man();
+        mFloatViewHolder.textCount.setText("参与人数：" + limitNum);
+        String str = "当前人数：" + currentNum;
+        if(currentNum < limitNum) {
+            str += "（未满）";
+        }else {
+            str += "（满员）";
+        }
+        mFloatViewHolder.textCurrentNum.setText(str);
+        if(TextUtils.isEmpty(mJmChartResp.getDescribe())) {
             mFloatViewHolder.textDescription.setVisibility(View.GONE);
         }else {
             mFloatViewHolder.textDescription.setVisibility(View.VISIBLE);
-            mFloatViewHolder.textDescription.setText("描述：" + "\n" + mJmChartResp.getData().getDescribe());
+            mFloatViewHolder.textDescription.setText("描述：" + "\n" + mJmChartResp.getDescribe());
         }
-        mFloatViewHolder.textRoomID.setText("房间ID：" + String.valueOf(mJmChartResp.getData().getRoom_id()));
-        mFloatViewHolder.textTitle.setText("主题：" + mJmChartResp.getData().getTitle());
-
-        mHandler.post(mTimeDownRunnable);
+        mFloatViewHolder.textRoomID.setText("房间ID：" + String.valueOf(mJmChartResp.getRoom_id()));
+        mFloatViewHolder.textTitle.setText("主题：" + mJmChartResp.getTitle());
+        mFloatViewHolder.textCountDownTime.setVisibility(View.GONE);
+        mFloatViewHolder.btnEnter.setVisibility(View.VISIBLE);
+        if(mJmChartResp.getWork() == 0) {
+            //还未开始
+            mHandler.post(mTimeDownRunnable);
+            mFloatViewHolder.textStatus.setText("未开始");
+            mFloatViewHolder.textCountDownTime.setVisibility(View.VISIBLE);
+        }else if(mJmChartResp.getWork() == 1) {
+            //开始中
+            mFloatViewHolder.textStatus.setText("进行中");
+        }else {
+            //已结束
+            mFloatViewHolder.textStatus.setText("已结束");
+            mFloatViewHolder.btnEnter.setVisibility(View.GONE);
+        }
+        str = "本人角色：";
+        if(DataManager.getInstance().getUserInfo().getUser_name().equals(mJmChartResp.getCreater())) {
+            //创造者
+            str += "创建者";
+        }else {
+            if(mJmChartResp.getRoom_role_type() == Constant.ROOM_ROLETYPE_PARTICIPANTS) {
+                str += "参与者";
+            }else {
+                str += "观众";
+            }
+        }
+        mFloatViewHolder.textRoomRole.setText(str);
+        if(mIsSelfRoomDelete) {
+            mFloatViewHolder.btnExit.setText("关闭");
+            mFloatViewHolder.textStatus.setText("被取消");
+        }else {
+            if(DataManager.getInstance().getUserInfo().getUser_name().equals(mJmChartResp.getCreater())) {
+                mFloatViewHolder.btnExit.setText("删除");
+            }else {
+                mFloatViewHolder.btnExit.setText("退出");
+            }
+        }
+        mFloatViewHolder.btnExit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(DataManager.getInstance().getUserInfo().getUser_name().equals(mJmChartResp.getCreater())) {
+                    requestDeleteChatRoom(-1); //预约退出的
+                }else {
+                    requestExitChatRoom(-1); //预约退出的
+                }
+            }
+        });
+        //显示Dialog
+        mRoomFloatDialog.show();
+        mRoomFloatDialog.getWindow().setContentView(mFloatViewHolder.rootView);
     }
 
     private void calcFloatTimeDown() {
         if(mJmChartResp == null) return;
-        long delta = -(System.currentTimeMillis() - DateUtils.getStringToDate(mJmChartResp.getData().getAppoint_time(),
+        long delta = -(System.currentTimeMillis() - DateUtils.getStringToDate(mJmChartResp.getAppoint_time(),
                 "yyyy-MM-dd HH:mm:ss")*1000)/1000;
         boolean isReturn = false;
         String returnStr = "";
         if(delta <= 0) {
             isReturn = true;
-            returnStr = "已经开始";
+            returnStr = "到预约时间";
         }
-        if(mJmChartResp.getData().getWork() == 2) {
+        if(mJmChartResp.getWork() == 2) {
             //房间结束
             isReturn = true;
             returnStr = "已结束";
@@ -604,7 +761,7 @@ public class HomeFragment extends BaseFragment {
         bean.setCurrentCount(BChatRoom.getMembers().size());
         bean.setIndexNext(DataManager.getInstance().getSelfMember().getIndex());
 
-        JMsgSender.sendRoomMessage(bean);
+        JMsgUtil.sendRoomMessage(bean);
     }
 
     @Override
@@ -617,7 +774,6 @@ public class HomeFragment extends BaseFragment {
     @Override
     public void onLogin() {
         super.onLogin();
-        setOnLookerRecyclerView();
         //获取房间
         requestGetChatRoomByUser();
     }
@@ -657,18 +813,17 @@ public class HomeFragment extends BaseFragment {
         //只获取公开的
         HashMap<String,Object> param = new HashMap<>();
         param.put("public",1);
-        if(DataManager.getInstance().getUserInfo().getRole_type().equals(Constant.ROLETYPE_GUEST)) {
-            if(DataManager.getInstance().getUserInfo().getMarrige() == Constant.ROLE_UNMARRIED) {
-                //未婚
-                param.put("work",0);  //进行中
-            }else {
-                param.put("work",1);  //预约状态的
-            }
-        }else {
-            param.put("work",0);
-        }
-//        param.put("work",-1);  //进行中
-//        param.put("status",-2);
+//        if(DataManager.getInstance().getUserInfo().getRole_type().equals(Constant.ROLETYPE_GUEST)) {
+//            if(DataManager.getInstance().getUserInfo().getMarrige() == Constant.ROLE_UNMARRIED) {
+//                //未婚
+//                param.put("work",0);  //进行中
+//            }else {
+//                param.put("work",1);  //预约状态的
+//            }
+//        }else {
+//            param.put("work",0);
+//        }
+        param.put("work",0);
         mXqApi.getChatRoomList(param)
                 .subscribeOn(Schedulers.io())
                 .compose(this.<NetResult<List<BChatRoom>>>bindToLifecycle())
@@ -707,8 +862,12 @@ public class HomeFragment extends BaseFragment {
         public TextView textAppointTime;
         public TextView textCountDownTime;
         public TextView textDescription;
+        public TextView textStatus;
+        public TextView textCurrentNum;
         public Button btnExit;
         public Button btnEnter;
+
+        public boolean isSelfRoom;  //是否是自己的房间
 
         public OnLookerViewHolder(View rootView) {
             super(rootView);
@@ -719,6 +878,8 @@ public class HomeFragment extends BaseFragment {
             textDescription = rootView.findViewById(R.id.text_room_description);
             textRoomID = rootView.findViewById(R.id.text_room_id);
             textTitle = rootView.findViewById(R.id.text_room_title);
+            textStatus = rootView.findViewById(R.id.text_room_status);
+            textCurrentNum = rootView.findViewById(R.id.text_room_current_num);
             btnEnter = rootView.findViewById(R.id.btn_room_enter);
             btnExit = rootView.findViewById(R.id.btn_room_exit);
         }
@@ -733,12 +894,20 @@ public class HomeFragment extends BaseFragment {
         }
 
         @Override
-        public void onBindViewHolder(OnLookerViewHolder holder, int position) {
+        public void onBindViewHolder(final OnLookerViewHolder holder, int position) {
             final BChatRoom resp = m_roomList.get(position);
             if(resp == null) return;
             holder.textAppointTime.setText("开始时间：" + resp.getAppoint_time());
-            holder.textCount.setText("人数：" + String.valueOf(resp.getLimit_angel()
-                    + resp.getLimit_lady() + resp.getLimit_man()));
+            int currentNum = resp.getCount_angel() + resp.getCount_lady() + resp.getCount_man();
+            int limitNum = resp.getLimit_angel() + resp.getLimit_lady() + resp.getLimit_man();
+            holder.textCount.setText("参与人数：" + limitNum);
+            String str = "当前人数：" + currentNum;
+            if(currentNum < limitNum) {
+                str += "（未满）";
+            }else {
+                str += "（满员）";
+            }
+            holder.textCurrentNum.setText(str);
             if(TextUtils.isEmpty(resp.getDescribe())) {
                 holder.textDescription.setVisibility(View.GONE);
             }else {
@@ -747,34 +916,81 @@ public class HomeFragment extends BaseFragment {
             }
             holder.textRoomID.setText("房间ID：" + String.valueOf(resp.getRoom_id()));
             holder.textTitle.setText("主题：" + resp.getTitle());
+            if(resp.getWork() == 0) {
+                //还未开始
+                holder.textStatus.setText("未开始");
+                holder.textCountDownTime.setVisibility(View.VISIBLE);
+            }else if(resp.getWork() == 1) {
+                //开始中
+                holder.textStatus.setText("进行中");
+            }else {
+                //已结束
+                holder.textStatus.setText("已结束");
+            }
             holder.textCountDownTime.setVisibility(View.GONE);
+            boolean isSelf = false;
+            if(mJmChartResp != null && mJmChartResp.getRoom_id() == resp.getRoom_id()) {
+                //是自己加入的房间
+                isSelf = true;
+            }
+            holder.isSelfRoom = isSelf;
+            final String STR_EXIT = "退出";
+            final String STR_DELETE = "删除";
+            final String STR_ONLOOKER = "围观";
+            final String STR_ENTER = "进入";
+            final String STR_JOIN = "加入";
             if(DataManager.getInstance().getUserInfo().getRole_type().equals(Constant.ROLRTYPE_ANGEL)) {
-                holder.viewBtnLayout.setVisibility(View.GONE);
+                if(isSelf) {
+                    holder.btnExit.setText(STR_DELETE);
+                    holder.btnEnter.setText(STR_ENTER);
+                    holder.btnExit.setVisibility(View.VISIBLE);
+                }else {
+                    holder.btnEnter.setText(STR_ONLOOKER);
+                    holder.btnExit.setVisibility(View.GONE);
+                }
             }else {
                 if(DataManager.getInstance().getUserInfo().getMarrige() == Constant.ROLE_UNMARRIED) {
-                    holder.btnExit.setText("围观");
-                    holder.btnEnter.setText("加入");
+                    holder.btnExit.setText(isSelf?STR_EXIT:STR_ONLOOKER);
+                    holder.btnEnter.setText(isSelf?STR_ENTER:STR_JOIN);
+                    holder.btnExit.setVisibility(View.VISIBLE);
                 }else {
-                    holder.btnExit.setText("围观");
-                    holder.btnEnter.setVisibility(View.GONE);
+                    if(isSelf) {
+                        holder.btnExit.setText(STR_EXIT);
+                        holder.btnEnter.setText(STR_ENTER);
+                        holder.btnExit.setVisibility(View.VISIBLE);
+                    }else {
+                        holder.btnEnter.setText(STR_ONLOOKER);
+                        holder.btnExit.setVisibility(View.GONE);
+                    }
                 }
             }
-            holder.btnExit.setOnClickListener(new View.OnClickListener() {
+
+            View.OnClickListener listener = new View.OnClickListener() {
                 @Override
-                public void onClick(View view) {
-                    //围观
-                    joinChartRoom(Constant.ROOM_ROLETYPE_ONLOOKER,resp.getRoom_id(),false);
+                public void onClick(View v) {
+                    String text = ((Button)v).getText().toString();
+                    if(text.equals(STR_EXIT)) {
+                        //退出
+                        requestExitChatRoom(resp.getWork()==0?-1:0);
+                    }else if(text.equals(STR_DELETE)) {
+                        //删除
+                        requestDeleteChatRoom(resp.getWork()==0?-1:0);
+                    }else if(text.equals(STR_ENTER)) {
+                        //进入
+                        requestEnterChatRoom();
+                    }else if(text.equals(STR_JOIN)) {
+                        //加入
+                        mIsMatch = false;
+                        mRoomID = resp.getRoom_id();
+                        toCommitJoinParticipant();
+                    }else if(text.equals(STR_ONLOOKER)) {
+                        //围观
+                        joinChartRoom(Constant.ROOM_ROLETYPE_ONLOOKER,resp.getRoom_id(),false);
+                    }
                 }
-            });
-            holder.btnEnter.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    //参与者
-                    mIsMatch = false;
-                    mRoomID = resp.getRoom_id();
-                    toCommitJoinParticipant();
-                }
-            });
+            };
+            holder.btnExit.setOnClickListener(listener);
+            holder.btnEnter.setOnClickListener(listener);
         }
 
         @Override
@@ -782,32 +998,6 @@ public class HomeFragment extends BaseFragment {
             return m_roomList.size();
         }
     }
-
-    /**
-     * EventBus事件
-     *
-     * @param param
-     */
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onChatRoomUpdate(EventBusParam param) {
-        if (param.getEventBusCode() == EventBusParam.EVENT_BUS_CHATROOM_CREATE
-                || param.getEventBusCode() == EventBusParam.EVENT_BUS_CHATROOM_DELETE) {
-            //更新聊天室列表
-            setOnLookerRecyclerView();
-        } else if (param.getEventBusCode() == EventBusParam.EVENT_BUS_CHECK_BLACKUSER) {
-            //检查是否是黑名单
-            Tools.checkUserOrBlack(getActivity(), DataManager.getInstance().getUserInfo().getUser_name(), new BlackCheckListener() {
-                @Override
-                public void onResult(boolean isBlack) {
-
-                }
-            });
-        }else if(param.getEventBusCode() == EventBusParam.EVENT_BUS_CHATROOM_APPOINT) {
-            //房间预约,更新我的房间
-            requestGetChatRoomByUser();
-        }
-    }
-
 
     /*******************参与者加入房间**************************/
     private void toCommitJoinParticipant() {
@@ -991,6 +1181,9 @@ public class HomeFragment extends BaseFragment {
         public TextView textAppointTime;
         public TextView textCountDownTime;
         public TextView textDescription;
+        public TextView textStatus;
+        public TextView textCurrentNum;
+        public TextView textRoomRole;
         public Button btnExit;
         public Button btnEnter;
         public ImageView imageClose;
@@ -998,16 +1191,18 @@ public class HomeFragment extends BaseFragment {
 
     /****************************JM 房间信息处理*********************************************/
     private final int JM_ROOM_CODE_JOIN = 1;
+    private final int JM_ROOM_CODE_EXIT = 2;
+    private final int JM_ROOM_CODE_DELETE = 3;
 
     private void sendJMRoomMessage(JMRoomSendParam param,boolean isHanldeSelf) {
-        JMsgSender.sendJMRoomMessage(param);
+        JMsgUtil.sendJMRoomMessage(param);
         if(isHanldeSelf) {
             handleJMRoomMessage(param);
         }
     }
 
     private void sendJMSingleMessage(JMSingleSendParam param,boolean isHanldeSelf) {
-        JMsgSender.sendJMSigleMessage(param);
+        JMsgUtil.sendJMSigleMessage(param);
         if(isHanldeSelf) {
             handleJMSingleMessage(param);
         }
@@ -1018,8 +1213,14 @@ public class HomeFragment extends BaseFragment {
      * @param param
      */
     private void handleJMRoomMessage(JMRoomSendParam param) {
-        if(param.getCode() == JM_ROOM_CODE_JOIN) {
+        if(param.getCode() == JM_ROOM_CODE_JOIN
+                || param.getCode() == JM_ROOM_CODE_EXIT
+                || param.getCode() == JM_ROOM_CODE_DELETE) {
             //有人加入房间，更新自己的房间
+            mIsSelfRoomDelete = false;
+            if(param.getCode() == JM_ROOM_CODE_DELETE) {
+                mIsSelfRoomDelete = true;
+            }
             requestGetChatRoomByUser();
         }
     }
@@ -1073,6 +1274,41 @@ public class HomeFragment extends BaseFragment {
         }catch (Exception e) {
             Log.e("yy",e.toString());
             return;
+        }
+    }
+
+    /**
+     * 处理EventBus的类
+     */
+    public class EventBusHelp {
+        public EventBusHelp() {
+            EventBus.getDefault().register(this);
+        }
+
+        /**
+         * EventBus事件
+         *
+         * @param param
+         */
+        @Subscribe(threadMode = ThreadMode.MAIN)
+        public void onEventBus(EventBusParam param) {
+            if (param.getEventBusCode() == EventBusParam.EVENT_BUS_CHATROOM_CREATE
+                    || param.getEventBusCode() == EventBusParam.EVENT_BUS_CHATROOM_DELETE) {
+                //更新聊天室列表
+                requestGetChatRoomByUser();
+            } else if (param.getEventBusCode() == EventBusParam.EVENT_BUS_CHECK_BLACKUSER) {
+                //检查是否是黑名单
+                Tools.checkUserOrBlack(getActivity(), DataManager.getInstance().getUserInfo().getUser_name(), new BlackCheckListener() {
+                    @Override
+                    public void onResult(boolean isBlack) {
+
+                    }
+                });
+            }
+        }
+
+        public void onDestroy() {
+            EventBus.getDefault().unregister(this);
         }
     }
 }

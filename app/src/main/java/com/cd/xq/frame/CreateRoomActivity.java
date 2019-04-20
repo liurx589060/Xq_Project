@@ -472,10 +472,6 @@ public class CreateRoomActivity extends BaseActivity {
 
                         //退出Activity
                         finish();
-
-                        EventBusParam busParam = new EventBusParam();
-                        busParam.setEventBusCode(EventBusParam.EVENT_BUS_CHATROOM_APPOINT);
-                        EventBus.getDefault().post(busParam);
                     }
                 }, new Consumer<Throwable>() {
                     @Override

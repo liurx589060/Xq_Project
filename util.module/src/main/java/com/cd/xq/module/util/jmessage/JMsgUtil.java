@@ -8,7 +8,9 @@ import com.cd.xq.module.util.beans.jmessage.JMSendBean;
 import com.cd.xq.module.util.tools.Log;
 import com.google.gson.Gson;
 
+import cn.jpush.im.android.api.ChatRoomManager;
 import cn.jpush.im.android.api.JMessageClient;
+import cn.jpush.im.android.api.callback.RequestCallback;
 import cn.jpush.im.android.api.model.Conversation;
 import cn.jpush.im.android.api.model.Message;
 import cn.jpush.im.android.api.options.MessageSendingOptions;
@@ -18,7 +20,7 @@ import cn.jpush.im.api.BasicCallback;
  * Created by Administrator on 2018/3/10.
  */
 
-public class JMsgSender {
+public class JMsgUtil {
 
 
     /**
@@ -139,5 +141,29 @@ public class JMsgSender {
         MessageSendingOptions options = new MessageSendingOptions();
         options.setShowNotification(false);
         JMessageClient.sendMessage(message,options);
+    }
+
+    /**
+     * 退出聊天室
+     * @param roomId
+     */
+    public static void exitJMChatRoom(long roomId,BasicCallback callback) {
+        ChatRoomManager.leaveChatRoom(roomId,callback);
+    }
+
+    /**
+     * 进入聊天室聊天室
+     * @param roomId
+     */
+    public static void enterJMChatRoom(long roomId,RequestCallback<Conversation> callback) {
+        ChatRoomManager.enterChatRoom(roomId,callback);
+    }
+
+    /**
+     * 删除聊天室
+     * @param roomId
+     */
+    public static void deleteJMChatRoom(long roomId,RequestCallback<Conversation> callback) {
+        ChatRoomManager.enterChatRoom(roomId,callback);
     }
 }

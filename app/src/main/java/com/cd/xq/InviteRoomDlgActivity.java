@@ -16,7 +16,7 @@ import com.cd.xq.beans.JMFriendInviteParam;
 import com.cd.xq.module.chart.DoubleRoomActivity;
 import com.cd.xq.module.util.beans.jmessage.JMSendBean;
 import com.cd.xq.module.util.beans.user.UserInfoBean;
-import com.cd.xq.module.util.jmessage.JMsgSender;
+import com.cd.xq.module.util.jmessage.JMsgUtil;
 import com.cd.xq.module.util.manager.DataManager;
 import com.cd.xq.module.util.network.NetWorkMg;
 import com.cd.xq.module.util.tools.Log;
@@ -121,7 +121,7 @@ public class InviteRoomDlgActivity extends Activity {
                     param.setAction(JMFriendInviteParam.ACTION_CANCEL);
                     param.setFromUser(DataManager.getInstance().getUserInfo());
                     sendBean.setJsonData(new Gson().toJson(param));
-                    JMsgSender.sendTextMessage(sendBean);
+                    JMsgUtil.sendTextMessage(sendBean);
                 }
                 mCurrentTime ++;
                 mHandler.postDelayed(this,1000);
@@ -138,7 +138,7 @@ public class InviteRoomDlgActivity extends Activity {
         param.setAction(JMFriendInviteParam.ACTION_CREATE);
         param.setFromUser(DataManager.getInstance().getUserInfo());
         sendBean.setJsonData(new Gson().toJson(param));
-        JMsgSender.sendTextMessage(sendBean);
+        JMsgUtil.sendTextMessage(sendBean);
     }
 
     private void doReceive() {
@@ -172,7 +172,7 @@ public class InviteRoomDlgActivity extends Activity {
                 param.setAction(JMFriendInviteParam.ACTION_CANCEL);
                 param.setFromUser(DataManager.getInstance().getUserInfo());
                 sendBean.setJsonData(new Gson().toJson(param));
-                JMsgSender.sendTextMessage(sendBean);
+                JMsgUtil.sendTextMessage(sendBean);
             }
                 break;
             case R.id.dlg_invite_receive_btn_refuse:
@@ -188,7 +188,7 @@ public class InviteRoomDlgActivity extends Activity {
                 param.setAction(JMFriendInviteParam.ACTION_REFUSE);
                 param.setFromUser(DataManager.getInstance().getUserInfo());
                 sendBean.setJsonData(new Gson().toJson(param));
-                JMsgSender.sendTextMessage(sendBean);
+                JMsgUtil.sendTextMessage(sendBean);
             }
                 break;
             case R.id.dlg_invite_receive_btn_accept:
@@ -204,7 +204,7 @@ public class InviteRoomDlgActivity extends Activity {
                 param.setAction(JMFriendInviteParam.ACTION_ACCEPT);
                 param.setFromUser(DataManager.getInstance().getUserInfo());
                 sendBean.setJsonData(new Gson().toJson(param));
-                JMsgSender.sendTextMessage(sendBean);
+                JMsgUtil.sendTextMessage(sendBean);
 
                 //进入两人聊天室
                 startDoubleRoomActivity();

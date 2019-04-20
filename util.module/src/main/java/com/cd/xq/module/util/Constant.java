@@ -13,7 +13,8 @@ public class Constant {
 
     public static String ROLRTYPE_ANGEL = "angel";
     public static String ROLETYPE_GUEST = "guest";
-    public static String ROLETYPE_ALL = "guest|angel";
+    public static String ROLETYPE_LOOKER = "looker";
+    public static String ROLETYPE_ALL = "guest|angel|looker";
     public static int ROLE_MARRIED = 2;   //已婚
     public static int ROLE_UNMARRIED = 1;   //未婚
     public static int ROOM_ROLETYPE_PARTICIPANTS = 1;   //参与者

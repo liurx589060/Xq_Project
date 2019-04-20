@@ -7,12 +7,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class BChatRoom {
-
     private long room_id;
     private int limit_level;
     private int limit_lady;
     private int limit_man;
     private int limit_angel;
+    private int count_lady;
+    private int count_man;
+    private int count_angel;
     private String push_address = "";
     private String play_address = "";
     private List<Member> members;
@@ -22,6 +24,7 @@ public class BChatRoom {
     private String title = "";
     private String describe = "";
     private int work = 2;  //默认结束
+    private int room_role_type;
 
     public void setMembers(List<Member> members) {
          this.members = members;
@@ -138,5 +141,37 @@ public class BChatRoom {
 
     public void setWork(int work) {
         this.work = work;
+    }
+
+    public int getCount_lady() {
+        return count_lady;
+    }
+
+    public void setCount_lady(int count_lady) {
+        this.count_lady = count_lady;
+    }
+
+    public int getCount_man() {
+        return count_man;
+    }
+
+    public void setCount_man(int count_man) {
+        this.count_man = count_man;
+    }
+
+    public int getCount_angel() {
+        return count_angel;
+    }
+
+    public void setCount_angel(int count_angel) {
+        this.count_angel = count_angel;
+    }
+
+    public int getRoom_role_type() {
+        return room_role_type;
+    }
+
+    public void setRoom_role_type(int room_role_type) {
+        this.room_role_type = room_role_type;
     }
 }

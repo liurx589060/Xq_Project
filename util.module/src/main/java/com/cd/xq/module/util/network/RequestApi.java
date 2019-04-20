@@ -54,10 +54,13 @@ public interface RequestApi {
 //    Observable<NetResult> cancelChatRoom(@Query("userName") String userName,@Query("roomId") long roomId);
 
     @GET("JMessage/exitChatRoom")
-    Observable<NetResult> exitChatRoom(@QueryMap Map<String, Object> map);
+    Observable<NetResult<BChatRoom>> exitChatRoom(@QueryMap Map<String, Object> map);
+
+    @GET("JMessage/deleteChatRoom")
+    Observable<NetResult<BChatRoom>> deleteChatRoom(@QueryMap Map<String, Object> map);
 
     @GET("JMessage/getChatRoomByUser")
-    Observable<JMChartResp> getChatRoomByUser(@Query("userName") String userName);
+    Observable<NetResult<BChatRoom>> getChatRoomByUser(@Query("userName") String userName);
 
     @GET("JMessage/exitChartRoom")
     Observable<JMChartResp> exitChartRoom(@QueryMap Map<String, Object> map);
@@ -67,6 +70,9 @@ public interface RequestApi {
 
     @GET("JMessage/joinChatRoom")
     Observable<NetResult<BChatRoom>> joinChatRoom(@QueryMap Map<String, Object> map);
+
+    @GET("JMessage/enterChatRoom")
+    Observable<NetResult<BChatRoom>> enterChatRoom(@Query("roomId") long roomId);
 
     @GET("User/getBlackUserByName")
     Observable<NetResult<BBlackUser>> getBlackUserByName(@QueryMap Map<String, Object> map);

@@ -37,6 +37,8 @@ public class JMChartRoomSendBean {
     public static final int CHART_ONLOOKER_ENTER_STATUS = 1002;//围观者进入房间时当前的状态
 
     public static final int CHART_GOTO_DOUBLE_ROOM = 2000;//转入双人聊天室
+    public static final int CHART_DELETE_ROOM = 2001;//房间解散
+    public static final int CHART_PARTICIPANTS_EXIT_ROOM = 2002;//参与者离开房间
 
     public static final int LIVE_CAMERA = 0x101;
     public static final int LIVE_MIC = 0x102;

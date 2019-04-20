@@ -7,6 +7,7 @@ import com.cd.xq.module.chart.status.statusBeans.EmptyChatBean;
 import com.cd.xq.module.chart.status.statusBeans.StatusAngelChartBean;
 import com.cd.xq.module.chart.status.statusBeans.StatusChartFinalBean;
 import com.cd.xq.module.chart.status.statusBeans.StatusConsumeGiftBean;
+import com.cd.xq.module.chart.status.statusBeans.StatusDeleteRoomBean;
 import com.cd.xq.module.chart.status.statusBeans.StatusHelpChangeLiveTypeBean;
 import com.cd.xq.module.chart.status.statusBeans.StatusHelpDoingDisturbBean;
 import com.cd.xq.module.chart.status.statusBeans.StatusHelpExitBean;
@@ -28,8 +29,9 @@ import com.cd.xq.module.chart.status.statusBeans.StatusManSecondSelectBean;
 import com.cd.xq.module.chart.status.statusBeans.StatusMatchBean;
 import com.cd.xq.module.chart.status.statusBeans.StatusOnLookerEnterBean;
 import com.cd.xq.module.chart.status.statusBeans.StatusOnLookerExitBean;
+import com.cd.xq.module.chart.status.statusBeans.StatusParticipantsExitBean;
 import com.cd.xq.module.util.beans.jmessage.JMChartRoomSendBean;
-import com.cd.xq.module.util.jmessage.JMsgSender;
+import com.cd.xq.module.util.jmessage.JMsgUtil;
 import com.cd.xq.module.util.status.BaseStatus;
 import com.cd.xq.module.util.status.StatusResp;
 
@@ -114,6 +116,8 @@ public class StatusManager {
         mHelpStatusMap.put(JMChartRoomSendBean.CHART_ONLOOKER_ENTER,new StatusOnLookerEnterBean());
         mHelpStatusMap.put(JMChartRoomSendBean.CHART_ONLOOKER_EXIT,new StatusOnLookerExitBean());
         mHelpStatusMap.put(JMChartRoomSendBean.CHART_HELP_GIFT_CONSUMR_STATUS,new StatusConsumeGiftBean());
+        mHelpStatusMap.put(JMChartRoomSendBean.CHART_DELETE_ROOM,new StatusDeleteRoomBean());
+        mHelpStatusMap.put(JMChartRoomSendBean.CHART_PARTICIPANTS_EXIT_ROOM,new StatusParticipantsExitBean());
 
         //设置流程序列
         Iterator helpEntry = mHelpStatusMap.entrySet().iterator();
@@ -231,7 +235,7 @@ public class StatusManager {
      * @param chartRoomSendBean
      */
     public void sendRoomMessage(JMChartRoomSendBean chartRoomSendBean) {
-        JMsgSender.sendRoomMessage(chartRoomSendBean);
+        JMsgUtil.sendRoomMessage(chartRoomSendBean);
         handlerRoomChart(chartRoomSendBean);
     }
 

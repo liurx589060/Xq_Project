@@ -46,7 +46,7 @@ import com.cd.xq.module.util.beans.jmessage.JMChartResp;
 import com.cd.xq.module.util.beans.jmessage.JMChartRoomSendBean;
 import com.cd.xq.module.util.beans.jmessage.Member;
 import com.cd.xq.module.util.beans.user.UserInfoBean;
-import com.cd.xq.module.util.jmessage.JMsgSender;
+import com.cd.xq.module.util.jmessage.JMsgUtil;
 import com.cd.xq.module.util.manager.DataManager;
 import com.cd.xq.module.util.network.NetWorkMg;
 import com.cd.xq.module.util.network.RequestApi;
@@ -616,6 +616,14 @@ public class XqStatusChartUIViewMg extends AbsChartView{
 
     }
 
+    /**
+     * 解散房间
+     */
+    public void statusDeleteRoom() {
+        Tools.toast(mXqActivity.getApplicationContext(),"房间已经解散",false);
+        mXqActivity.finish();
+    }
+
     @SuppressLint("CheckResult")
     private void getChartRoomMembersList(long roomId) {
         mApi.getChartRoomMemeberList(roomId)
@@ -648,11 +656,13 @@ public class XqStatusChartUIViewMg extends AbsChartView{
     }
 
     private void exit() {
-        if(DataManager.getInstance().getUserInfo().getUser_name().equals(DataManager.getInstance().getChartBChatRoom().getCreater())) {
-            deleteChartRoom();
-        }else {
-            exitChartRoom();
-        }
+//        if(DataManager.getInstance().getUserInfo().getUser_name().equals(DataManager.getInstance().getChartBChatRoom().getCreater())) {
+//            deleteChartRoom();
+//        }else {
+//            exitChartRoom();
+//        }
+
+        requestExitChatRoom(mIsRoomMatchSuccess?1:0);
     }
 
     private void deleteChartRoom() {
@@ -682,6 +692,47 @@ public class XqStatusChartUIViewMg extends AbsChartView{
 
                         norifyRoomExit(JMNormalSendBean.NORMAL_EXIT);
                         mXqActivity.finish();
+                    }
+                });
+    }
+
+    /**
+     * 退出房间
+     */
+    private void requestExitChatRoom(final int status) {
+        //发送退出房间的消息
+        BaseStatus baseStatus = null;
+        if(DataManager.getInstance().getUserInfo().getUser_name()
+                .equals(DataManager.getInstance().getChartBChatRoom().getCreater())) {
+            baseStatus = mStatusManager.getStatus(JMChartRoomSendBean.CHART_DELETE_ROOM);
+        }else {
+            baseStatus = mStatusManager.getStatus(JMChartRoomSendBean.CHART_PARTICIPANTS_EXIT_ROOM);
+        }
+        JMChartRoomSendBean sendBean = baseStatus.getChartSendBeanWillSend(null,
+                BaseStatus.MessageType.TYPE_SEND);
+        mStatusManager.sendRoomMessage(sendBean);
+
+        HashMap<String,Object> param = new HashMap<>();
+        param.put("userName",DataManager.getInstance().getUserInfo().getUser_name());
+        param.put("roomId",DataManager.getInstance().getChartBChatRoom().getRoom_id());
+        param.put("status",status); //失败
+        mApi.exitChatRoom(param)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Consumer<NetResult>() {
+                    @Override
+                    public void accept(NetResult netResult) throws Exception {
+                        if (netResult.getStatus() != XqErrorCode.SUCCESS) {
+                            com.cd.xq.module.util.tools.Log.e("requestCancelChatRoom--" + netResult.getMsg());
+                            return;
+                        }
+                        mXqActivity.finish();
+                    }
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Exception {
+                        com.cd.xq.module.util.tools.Log.e("requestExitChatRoom--" + throwable.toString());
+                        Tools.toast(mXqActivity.getApplicationContext(),throwable.toString(),false);
                     }
                 });
     }
@@ -730,7 +781,7 @@ public class XqStatusChartUIViewMg extends AbsChartView{
                                 normalSendBean.setTime(Tools.getCurrentDateTime());
                                 normalSendBean.setRoomId(DataManager.getInstance().getChartBChatRoom().getRoom_id());
                                 normalSendBean.setMsg(DataManager.getInstance().getUserInfo().getNick_name() + "--离开房间");
-                                JMsgSender.sendNomalMessage(normalSendBean);
+                                JMsgUtil.sendNomalMessage(normalSendBean);
                             }
                         }
 
@@ -755,7 +806,7 @@ public class XqStatusChartUIViewMg extends AbsChartView{
                 normalSendBean.setCode(code);
                 normalSendBean.setRoomId(DataManager.getInstance().getChartBChatRoom().getRoom_id());
                 normalSendBean.setTargetUserName(member.getUserInfo().getUser_name());
-                JMsgSender.sendNomalMessage(normalSendBean);
+                JMsgUtil.sendNomalMessage(normalSendBean);
             }
         }
     }
@@ -790,7 +841,7 @@ public class XqStatusChartUIViewMg extends AbsChartView{
             sendBean1.setRoomId(DataManager.getInstance().getChartBChatRoom().getRoom_id());
             sendBean1.setTargetUserName(targetBean.getUser_name());
             sendBean1.setExtra(extraStr);
-            JMsgSender.sendNomalMessage(sendBean1);
+            JMsgUtil.sendNomalMessage(sendBean1);
         }
     }
 
@@ -1303,6 +1354,12 @@ public class XqStatusChartUIViewMg extends AbsChartView{
                 return;
             }
 
+            if(chartRoomSendBean.getProcessStatus() == JMChartRoomSendBean.CHART_DELETE_ROOM) {
+                //解散房间
+                Tools.toast(mXqActivity,"房间被解散",true);
+                mXqActivity.finish();
+                return;
+            }
             if(chartRoomSendBean.getProcessStatus() < mStatusManager.getCurrentSendBean().getProcessStatus()
                     && chartRoomSendBean.getMessageType() == BaseStatus.MessageType.TYPE_SEND) {
                 return;
@@ -1435,7 +1492,7 @@ public class XqStatusChartUIViewMg extends AbsChartView{
 
         String strExtra = object.toString();
         sendBean.setExtra(strExtra);
-        JMsgSender.sendNomalMessage(sendBean);
+        JMsgUtil.sendNomalMessage(sendBean);
     }
 
     private class ViewInstance {

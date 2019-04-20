@@ -1,32 +1,12 @@
 package com.cd.xq.utils;
 
-import android.content.Context;
-import android.content.pm.PackageManager;
-import android.os.Handler;
-import android.support.annotation.Nullable;
-
-import com.allenliu.versionchecklib.v2.AllenVersionChecker;
-import com.allenliu.versionchecklib.v2.builder.DownloadBuilder;
-import com.allenliu.versionchecklib.v2.builder.UIData;
-import com.allenliu.versionchecklib.v2.callback.ForceUpdateListener;
-import com.allenliu.versionchecklib.v2.callback.RequestVersionListener;
-import com.cd.xq.beans.BCheckUpdate;
 import com.cd.xq.beans.JMOnlineParam;
 import com.cd.xq.manager.AppDataManager;
-import com.cd.xq.module.util.beans.NetResult;
 import com.cd.xq.module.util.beans.jmessage.JMSendBean;
 import com.cd.xq.module.util.beans.user.UserInfoBean;
-import com.cd.xq.module.util.jmessage.JMsgSender;
+import com.cd.xq.module.util.jmessage.JMsgUtil;
 import com.cd.xq.module.util.manager.DataManager;
-import com.cd.xq.module.util.network.NetWorkMg;
-import com.cd.xq.module.util.tools.Log;
-import com.cd.xq.network.XqRequestApi;
 import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-
-import java.lang.reflect.Type;
-
-import static com.cd.xq.module.util.network.NetWorkMg.IP_ADDRESS;
 
 /**
  * Created by Administrator on 2019/2/13.
@@ -54,6 +34,6 @@ public class AppTools {
         param.setType(JMOnlineParam.TYPE_SEND);
         param.setOnLine(isOnLine);
         sendBean.setJsonData(new Gson().toJson(param));
-        JMsgSender.sendTextMessage(sendBean);
+        JMsgUtil.sendTextMessage(sendBean);
     }
 }
