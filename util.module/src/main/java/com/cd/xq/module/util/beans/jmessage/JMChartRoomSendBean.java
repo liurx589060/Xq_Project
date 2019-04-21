@@ -7,7 +7,11 @@ import com.cd.xq.module.util.status.BaseStatus;
  */
 
 public class JMChartRoomSendBean {
-    public static final int CHART_STATUS_MATCHING = 1;          //匹配
+    //在流程之前，并且流程开始后不在执行的
+    public static final int CHART_INITIAL = Integer.MIN_VALUE;  //最初状态
+    public static final int CHART_PRE_START_LIVE = -100;//开始直播
+
+    public static final int CHART_STATUS_PARTICIPANTS_ENTER = 1;          //人员进场
     public static final int CHART_STATUS_INTRO_MAN = 2;         //男生自我介绍
     public static final int CHART_STATUS_LADY_SELECT_FIRST = 3; //女生第一次选择
     public static final int CHART_STATUS_INTRO_LADY = 4;        //女生聊天第一轮
@@ -32,8 +36,7 @@ public class JMChartRoomSendBean {
     public static final int CHART_HELP_STATUS_CHART_EXIT_ROOM = 104;       //离开房间
     public static final int CHART_HELP_GIFT_CONSUMR_STATUS = 105;//礼物消费
     public static final int CHART_HELP_START_ROOM = 106;//房间开始
-    public static final int CHART_HELP_START_LIVE = 107;//开始直播
-    public static final int CHART_HELP_STOP_LIVE = 108;//停止直播
+    public static final int CHART_PRE_STOP_LIVE = 107;//停止直播
 
     public static final int CHART_ONLOOKER_ENTER = 1000;          //围观者进入
     public static final int CHART_ONLOOKER_EXIT = 1001;          //围观者离开
@@ -47,7 +50,7 @@ public class JMChartRoomSendBean {
     public static final int LIVE_MIC = 0x102;
     public static final int LIVE_NONE = 0x100;
 
-    private int processStatus;
+    private int processStatus = Integer.MIN_VALUE;
     private int currentCount;
     private int indexSelf;
     private int indexNext;

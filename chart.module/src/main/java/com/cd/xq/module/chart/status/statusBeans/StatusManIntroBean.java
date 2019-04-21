@@ -103,6 +103,7 @@ public class StatusManIntroBean extends ChatBaseStatus {
     public void handleSend(StatusResp statusResp, JMChartRoomSendBean sendBean) {
         chartUIViewMg.stopTiming();
         chartUIViewMg.resetLiveStatus();
+        chartUIViewMg.statusManIntro(sendBean);
 
         chartUIViewMg.setTipText(getPublicString());
         chartUIViewMg.addSystemEventAndRefresh(sendBean);

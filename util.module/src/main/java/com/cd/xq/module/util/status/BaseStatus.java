@@ -75,6 +75,13 @@ public abstract class BaseStatus {
         mHandledIndexList = new ArrayList<>();
     }
 
+    public void initial() {
+        mCompleteCount = 0;
+        mOrder = -1;
+        mStartIndex = 0;
+        mHandledIndexList.clear();
+    }
+
     /**
      * 字符的类型标识
      * @return

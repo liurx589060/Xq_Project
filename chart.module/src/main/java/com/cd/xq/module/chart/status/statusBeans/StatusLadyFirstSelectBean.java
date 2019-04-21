@@ -15,6 +15,13 @@ public class StatusLadyFirstSelectBean extends ChatBaseStatus {
     private int mCompleteCount = 0;
     private Map<Integer,Boolean> ladySelectedResultMap;
 
+    @Override
+    public void initial() {
+        super.initial();
+        mCompleteCount = 0;
+        ladySelectedResultMap.clear();
+    }
+
     public StatusLadyFirstSelectBean() {
         ladySelectedResultMap = new HashMap<>();
     }

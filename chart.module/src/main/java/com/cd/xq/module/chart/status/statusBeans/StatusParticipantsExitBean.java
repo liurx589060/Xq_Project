@@ -3,8 +3,11 @@ package com.cd.xq.module.chart.status.statusBeans;
 
 import com.cd.xq.module.util.Constant;
 import com.cd.xq.module.util.beans.jmessage.JMChartRoomSendBean;
+import com.cd.xq.module.util.beans.jmessage.Member;
 import com.cd.xq.module.util.manager.DataManager;
 import com.cd.xq.module.util.status.StatusResp;
+
+import java.util.List;
 
 import static com.cd.xq.module.util.status.BaseStatus.HandleType.HANDLE_NONE;
 
@@ -106,6 +109,19 @@ public class StatusParticipantsExitBean extends ChatBaseStatus {
     public void handleSend(StatusResp statusResp, JMChartRoomSendBean sendBean) {
         chartUIViewMg.addSystemEventAndRefresh(sendBean);
         chartUIViewMg.statusParticipantsExit(sendBean);
+        String angelName = "";
+        List<Member> list = DataManager.getInstance().getChartBChatRoom().getMembers();
+        for(int i = 0 ; i < list.size();i++) {
+            Member member = list.get(i);
+            if(member.getUserInfo().getRole_type().equals(Constant.ROLRTYPE_ANGEL)) {
+                angelName = member.getUserInfo().getUser_name();
+                break;
+            }
+        }
+        if(sendBean.getUserName().equals(angelName)) {
+            //爱心大使退出
+            chartUIViewMg.resetLiveStatus();
+        }
     }
 
     @Override

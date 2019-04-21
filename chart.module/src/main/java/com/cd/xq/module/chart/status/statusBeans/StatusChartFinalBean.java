@@ -24,7 +24,7 @@ public class StatusChartFinalBean extends ChatBaseStatus {
 
     @Override
     public int getLiveTimeCount() {
-        return 0;
+        return 60;
     }
 
     @Override

@@ -6,21 +6,22 @@ import com.cd.xq.module.util.beans.jmessage.JMChartRoomSendBean;
 import com.cd.xq.module.util.status.StatusResp;
 
 import static com.cd.xq.module.util.status.BaseStatus.HandleType.HANDLE_MATCH;
+import static com.cd.xq.module.util.status.BaseStatus.HandleType.HANDLE_NONE;
 
 /**
- * 匹配状态
+ * 最初状态
  * Created by Administrator on 2018/9/26.
  */
 
-public class StatusMatchBean extends ChatBaseStatus {
+public class StatusInitialBean extends ChatBaseStatus {
     @Override
     public String getTypesWithString() {
-        return "Match_Status";
+        return "Initial_Status";
     }
 
     @Override
     public String getPublicString() {
-        return "匹配阶段";
+        return "人员进场";
     }
 
     @Override
@@ -30,7 +31,7 @@ public class StatusMatchBean extends ChatBaseStatus {
 
     @Override
     public int getStatus() {
-        return JMChartRoomSendBean.CHART_STATUS_MATCHING;
+        return JMChartRoomSendBean.CHART_INITIAL;
     }
 
     @Override
@@ -50,20 +51,18 @@ public class StatusMatchBean extends ChatBaseStatus {
 
     @Override
     public HandleType getHandleType() {
-        return HANDLE_MATCH;
+        return HANDLE_NONE;
     }
 
     @Override
     public boolean isLast(int completeCount,JMChartRoomSendBean receiveBean) {
-        int allCount = mBChatRoom.getLimit_angel() + mBChatRoom.getLimit_man() + mBChatRoom.getLimit_lady();
-        boolean isLast = receiveBean.getCurrentCount()>=allCount?true:false;
-        return isLast;
+        return false;
     }
 
     @Override
     public JMChartRoomSendBean getChartSendBeanWillSend(JMChartRoomSendBean receiveBean,MessageType messageType) {
         JMChartRoomSendBean sendBean = createBaseChartRoomSendBean();
-        sendBean.setMsg("嘉宾"+ mUserInfo.getUser_name() +"进入房间");
+        sendBean.setMsg("重新准备房间");
         sendBean.setProcessStatus(getStatus());
         sendBean.setMessageType(messageType);
 
@@ -92,17 +91,10 @@ public class StatusMatchBean extends ChatBaseStatus {
 
     @Override
     public void handleSend(StatusResp statusResp, JMChartRoomSendBean sendBean) {
+        chartUIViewMg.addSystemEventAndRefresh(sendBean);
         chartUIViewMg.stopTiming();
         chartUIViewMg.resetLiveStatus();
-
-        chartUIViewMg.requestGetChatRoomMemberParticipants();
-        chartUIViewMg.setTipText(getPublicString());
-        chartUIViewMg.addSystemEventAndRefresh(sendBean);
-        chartUIViewMg.speech(sendBean.getMsg());
-
-        if(statusResp.isLast()) {
-            chartUIViewMg.statusMatch(sendBean);
-        }
+        chartUIViewMg.statusInitialRoom(sendBean);
     }
 
     @Override

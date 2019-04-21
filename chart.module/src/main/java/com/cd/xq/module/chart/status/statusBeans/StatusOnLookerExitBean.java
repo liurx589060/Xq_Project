@@ -98,6 +98,7 @@ public class StatusOnLookerExitBean extends ChatBaseStatus {
         chartUIViewMg.statusUpdateOnLookerList(sendBean);
     }
 
+
     @Override
     public void handleResponse(StatusResp statusResp, JMChartRoomSendBean sendBean) {
 

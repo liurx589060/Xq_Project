@@ -31,7 +31,7 @@ public class StatusStartLiveBean extends ChatBaseStatus {
 
     @Override
     public int getStatus() {
-        return JMChartRoomSendBean.CHART_HELP_START_LIVE;
+        return JMChartRoomSendBean.CHART_PRE_START_LIVE;
     }
 
     @Override
@@ -86,10 +86,6 @@ public class StatusStartLiveBean extends ChatBaseStatus {
     @Override
     public void onEnd() {
 
-    }
-
-    @Override
-    protected void onPostHandler(StatusResp resp, JMChartRoomSendBean receiveBean) {
     }
 
     @Override

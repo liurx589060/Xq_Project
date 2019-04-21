@@ -13,6 +13,13 @@ public class StatusManFirstSelectBean extends ChatBaseStatus {
     protected int mSelectLadyIndex = -1;
 
     @Override
+    public void initial() {
+        super.initial();
+        mCompleteCount = 0;
+        mSelectLadyIndex = -1;
+    }
+
+    @Override
     public String getTypesWithString() {
         return "Man_First_Select_Status";
     }

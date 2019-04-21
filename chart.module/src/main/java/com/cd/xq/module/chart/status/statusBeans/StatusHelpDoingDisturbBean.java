@@ -12,6 +12,12 @@ public class StatusHelpDoingDisturbBean extends ChatBaseStatus {
     private boolean isSelfDisturbing;
 
     @Override
+    public void initial() {
+        super.initial();
+        isSelfDisturbing = false;
+    }
+
+    @Override
     public String getTypesWithString() {
         return "Angel_Doing_disturb";
     }

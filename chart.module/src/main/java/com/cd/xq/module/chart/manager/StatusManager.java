@@ -26,12 +26,13 @@ import com.cd.xq.module.chart.status.statusBeans.StatusManIntroBean;
 import com.cd.xq.module.chart.status.statusBeans.StatusManPerformanceBean;
 import com.cd.xq.module.chart.status.statusBeans.StatusManSecondQuestionBean;
 import com.cd.xq.module.chart.status.statusBeans.StatusManSecondSelectBean;
-import com.cd.xq.module.chart.status.statusBeans.StatusMatchBean;
+import com.cd.xq.module.chart.status.statusBeans.StatusParticipantsEnterBean;
 import com.cd.xq.module.chart.status.statusBeans.StatusOnLookerEnterBean;
 import com.cd.xq.module.chart.status.statusBeans.StatusOnLookerExitBean;
 import com.cd.xq.module.chart.status.statusBeans.StatusParticipantsExitBean;
 import com.cd.xq.module.chart.status.statusBeans.StatusStartLiveBean;
 import com.cd.xq.module.chart.status.statusBeans.StatusStopLiveBean;
+import com.cd.xq.module.chart.status.statusBeans.StatusInitialBean;
 import com.cd.xq.module.util.beans.jmessage.JMChartRoomSendBean;
 import com.cd.xq.module.util.jmessage.JMsgUtil;
 import com.cd.xq.module.util.status.BaseStatus;
@@ -77,7 +78,8 @@ public class StatusManager {
         mHelpStatusMap = new LinkedHashMap<>();
         mHandleSelfList = new ArrayList<>();
 
-        mOrderStatusMap.put(JMChartRoomSendBean.CHART_STATUS_MATCHING,new StatusMatchBean());
+
+        mOrderStatusMap.put(JMChartRoomSendBean.CHART_STATUS_PARTICIPANTS_ENTER,new StatusParticipantsEnterBean());
         mOrderStatusMap.put(JMChartRoomSendBean.CHART_STATUS_INTRO_MAN,new StatusManIntroBean());
         mOrderStatusMap.put(JMChartRoomSendBean.CHART_STATUS_LADY_SELECT_FIRST,new StatusLadyFirstSelectBean());
         mOrderStatusMap.put(JMChartRoomSendBean.CHART_STATUS_INTRO_LADY,new StatusLadyChartFirstBean());
@@ -111,12 +113,13 @@ public class StatusManager {
         }
 
         //添加辅助状态机
+        mHelpStatusMap.put(JMChartRoomSendBean.CHART_INITIAL,new StatusInitialBean());
         mHelpStatusMap.put(JMChartRoomSendBean.CHART_HELP_STATUS_CHART_CHANGR_LIVETYPE,new StatusHelpChangeLiveTypeBean());
         mHelpStatusMap.put(JMChartRoomSendBean.CHART_HELP_STATUS_ANGEL_DISTURBING,new StatusHelpDoingDisturbBean());
         mHelpStatusMap.put(JMChartRoomSendBean.CHART_HELP_STATUS_ANGEL_QUEST_DISTURB,new StatusHelpQuestDisturbBean());
         mHelpStatusMap.put(JMChartRoomSendBean.CHART_HELP_STATUS_CHART_EXIT_ROOM,new StatusHelpExitBean());
-        mHelpStatusMap.put(JMChartRoomSendBean.CHART_HELP_START_LIVE,new StatusStartLiveBean());
-        mHelpStatusMap.put(JMChartRoomSendBean.CHART_HELP_STOP_LIVE,new StatusStopLiveBean());
+        mHelpStatusMap.put(JMChartRoomSendBean.CHART_PRE_START_LIVE,new StatusStartLiveBean());
+        mHelpStatusMap.put(JMChartRoomSendBean.CHART_PRE_STOP_LIVE,new StatusStopLiveBean());
         mHelpStatusMap.put(JMChartRoomSendBean.CHART_ONLOOKER_ENTER,new StatusOnLookerEnterBean());
         mHelpStatusMap.put(JMChartRoomSendBean.CHART_ONLOOKER_EXIT,new StatusOnLookerExitBean());
         mHelpStatusMap.put(JMChartRoomSendBean.CHART_HELP_GIFT_CONSUMR_STATUS,new StatusConsumeGiftBean());
@@ -139,6 +142,23 @@ public class StatusManager {
             baseStatus = mHelpStatusMap.get(statusIndex);
         }
         return baseStatus;
+    }
+
+    /**
+     * 初始化房间
+     */
+    public void initial() {
+        Iterator entry = mOrderStatusMap.entrySet().iterator();
+        while (entry.hasNext()) {
+            Map.Entry<Integer,ChatBaseStatus> en = (Map.Entry) entry.next();
+            en.getValue().initial();
+        }
+
+        Iterator helpEntry = mHelpStatusMap.entrySet().iterator();
+        while (helpEntry.hasNext()) {
+            Map.Entry<Integer,ChatBaseStatus> en = (Map.Entry) helpEntry.next();
+            en.getValue().initial();
+        }
     }
 
     public void handlerRoomChart(JMChartRoomSendBean sendBean) {

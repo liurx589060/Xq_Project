@@ -3,25 +3,24 @@ package com.cd.xq.module.chart.status.statusBeans;
 
 import com.cd.xq.module.util.Constant;
 import com.cd.xq.module.util.beans.jmessage.JMChartRoomSendBean;
-import com.cd.xq.module.util.status.BaseStatus;
 import com.cd.xq.module.util.status.StatusResp;
 
-import static com.cd.xq.module.util.status.BaseStatus.HandleType.HANDLE_NONE;
+import static com.cd.xq.module.util.status.BaseStatus.HandleType.HANDLE_MATCH;
 
 /**
- * 停止直播
+ * 匹配状态
  * Created by Administrator on 2018/9/26.
  */
 
-public class StatusStopLiveBean extends ChatBaseStatus {
+public class StatusParticipantsEnterBean extends ChatBaseStatus {
     @Override
     public String getTypesWithString() {
-        return "Live_Stop_Status";
+        return "Match_Status";
     }
 
     @Override
     public String getPublicString() {
-        return "停止直播";
+        return "人员进场";
     }
 
     @Override
@@ -31,7 +30,7 @@ public class StatusStopLiveBean extends ChatBaseStatus {
 
     @Override
     public int getStatus() {
-        return JMChartRoomSendBean.CHART_PRE_STOP_LIVE;
+        return JMChartRoomSendBean.CHART_STATUS_PARTICIPANTS_ENTER;
     }
 
     @Override
@@ -46,25 +45,28 @@ public class StatusStopLiveBean extends ChatBaseStatus {
 
     @Override
     public String getRequestRoleType() {
-        return Constant.ROLRTYPE_ANGEL;
+        return Constant.ROLETYPE_ALL;
     }
 
     @Override
     public HandleType getHandleType() {
-        return HANDLE_NONE;
+        return HANDLE_MATCH;
     }
 
     @Override
     public boolean isLast(int completeCount,JMChartRoomSendBean receiveBean) {
-        return false;
+        int allCount = mBChatRoom.getLimit_angel() + mBChatRoom.getLimit_man() + mBChatRoom.getLimit_lady();
+        boolean isLast = receiveBean.getCurrentCount()>=allCount?true:false;
+        return isLast;
     }
 
     @Override
     public JMChartRoomSendBean getChartSendBeanWillSend(JMChartRoomSendBean receiveBean,MessageType messageType) {
         JMChartRoomSendBean sendBean = createBaseChartRoomSendBean();
-        sendBean.setMsg("直播停止");
+        sendBean.setMsg("嘉宾"+ mUserInfo.getUser_name() +"进入房间");
         sendBean.setProcessStatus(getStatus());
         sendBean.setMessageType(messageType);
+
         return sendBean;
     }
 
@@ -89,13 +91,23 @@ public class StatusStopLiveBean extends ChatBaseStatus {
     }
 
     @Override
-    public void handleSend(StatusResp statusResp, JMChartRoomSendBean sendBean) {
-        chartUIViewMg.addSystemEventAndRefresh(sendBean);
-        chartUIViewMg.resetLiveStatus();
+    protected void onPostHandler(StatusResp resp, JMChartRoomSendBean receiveBean) {
     }
 
     @Override
-    protected void onPostHandler(StatusResp resp, JMChartRoomSendBean receiveBean) {
+    public void handleSend(StatusResp statusResp, JMChartRoomSendBean sendBean) {
+//        chartUIViewMg.stopTiming();
+//        chartUIViewMg.resetLiveStatus();
+
+        chartUIViewMg.requestGetChatRoomMemberParticipants();
+        chartUIViewMg.setTipText(getPublicString());
+        chartUIViewMg.addSystemEventAndRefresh(sendBean);
+        chartUIViewMg.speech(sendBean.getMsg());
+        chartUIViewMg.statusSendToEnterUserCurrentStatus(sendBean.getUserName());
+
+        if(statusResp.isLast()) {
+            chartUIViewMg.statusMatch(sendBean);
+        }
     }
 
     @Override

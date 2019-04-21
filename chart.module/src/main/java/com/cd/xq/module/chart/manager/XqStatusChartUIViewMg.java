@@ -40,11 +40,10 @@ import com.cd.xq.module.chart.status.statusBeans.StatusHelpQuestDisturbBean;
 import com.cd.xq.module.chart.status.statusBeans.StatusManFinalSelectBean;
 import com.cd.xq.module.chart.status.statusBeans.StatusManFirstSelectBean;
 import com.cd.xq.module.chart.status.statusBeans.StatusManSecondSelectBean;
-import com.cd.xq.module.chart.status.statusBeans.StatusMatchBean;
+import com.cd.xq.module.chart.status.statusBeans.StatusParticipantsEnterBean;
 import com.cd.xq.module.chart.status.statusBeans.StatusOnLookerEnterBean;
 import com.cd.xq.module.util.Constant;
 import com.cd.xq.module.util.beans.JMNormalSendBean;
-import com.cd.xq.module.util.beans.JMRoomSendParam;
 import com.cd.xq.module.util.beans.NetResult;
 import com.cd.xq.module.util.beans.jmessage.BChatRoom;
 import com.cd.xq.module.util.beans.jmessage.JMChartResp;
@@ -150,7 +149,7 @@ public class XqStatusChartUIViewMg extends AbsChartView{
     private final int DISTURB_COUNT = 3; //一轮可插话的次数
     private HeadInfoViewMg mHeadInfoViewMg;
     private View mHeadInfoBgRelayout;
-    private boolean mIsOnLookerRecCurrentStatus = false;  //是否接受过围观者当前
+    private boolean mIsEnterRecCurrentStatus = false;  //是否接受过人员进入房间发送的当前状态
     private boolean mIsRoomMatchSuccess = false;  //是否匹配成功
     private boolean mIsSelefMatchSuccess = false;  //是否自己匹配成功
     private boolean mIsGoToDouble = false;  //是否接受过进入双人聊天室
@@ -317,10 +316,10 @@ public class XqStatusChartUIViewMg extends AbsChartView{
                 BaseStatus baseStatus;
                 if((Boolean) mBtnLive.getTag()) {
                     mBtnLive.setText("停止");
-                    baseStatus = mStatusManager.getStatus(JMChartRoomSendBean.CHART_HELP_START_LIVE);
+                    baseStatus = mStatusManager.getStatus(JMChartRoomSendBean.CHART_PRE_START_LIVE);
                 }else {
                     mBtnLive.setText("开始");
-                    baseStatus = mStatusManager.getStatus(JMChartRoomSendBean.CHART_HELP_STOP_LIVE);
+                    baseStatus = mStatusManager.getStatus(JMChartRoomSendBean.CHART_PRE_STOP_LIVE);
                 }
                 JMChartRoomSendBean bean = baseStatus.getChartSendBeanWillSend(null, BaseStatus.MessageType.TYPE_SEND);
                 bean.setIndexNext(baseStatus.getStartIndex());
@@ -353,7 +352,7 @@ public class XqStatusChartUIViewMg extends AbsChartView{
         mRadioGroupLiveType.setVisibility(View.GONE);
         mHeadInfoBgRelayout.setVisibility(View.GONE);
 
-        mTextTip.setText(mStatusManager.getStatus(JMChartRoomSendBean.CHART_STATUS_MATCHING).getPublicString());
+        mTextTip.setText(mStatusManager.getStatus(JMChartRoomSendBean.CHART_STATUS_PARTICIPANTS_ENTER).getPublicString());
 
         //获取举报项目
         getReportItems();
@@ -387,7 +386,7 @@ public class XqStatusChartUIViewMg extends AbsChartView{
         JMChartRoomSendBean bean = null;
         if (DataManager.getInstance().getSelfMember().getRoomRoleType() == Constant
                 .ROOM_ROLETYPE_PARTICIPANTS) {
-            bean = new StatusMatchBean().getChartSendBeanWillSend(null, BaseStatus.MessageType
+            bean = new StatusParticipantsEnterBean().getChartSendBeanWillSend(null, BaseStatus.MessageType
                     .TYPE_SEND);
         } else if (DataManager.getInstance().getSelfMember().getRoomRoleType() == Constant
                 .ROOM_ROLETYPE_ONLOOKER) {
@@ -719,6 +718,22 @@ public class XqStatusChartUIViewMg extends AbsChartView{
         mStatusManager.sendRoomMessage(bean);
     }
 
+    /**
+     * 个人介绍
+     */
+    public void statusManIntro(JMChartRoomSendBean sendBean) {
+        mBtnExit.setVisibility(View.GONE);
+        mIsRoomStarted = true;
+    }
+
+    /**
+     * 初始化房间状态
+     * @param sendBean
+     */
+    public void statusInitialRoom(JMChartRoomSendBean sendBean) {
+        mStatusManager.initial();
+    }
+
     public void statusStartLive(JMChartRoomSendBean sendBean) {
         //房间开始
         //标识为未开始，可进行下一次
@@ -746,8 +761,12 @@ public class XqStatusChartUIViewMg extends AbsChartView{
      * @param sendBean
      */
     public void statusChatFinal(JMChartRoomSendBean sendBean) {
-        //上报结果
-        requestCommitChatRoomResult();
+        if(DataManager.getInstance().getUserInfo().getRole_type().equals(Constant.ROLRTYPE_ANGEL)) {
+            //上报结果
+            requestCommitChatRoomResult();
+        }
+        mBtnExit.setVisibility(View.VISIBLE);
+        mIsRoomStarted = false;
     }
 
     @SuppressLint("CheckResult")
@@ -868,7 +887,7 @@ public class XqStatusChartUIViewMg extends AbsChartView{
                             return;
                         }
 
-                        norifyRoomExit(JMNormalSendBean.NORMAL_EXIT);
+                        norifyRoomExit(JMNormalSendBean.NORMAL_EXIT_ROOM);
                         mXqActivity.finish();
                     }
                 });
@@ -949,11 +968,20 @@ public class XqStatusChartUIViewMg extends AbsChartView{
                             com.cd.xq.module.util.tools.Log.e("requestCommitChatRoomResult--" + netResult.getMsg());
                             return;
                         }
-                        //标识为未开始，可进行下一次
-                        mIsRoomStarted = false;
-                        mBtnExit.setVisibility(View.VISIBLE);
-                        mBtnStart.setVisibility(View.VISIBLE);
-                        mBtnLive.setVisibility(View.VISIBLE);
+                        //60S后进行下一次，标识为未开始，可进行下一次
+                        int time = mStatusManager.getStatus(JMChartRoomSendBean.CHART_INITIAL).getLiveTimeCount();
+                        mHandler.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                mBtnStart.setVisibility(View.VISIBLE);
+                                mBtnLive.setVisibility(View.VISIBLE);
+                                //发送初始化
+                                BaseStatus baseStatus = mStatusManager.getStatus(JMChartRoomSendBean.CHART_INITIAL);
+                                JMChartRoomSendBean bean = baseStatus.getChartSendBeanWillSend(null, BaseStatus.MessageType.TYPE_SEND);
+                                bean.setIndexNext(baseStatus.getStartIndex());
+                                mStatusManager.sendRoomMessage(bean);
+                            }
+                        },time*1000);
                     }
                 }, new Consumer<Throwable>() {
                     @Override
@@ -1706,7 +1734,7 @@ public class XqStatusChartUIViewMg extends AbsChartView{
             return;
         }
 
-        if(normalSendBean.getCode() == JMNormalSendBean.NORMAL_EXIT) {//离开
+        if(normalSendBean.getCode() == JMNormalSendBean.NORMAL_EXIT_ROOM) {//离开
             Tools.toast(mXqActivity,"房间被解散",true);
             mXqActivity.finish();
         }else if(normalSendBean.getCode() == JMChartRoomSendBean.CHART_HELP_STATUS_CHART_EXIT_ROOM
@@ -1715,9 +1743,9 @@ public class XqStatusChartUIViewMg extends AbsChartView{
             JMChartRoomSendBean sendBean = status.getChartSendBeanWillSend(null, BaseStatus.MessageType.TYPE_SEND);
             sendBean.setMsg(normalSendBean.getMsg());
             status.handlerRoomChart(sendBean);
-        }else if(normalSendBean.getCode() == JMChartRoomSendBean.CHART_ONLOOKER_ENTER_STATUS) {
-            //围观者进入时的当前房间状态
-            if(!mIsOnLookerRecCurrentStatus) {
+        }else if(normalSendBean.getCode() == JMNormalSendBean.NORMAL_ENTER_ROOM) {
+            //人员进入时的当前房间状态
+            if(!mIsEnterRecCurrentStatus) {
                 try {
                     String extra = normalSendBean.getExtra();
                     JSONObject object = new JSONObject(extra);
@@ -1745,8 +1773,7 @@ public class XqStatusChartUIViewMg extends AbsChartView{
                         mStatusManager.handlerRoomChart(bean);
                     }
 
-                    //更新围观列表
-                    mIsOnLookerRecCurrentStatus = true;
+                    mIsEnterRecCurrentStatus = true;
                 }catch (Exception e) {
                     com.cd.xq.module.util.tools.Log.e("onEventMainThread--" + e.toString());
                 }
@@ -1778,9 +1805,9 @@ public class XqStatusChartUIViewMg extends AbsChartView{
     /**
      * 发送当前状态给进入的围观者
      */
-    public void sendToEnterUserCurrentStatus(String userName) {
+    public void statusSendToEnterUserCurrentStatus(String userName) {
         JMNormalSendBean sendBean = new JMNormalSendBean();
-        sendBean.setCode(JMChartRoomSendBean.CHART_ONLOOKER_ENTER_STATUS);
+        sendBean.setCode(JMNormalSendBean.NORMAL_ENTER_ROOM);
         sendBean.setTargetUserName(userName);
         sendBean.setRoomId(DataManager.getInstance().getChartBChatRoom().getRoom_id());
         JSONObject object = new JSONObject();
@@ -1799,8 +1826,8 @@ public class XqStatusChartUIViewMg extends AbsChartView{
             object.put("ladySelect",strLadySelected);
             object.put("status",new Gson().toJson(mStatusManager.getCurrentSendBean()));
         }catch (Exception e) {
-            Tools.toast(mXqActivity,"sendToOnLookerCurrentStatus--" + e.toString(),false);
-            com.cd.xq.module.util.tools.Log.e("sendToOnLookerCurrentStatus--" + e.toString());
+            Tools.toast(mXqActivity,"sendToEnterUserCurrentStatus--" + e.toString(),false);
+            com.cd.xq.module.util.tools.Log.e("sendToEnterUserCurrentStatus--" + e.toString());
         }
 
         String strExtra = object.toString();

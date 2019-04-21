@@ -32,7 +32,7 @@ import com.cd.xq.module.chart.ChartRoomActivity;
 import com.cd.xq.module.chart.beans.BConsumeGift;
 import com.cd.xq.module.chart.beans.BGetGiftItem;
 import com.cd.xq.module.chart.network.ChatRequestApi;
-import com.cd.xq.module.chart.status.statusBeans.StatusMatchBean;
+import com.cd.xq.module.chart.status.statusBeans.StatusParticipantsEnterBean;
 import com.cd.xq.module.chart.status.statusBeans.StatusOnLookerEnterBean;
 import com.cd.xq.module.chart.utils.ChatTools;
 import com.cd.xq.module.util.Constant;
@@ -42,7 +42,6 @@ import com.cd.xq.module.util.beans.JMRoomSendParam;
 import com.cd.xq.module.util.beans.JMSingleSendParam;
 import com.cd.xq.module.util.beans.NetResult;
 import com.cd.xq.module.util.beans.jmessage.BChatRoom;
-import com.cd.xq.module.util.beans.jmessage.JMChartResp;
 import com.cd.xq.module.util.beans.jmessage.JMChartRoomSendBean;
 import com.cd.xq.module.util.beans.user.UserInfoBean;
 import com.cd.xq.module.util.common.MultiItemDivider;
@@ -767,7 +766,7 @@ public class HomeFragment extends BaseFragment {
         JMChartRoomSendBean bean = null;
         if (DataManager.getInstance().getSelfMember().getRoomRoleType() == Constant
                 .ROOM_ROLETYPE_PARTICIPANTS) {
-            bean = new StatusMatchBean().getChartSendBeanWillSend(null, BaseStatus.MessageType
+            bean = new StatusParticipantsEnterBean().getChartSendBeanWillSend(null, BaseStatus.MessageType
                     .TYPE_SEND);
         } else if (DataManager.getInstance().getSelfMember().getRoomRoleType() == Constant
                 .ROOM_ROLETYPE_ONLOOKER) {

@@ -5,7 +5,8 @@ package com.cd.xq.module.util.beans;
  */
 
 public class JMNormalSendBean {
-    public static final int NORMAL_EXIT = 0x040;//创建者解散聊天室
+    public static final int NORMAL_EXIT_ROOM = 0x040;//创建者解散聊天室
+    public static final int NORMAL_ENTER_ROOM = 0x041;//人员进入房间
 
     private int code;
     private String msg = "";
