@@ -5,6 +5,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
@@ -23,6 +24,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.cd.xq.CommonDialogActivity;
 import com.cd.xq.R;
 import com.cd.xq.beans.BCheckRoomExpiry;
 import com.cd.xq.beans.BGetBanner;
@@ -62,8 +64,10 @@ import com.hjq.permissions.Permission;
 import com.hjq.permissions.XXPermissions;
 import com.scwang.smartrefresh.header.BezierCircleHeader;
 import com.scwang.smartrefresh.layout.SmartRefreshLayout;
+import com.scwang.smartrefresh.layout.api.RefreshLayout;
 import com.scwang.smartrefresh.layout.constant.SpinnerStyle;
 import com.scwang.smartrefresh.layout.footer.BallPulseFooter;
+import com.scwang.smartrefresh.layout.listener.OnRefreshListener;
 import com.stx.xhb.xbanner.XBanner;
 
 import org.greenrobot.eventbus.EventBus;
@@ -126,6 +130,10 @@ public class HomeFragment extends BaseFragment {
     private long mRoomID;
     private EventBusHelp mEventBusHelp;
     private boolean mIsSelfRoomDelete;
+    private long mTipTime = 2;  //2分钟
+    private boolean mIsRecTipStartRoom;
+    private boolean mIsRecAppotintTimeClose;
+    private RefreshLayout mRefreshLayout;
 
     @Nullable
     @Override
@@ -414,6 +422,15 @@ public class HomeFragment extends BaseFragment {
         //设置 Footer 为 球脉冲 样式
         homeRefreshLayout.setRefreshFooter(new BallPulseFooter(getActivity()).setSpinnerStyle
                 (SpinnerStyle.Scale));
+        homeRefreshLayout.setOnRefreshListener(new OnRefreshListener() {
+            @Override
+            public void onRefresh(@NonNull RefreshLayout refreshLayout) {
+                //刷新
+                mRefreshLayout = refreshLayout;
+                requestGetBanner();
+                requestGetChatRoomByUser();
+            }
+        });
         homeRefreshLayout.setEnableLoadMore(false);
     }
 
@@ -647,6 +664,11 @@ public class HomeFragment extends BaseFragment {
             mFloatViewHolder.textCountDownTime.setVisibility(View.VISIBLE);
         }else if(mJmChartResp.getWork() == 1) {
             //开始中
+            if(!mIsRecAppotintTimeClose) {
+                //发送已经开始
+                showAppointTimeCloseDialog();
+                mIsRecAppotintTimeClose = true;
+            }
             mFloatViewHolder.textStatus.setText("进行中");
         }else {
             //已结束
@@ -700,10 +722,18 @@ public class HomeFragment extends BaseFragment {
                 "yyyy-MM-dd HH:mm:ss")*1000)/1000;
         boolean isReturn = false;
         String returnStr = "";
+
         if(delta <= 0) {
             isReturn = true;
             returnStr = "到预约时间";
         }
+
+        if(delta <= 0 && !mIsRecAppotintTimeClose) {
+            //发送已经开始
+            showAppointTimeCloseDialog();
+            mIsRecAppotintTimeClose = true;
+        }
+
         if(mJmChartResp.getWork() == 2) {
             //房间结束
             isReturn = true;
@@ -742,6 +772,13 @@ public class HomeFragment extends BaseFragment {
         String timeCount = "倒计时：" + str;
         mFloatViewHolder.textCountDownTime.setText(timeCount);
         textTimeCountDown.setText(str);
+
+        if(delta > 0 && delta <= mTipTime*60 && !mIsRecTipStartRoom) {
+            //发送进入房间的提示
+            String text = "房间还有" + str + "将开始，你是否进入房间？";
+            showTipStartDialog(text);
+            mIsRecTipStartRoom = true;
+        }
     }
 
 
@@ -755,28 +792,6 @@ public class HomeFragment extends BaseFragment {
                         .into((ImageView) view);
             }
         });
-    }
-
-    /**
-     * 发送加入房间的消息
-     */
-    private void sendChartRoomMessage() {
-        //发送聊天室信息
-        BChatRoom BChatRoom = DataManager.getInstance().getChartBChatRoom();
-        JMChartRoomSendBean bean = null;
-        if (DataManager.getInstance().getSelfMember().getRoomRoleType() == Constant
-                .ROOM_ROLETYPE_PARTICIPANTS) {
-            bean = new StatusParticipantsEnterBean().getChartSendBeanWillSend(null, BaseStatus.MessageType
-                    .TYPE_SEND);
-        } else if (DataManager.getInstance().getSelfMember().getRoomRoleType() == Constant
-                .ROOM_ROLETYPE_ONLOOKER) {
-            bean = new StatusOnLookerEnterBean().getChartSendBeanWillSend(null, BaseStatus
-                    .MessageType.TYPE_SEND);
-        }
-        bean.setCurrentCount(BChatRoom.getMembers().size());
-        bean.setIndexNext(DataManager.getInstance().getSelfMember().getIndex());
-
-        JMsgUtil.sendRoomMessage(bean);
     }
 
     @Override
@@ -859,6 +874,9 @@ public class HomeFragment extends BaseFragment {
                             m_roomList.addAll(bGetArraysNetResult.getData());
                         }
                         mOnLookerAdapter.notifyDataSetChanged();
+                        if(mRefreshLayout != null) {
+                            mRefreshLayout.finishRefresh();
+                        }
                     }
                 }, new Consumer<Throwable>() {
                     @Override
@@ -1202,6 +1220,52 @@ public class HomeFragment extends BaseFragment {
         public Button btnExit;
         public Button btnEnter;
         public ImageView imageClose;
+    }
+
+    /**
+     * 提示进入房间
+     */
+    private void showTipStartDialog(String text) {
+        if(mJmChartResp == null || DataManager.getInstance().isInChatRoom()) return;
+        CommonDialogActivity.ICommonTipStartListener listener = new CommonDialogActivity.ICommonTipStartListener() {
+            @Override
+            public void onNegative() {
+            }
+
+            @Override
+            public void onPositive() {
+                requestEnterChatRoom();
+            }
+        };
+        CommonDialogActivity.setICommonTipStartListener(listener);
+        CommonDialogActivity.showDialog(getActivity(),CommonDialogActivity.TYPE_JM_TIP_DIALOG);
+    }
+
+    /**
+     * 预约时间到
+     */
+    private void showAppointTimeCloseDialog() {
+        if(mJmChartResp == null || DataManager.getInstance().isInChatRoom()) return;
+        final boolean isCreater = mJmChartResp.getCreater().equals(DataManager.getInstance().getUserInfo().getUser_name());
+        CommonDialogActivity.ICommonAppointTimeCloseListener listener = new CommonDialogActivity.ICommonAppointTimeCloseListener() {
+            @Override
+            public void onNegative() {
+                if(isCreater) {
+                    requestDeleteChatRoom(-1);
+                }else {
+                    requestExitChatRoom(-1);
+                }
+            }
+
+            @Override
+            public void onPositive() {
+                requestEnterChatRoom();
+            }
+        };
+        CommonDialogActivity.setICommonAppointTimeCloseListener(listener);
+        CommonDialogActivity.showDialog(getActivity(),CommonDialogActivity.TYPE_JM_APPOINTTIME_CLOSE_DIALOG
+                ,mJmChartResp.getCreater());
+        requestGetChatRoomByUser();
     }
 
     /****************************JM 房间信息处理*********************************************/

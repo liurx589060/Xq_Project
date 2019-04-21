@@ -8,7 +8,7 @@ import com.cd.xq.module.util.status.BaseStatus;
 
 public class JMChartRoomSendBean {
     //在流程之前，并且流程开始后不在执行的
-    public static final int CHART_INITIAL = Integer.MIN_VALUE;  //最初状态
+    public static final int CHART_INITIAL = Integer.MAX_VALUE;  //最初状态
     public static final int CHART_PRE_START_LIVE = -100;//开始直播
 
     public static final int CHART_STATUS_PARTICIPANTS_ENTER = 1;          //人员进场

@@ -29,6 +29,9 @@ public class ChartRoomActivity extends BaseActivity {
         setContentView(R.layout.activity_chart_room);
         mXqStatusChartUIViewMg = new XqStatusChartUIViewMg(this, (FrameLayout) findViewById(R.id.chart_activity_frameLayout));
         mXqStatusChartUIViewMg.init();
+
+        //标识在房间里
+        DataManager.getInstance().setInChatRoom(true);
     }
 
     @Override
@@ -39,6 +42,9 @@ public class ChartRoomActivity extends BaseActivity {
         //重置roomId
         DataManager.getInstance().getChartBChatRoom().setRoom_id(0);
         MscDefaultSpeech.getInstance().destroy();
+
+        //标识在房间里
+        DataManager.getInstance().setInChatRoom(false);
     }
 
     @Override

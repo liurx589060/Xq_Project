@@ -161,6 +161,13 @@
             android:configChanges="orientation|keyboard|keyboardHidden|navigation"
             android:name=".InviteRoomDlgActivity"/>
 
+        <activity
+            android:theme="@style/ActivityTranslucent"
+            android:excludeFromRecents="true"
+            android:screenOrientation="portrait"
+            android:configChanges="orientation|keyboard|keyboardHidden|navigation"
+            android:name=".CommonDialogActivity"/>
+
 
 
         <!--图片选择器-->

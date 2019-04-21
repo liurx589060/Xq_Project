@@ -13,6 +13,7 @@ public class DataManager {
     private UserInfoBean userInfo;
     private BChatRoom chartBChatRoom;
     private String jmUserName;
+    private boolean isInChatRoom;
 
     private DataManager(){}
 
@@ -62,5 +63,13 @@ public class DataManager {
 
     public void setJmUserName(String jmUserName) {
         this.jmUserName = jmUserName;
+    }
+
+    public boolean isInChatRoom() {
+        return isInChatRoom;
+    }
+
+    public void setInChatRoom(boolean inChatRoom) {
+        isInChatRoom = inChatRoom;
     }
 }
