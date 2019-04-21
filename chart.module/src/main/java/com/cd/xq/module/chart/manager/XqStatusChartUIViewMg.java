@@ -34,6 +34,7 @@ import com.cd.xq.module.chart.ChartRoomActivity;
 import com.cd.xq.module.chart.DoubleRoomActivity;
 import com.cd.xq.module.chart.beans.BGetGiftItem;
 import com.cd.xq.module.chart.beans.BGetReportItem;
+import com.cd.xq.module.chart.beans.ChatGiftInstance;
 import com.cd.xq.module.chart.network.ChatRequestApi;
 import com.cd.xq.module.chart.status.statusBeans.StatusHelpChangeLiveTypeBean;
 import com.cd.xq.module.chart.status.statusBeans.StatusHelpQuestDisturbBean;
@@ -369,7 +370,13 @@ public class XqStatusChartUIViewMg extends AbsChartView{
         sendEnterRoomMessage();
 
         if(DataManager.getInstance().getUserInfo().getRole_type().equals(Constant.ROLRTYPE_ANGEL)) {
-            mBtnStart.setVisibility(View.GONE);
+            boolean isFull = false;
+            BChatRoom chatRoom = DataManager.getInstance().getChartBChatRoom();
+            if(chatRoom.getMembers().size() >= chatRoom.getLimit_angel() + chatRoom.getLimit_lady()
+                    + chatRoom.getLimit_man()) {
+                isFull = true;
+            }
+            mBtnStart.setVisibility(isFull?View.VISIBLE:View.GONE);
             mBtnLive.setVisibility(View.VISIBLE);
         }else {
             mBtnStart.setVisibility(View.GONE);
@@ -403,27 +410,6 @@ public class XqStatusChartUIViewMg extends AbsChartView{
         MemberViewHolder viewHolder = new MemberViewHolder(mRootView.findViewById(R.id.chart_room_activity_member_item_0));
         mAngelViewInstance = viewHolder.viewHolderLeft;
         mManViewInstance = viewHolder.viewHolderRight;
-    }
-
-    public class ChatGiftInstance {
-        private String targetUser = "";
-        private BGetGiftItem giftItem;
-
-        public String getTargetUser() {
-            return targetUser;
-        }
-
-        public void setTargetUser(String targetUser) {
-            this.targetUser = targetUser;
-        }
-
-        public BGetGiftItem getGiftItem() {
-            return giftItem;
-        }
-
-        public void setGiftItem(BGetGiftItem giftItem) {
-            this.giftItem = giftItem;
-        }
     }
 
     private void initPresentGiftView() {
@@ -713,7 +699,7 @@ public class XqStatusChartUIViewMg extends AbsChartView{
         mBtnExit.setVisibility(View.GONE);
         //通知开始发言
         BaseStatus baseStatus = mStatusManager.getStatus(JMChartRoomSendBean.CHART_STATUS_INTRO_MAN);
-        JMChartRoomSendBean bean = baseStatus.getChartSendBeanWillSend(null, BaseStatus.MessageType.TYPE_SEND);
+        JMChartRoomSendBean bean = baseStatus.getChartSendBeanWillSend(new JMChartRoomSendBean(), BaseStatus.MessageType.TYPE_SEND);
         bean.setIndexNext(baseStatus.getStartIndex());
         mStatusManager.sendRoomMessage(bean);
     }
@@ -745,7 +731,9 @@ public class XqStatusChartUIViewMg extends AbsChartView{
 
     public void statusMatch(JMChartRoomSendBean sendBean) {
         //显示开始按钮
-        mBtnStart.setVisibility(View.VISIBLE);
+        if(DataManager.getInstance().getUserInfo().getRole_type().equals(Constant.ROLRTYPE_ANGEL)) {
+            mBtnStart.setVisibility(View.VISIBLE);
+        }
     }
 
     /**

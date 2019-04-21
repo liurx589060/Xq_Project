@@ -2,6 +2,7 @@ package com.cd.xq.module.chart.status.statusBeans;
 
 
 import com.cd.xq.module.chart.beans.BGetGiftItem;
+import com.cd.xq.module.chart.beans.ChatGiftInstance;
 import com.cd.xq.module.chart.manager.XqStatusChartUIViewMg;
 import com.cd.xq.module.util.Constant;
 import com.cd.xq.module.util.beans.jmessage.JMChartRoomSendBean;
@@ -95,8 +96,8 @@ public class StatusConsumeGiftBean extends ChatBaseStatus {
 
     @Override
     public void handleSend(StatusResp statusResp, JMChartRoomSendBean sendBean) {
-        XqStatusChartUIViewMg.ChatGiftInstance item = new Gson().fromJson(sendBean.getData()
-                ,XqStatusChartUIViewMg.ChatGiftInstance.class);
+        ChatGiftInstance item = new Gson().fromJson(sendBean.getData()
+                ,ChatGiftInstance.class);
         chartUIViewMg.doConsumeGift(item);
         chartUIViewMg.addSystemEventAndRefresh(sendBean);
     }

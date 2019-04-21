@@ -181,71 +181,39 @@ public class HomeFragment extends BaseFragment {
         mBtnAngel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                requestPermission(new OnPermission() {
-                    @Override
-                    public void hasPermission(List<String> granted, boolean isAll) {
-                        if (!isAll) {
-                            Tools.toast(getActivity(), "请同意权限", false);
-                            XXPermissions.gotoPermissionSettings(getActivity());
-                            return;
-                        }
+                if (!DataManager.getInstance().getUserInfo().isOnLine()) {
+                    Tools.toast(getActivity(), "请先登录...", true);
+                    return;
+                }
 
-                        if (!DataManager.getInstance().getUserInfo().isOnLine()) {
-                            Tools.toast(getActivity(), "请先登录...", true);
-                            return;
-                        }
+                if (!DataManager.getInstance().getUserInfo().getRole_type().equals(Constant.ROLRTYPE_ANGEL)) {
+                    Tools.toast(getActivity(), "您不是爱心大使", true);
+                    return;
+                }
 
-                        if (!DataManager.getInstance().getUserInfo().getRole_type().equals(Constant.ROLRTYPE_ANGEL)) {
-                            Tools.toast(getActivity(), "您不是爱心大使", true);
-                            return;
-                        }
-
-                        Intent intent = new Intent(getActivity(), CreateRoomActivity.class);
-                        getActivity().startActivity(intent);
-                    }
-
-                    @Override
-                    public void noPermission(List<String> denied, boolean quick) {
-
-                    }
-                });
+                Intent intent = new Intent(getActivity(), CreateRoomActivity.class);
+                getActivity().startActivity(intent);
             }
         });
 
         mBtnGuest.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                requestPermission(new OnPermission() {
-                    @Override
-                    public void hasPermission(List<String> granted, boolean isAll) {
-                        if (!isAll) {
-                            Tools.toast(getActivity(), "请同意权限", false);
-                            XXPermissions.gotoPermissionSettings(getActivity());
-                            return;
-                        }
+                if (!DataManager.getInstance().getUserInfo().getRole_type().equals(Constant.ROLETYPE_GUEST)) {
+                    Tools.toast(getActivity(), "您不是Guest", true);
+                    return;
+                }
 
-                        if (!DataManager.getInstance().getUserInfo().getRole_type().equals(Constant.ROLETYPE_GUEST)) {
-                            Tools.toast(getActivity(), "您不是Guest", true);
-                            return;
-                        }
+                if (DataManager.getInstance().getUserInfo().getMarrige() != Constant.ROLE_UNMARRIED) {
+                    //不是未婚状态
+                    Tools.toast(getActivity(), "您是观众身份只能围观房间不可参与", true);
+                    return;
+                }
 
-                        if (DataManager.getInstance().getUserInfo().getMarrige() != Constant.ROLE_UNMARRIED) {
-                            //不是未婚状态
-                            Tools.toast(getActivity(), "您是观众身份只能围观房间不可参与", true);
-                            return;
-                        }
-
-                        //参与者加入房间
-                        mIsMatch = true;
-                        mRoomID = -1;
-                        toCommitJoinParticipant();
-                    }
-
-                    @Override
-                    public void noPermission(List<String> denied, boolean quick) {
-
-                    }
-                });
+                //参与者加入房间
+                mIsMatch = true;
+                mRoomID = -1;
+                toCommitJoinParticipant();
             }
         });
 
@@ -302,7 +270,7 @@ public class HomeFragment extends BaseFragment {
             @Override
             public void onClick(View v) {
                 //进入房间
-                requestEnterChatRoom();
+                doEnterChatRoom();
             }
         });
         mRoomFloatDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
@@ -492,6 +460,29 @@ public class HomeFragment extends BaseFragment {
                         Tools.toast(getActivity().getApplicationContext(),throwable.toString(),false);
                     }
                 });
+    }
+
+    private void doEnterChatRoom() {
+        if(mJmChartResp == null) return;
+        //申请权限
+        requestPermission(new OnPermission() {
+            @Override
+            public void hasPermission(List<String> granted, boolean isAll) {
+                if (!isAll) {
+                    Tools.toast(getActivity(), "请同意权限", false);
+                    XXPermissions.gotoPermissionSettings(getActivity());
+                    return;
+                }
+
+                requestEnterChatRoom();
+
+            }
+
+            @Override
+            public void noPermission(List<String> denied, boolean quick) {
+
+            }
+        });
     }
 
     /**
@@ -1010,7 +1001,7 @@ public class HomeFragment extends BaseFragment {
                         requestDeleteChatRoom(resp.getWork()==0?-1:0);
                     }else if(text.equals(STR_ENTER)) {
                         //进入
-                        requestEnterChatRoom();
+                        doEnterChatRoom();
                     }else if(text.equals(STR_JOIN)) {
                         //加入
                         mIsMatch = false;
@@ -1234,7 +1225,7 @@ public class HomeFragment extends BaseFragment {
 
             @Override
             public void onPositive() {
-                requestEnterChatRoom();
+                doEnterChatRoom();
             }
         };
         CommonDialogActivity.setICommonTipStartListener(listener);
@@ -1259,7 +1250,7 @@ public class HomeFragment extends BaseFragment {
 
             @Override
             public void onPositive() {
-                requestEnterChatRoom();
+                doEnterChatRoom();
             }
         };
         CommonDialogActivity.setICommonAppointTimeCloseListener(listener);
