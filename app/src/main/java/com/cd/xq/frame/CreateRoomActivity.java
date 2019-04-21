@@ -352,7 +352,7 @@ public class CreateRoomActivity extends BaseActivity {
     private void setLiveAddress() {
         if (mPushAddressType == 0) {
             //本地
-            mTXPushAddress = NetWorkMg.getCameraUrl();
+            mTXPushAddress = NetWorkMg.getCameraUrl() + "_" + DataManager.getInstance().getUserInfo().getUser_name();
             mTXPlayerAddress = mTXPushAddress;
         } else if (mPushAddressType == 1) {
             Calendar calendar = Calendar.getInstance();

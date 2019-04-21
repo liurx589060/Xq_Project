@@ -20,6 +20,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
@@ -39,9 +40,13 @@ import com.cd.xq.module.chart.status.statusBeans.StatusHelpQuestDisturbBean;
 import com.cd.xq.module.chart.status.statusBeans.StatusManFinalSelectBean;
 import com.cd.xq.module.chart.status.statusBeans.StatusManFirstSelectBean;
 import com.cd.xq.module.chart.status.statusBeans.StatusManSecondSelectBean;
+import com.cd.xq.module.chart.status.statusBeans.StatusMatchBean;
+import com.cd.xq.module.chart.status.statusBeans.StatusOnLookerEnterBean;
 import com.cd.xq.module.util.Constant;
 import com.cd.xq.module.util.beans.JMNormalSendBean;
+import com.cd.xq.module.util.beans.JMRoomSendParam;
 import com.cd.xq.module.util.beans.NetResult;
+import com.cd.xq.module.util.beans.jmessage.BChatRoom;
 import com.cd.xq.module.util.beans.jmessage.JMChartResp;
 import com.cd.xq.module.util.beans.jmessage.JMChartRoomSendBean;
 import com.cd.xq.module.util.beans.jmessage.Member;
@@ -124,6 +129,8 @@ public class XqStatusChartUIViewMg extends AbsChartView{
     private TextView mTextCountDown;
     private ImageView mBtnDisturb;
     private RadioGroup mRadioGroupLiveType;
+    private Button mBtnStart;
+    private Button mBtnLive;
 
     private ViewInstance mAngelViewInstance;
     private ViewInstance mManViewInstance;
@@ -150,6 +157,8 @@ public class XqStatusChartUIViewMg extends AbsChartView{
     private PresentGiftViewMg mPresentGiftViewMg;  //赠送礼物弹窗
 
     private ArrayList<BGetReportItem> mReportItemList;
+    private boolean mIsRoomStarted = false;  //房间是否开始
+    private boolean mIsCreater;
 
     private ISpeechListener mSpeechListener = new ISpeechListener() {
         @Override
@@ -247,6 +256,8 @@ public class XqStatusChartUIViewMg extends AbsChartView{
         mTextTip = mRootView.findViewById(R.id.chart_room_activity_text_describe);
         mBtnDisturb = mRootView.findViewById(R.id.chart_room_activity_img_disturb);
         mRadioGroupLiveType = mRootView.findViewById(R.id.chart_room_activity_radioGroup_liveType);
+        mBtnStart = mRootView.findViewById(R.id.chart_room_activity_btn_start);
+        mBtnLive = mRootView.findViewById(R.id.chart_room_activity_btn_live);
         mTextCountDown.setVisibility(View.INVISIBLE);
 
         mBtnExit.setOnClickListener(new View.OnClickListener() {
@@ -290,6 +301,33 @@ public class XqStatusChartUIViewMg extends AbsChartView{
             }
         });
 
+        mBtnStart.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                requestStartChatRoom();
+            }
+        });
+
+        mBtnLive.setTag(false);
+        mBtnLive.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //发送直播
+                mBtnLive.setTag(!((Boolean) mBtnLive.getTag()));
+                BaseStatus baseStatus;
+                if((Boolean) mBtnLive.getTag()) {
+                    mBtnLive.setText("停止");
+                    baseStatus = mStatusManager.getStatus(JMChartRoomSendBean.CHART_HELP_START_LIVE);
+                }else {
+                    mBtnLive.setText("开始");
+                    baseStatus = mStatusManager.getStatus(JMChartRoomSendBean.CHART_HELP_STOP_LIVE);
+                }
+                JMChartRoomSendBean bean = baseStatus.getChartSendBeanWillSend(null, BaseStatus.MessageType.TYPE_SEND);
+                bean.setIndexNext(baseStatus.getStartIndex());
+                mStatusManager.sendRoomMessage(bean);
+            }
+        });
+
         mRadioGroupLiveType.setOnCheckedChangeListener(mCheckChangedListener);
         mHeadInfoViewMg = new HeadInfoViewMg(mXqActivity,mRootView.findViewById(R.id.chart_room_activity_headInfo));
         mHeadInfoBgRelayout = mRootView.findViewById(R.id.chart_room_activity_relayout_headInfo);
@@ -319,6 +357,47 @@ public class XqStatusChartUIViewMg extends AbsChartView{
 
         //获取举报项目
         getReportItems();
+
+        if(DataManager.getInstance().getUserInfo().getUser_name()
+                .equals(DataManager.getInstance().getChartBChatRoom().getCreater())) {
+            //创建者
+            mIsCreater = true;
+        }else {
+            mIsCreater = false;
+        }
+
+        //发送加入房间的消息
+        sendEnterRoomMessage();
+
+        if(DataManager.getInstance().getUserInfo().getRole_type().equals(Constant.ROLRTYPE_ANGEL)) {
+            mBtnStart.setVisibility(View.GONE);
+            mBtnLive.setVisibility(View.VISIBLE);
+        }else {
+            mBtnStart.setVisibility(View.GONE);
+            mBtnLive.setVisibility(View.GONE);
+        }
+    }
+
+    /**
+     * 发送加入房间的消息
+     */
+    private void sendEnterRoomMessage() {
+        //发送聊天室信息
+        BChatRoom BChatRoom = DataManager.getInstance().getChartBChatRoom();
+        JMChartRoomSendBean bean = null;
+        if (DataManager.getInstance().getSelfMember().getRoomRoleType() == Constant
+                .ROOM_ROLETYPE_PARTICIPANTS) {
+            bean = new StatusMatchBean().getChartSendBeanWillSend(null, BaseStatus.MessageType
+                    .TYPE_SEND);
+        } else if (DataManager.getInstance().getSelfMember().getRoomRoleType() == Constant
+                .ROOM_ROLETYPE_ONLOOKER) {
+            bean = new StatusOnLookerEnterBean().getChartSendBeanWillSend(null, BaseStatus
+                    .MessageType.TYPE_SEND);
+        }
+        bean.setCurrentCount(BChatRoom.getMembers().size());
+        bean.setIndexNext(DataManager.getInstance().getSelfMember().getIndex());
+
+        JMsgUtil.sendRoomMessage(bean);
     }
 
     private void initAngelManViewInstance() {
@@ -465,6 +544,11 @@ public class XqStatusChartUIViewMg extends AbsChartView{
         List<Member> members = DataManager.getInstance().getChartBChatRoom().getMembers();
         for (int i = 0 ; i < members.size() ; i++) {
             Member member = members.get(i);
+            if(member.getInRoom() != 1) {
+                //不在房间
+                continue;
+            }
+
             int index = member.getIndex();
             UserInfoBean bean = member.getUserInfo();
             if(bean.getRole_type().equals(Constant.ROLRTYPE_ANGEL)) {
@@ -608,12 +692,45 @@ public class XqStatusChartUIViewMg extends AbsChartView{
         getChartRoomMembersList(DataManager.getInstance().getChartBChatRoom().getRoom_id());
     }
 
-//    public void updateMember() {
-//        upDataMembers();
-//    }
+    public void statusUpdateOnLookerList(JMChartRoomSendBean sendBean) {
+        //更新围观列表
+        requestGetChatRoomMemberOnLooker();
+    }
 
-    public void updateOnLookerList() {
+    public void statusParticipantsExit(JMChartRoomSendBean sendBean) {
+        //更新成员列表
+        requestGetChatRoomMemberParticipants();
+    }
 
+    /**
+     * 房间开始
+     */
+    public void startRoom() {
+        //房间开始
+        //标识为未开始，可进行下一次
+        mIsRoomStarted = true;
+        mBtnLive.setVisibility(View.GONE);
+        mBtnStart.setVisibility(View.GONE);
+        mBtnExit.setVisibility(View.GONE);
+        //通知开始发言
+        BaseStatus baseStatus = mStatusManager.getStatus(JMChartRoomSendBean.CHART_STATUS_INTRO_MAN);
+        JMChartRoomSendBean bean = baseStatus.getChartSendBeanWillSend(null, BaseStatus.MessageType.TYPE_SEND);
+        bean.setIndexNext(baseStatus.getStartIndex());
+        mStatusManager.sendRoomMessage(bean);
+    }
+
+    public void statusStartLive(JMChartRoomSendBean sendBean) {
+        //房间开始
+        //标识为未开始，可进行下一次
+        mIsRoomStarted = true;
+        mBtnLive.setVisibility(View.GONE);
+        mBtnStart.setVisibility(View.GONE);
+        mBtnExit.setVisibility(View.GONE);
+    }
+
+    public void statusMatch(JMChartRoomSendBean sendBean) {
+        //显示开始按钮
+        mBtnStart.setVisibility(View.VISIBLE);
     }
 
     /**
@@ -622,6 +739,15 @@ public class XqStatusChartUIViewMg extends AbsChartView{
     public void statusDeleteRoom() {
         Tools.toast(mXqActivity.getApplicationContext(),"房间已经解散",false);
         mXqActivity.finish();
+    }
+
+    /**
+     * 所有流程已结束
+     * @param sendBean
+     */
+    public void statusChatFinal(JMChartRoomSendBean sendBean) {
+        //上报结果
+        requestCommitChatRoomResult();
     }
 
     @SuppressLint("CheckResult")
@@ -655,15 +781,67 @@ public class XqStatusChartUIViewMg extends AbsChartView{
                 });
     }
 
-    private void exit() {
-//        if(DataManager.getInstance().getUserInfo().getUser_name().equals(DataManager.getInstance().getChartBChatRoom().getCreater())) {
-//            deleteChartRoom();
-//        }else {
-//            exitChartRoom();
-//        }
-
-        requestExitChatRoom(mIsRoomMatchSuccess?1:0);
+    private void sendExitOrDeleteMessage(boolean isCreater) {
+        //发送退出房间的消息
+        BaseStatus baseStatus = null;
+        if(mIsRoomStarted && isCreater) {
+            baseStatus = mStatusManager.getStatus(JMChartRoomSendBean.CHART_DELETE_ROOM);
+        }else {
+            baseStatus = mStatusManager.getStatus(JMChartRoomSendBean.CHART_PARTICIPANTS_EXIT_ROOM);
+        }
+        JMChartRoomSendBean sendBean = baseStatus.getChartSendBeanWillSend(null,
+                BaseStatus.MessageType.TYPE_SEND);
+        mStatusManager.sendRoomMessage(sendBean);
     }
+
+    private void exit() {
+        if(mIsRoomStarted) {
+            //房间已经开始
+            if(mIsCreater) {
+                //创建者
+                requestDeleteChatRoom(mIsRoomMatchSuccess?1:0);
+            }else {
+                requestExitChatRoom(mIsSelefMatchSuccess?1:0);
+            }
+        }else {
+            //离开房间
+            requestLeaveChatRoom();
+        }
+    }
+
+    /**
+     * 删除房间
+     */
+    private void requestDeleteChatRoom(final int status) {
+        //发送聊天室删除消息
+        sendExitOrDeleteMessage(true);
+
+        HashMap<String,Object> param = new HashMap<>();
+        param.put("userName",DataManager.getInstance().getUserInfo().getUser_name());
+        param.put("roomId",DataManager.getInstance().getChartBChatRoom().getRoom_id());
+        param.put("status",status); //失败
+        mApi.deleteChatRoom(param)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Consumer<NetResult<BChatRoom>>() {
+                    @Override
+                    public void accept(NetResult<BChatRoom> netResult) throws Exception {
+                        if (netResult.getStatus() != XqErrorCode.SUCCESS) {
+                            com.cd.xq.module.util.tools.Log.e("requestCancelChatRoom--" + netResult.getMsg());
+                            return;
+                        }
+
+                        mXqActivity.finish();
+                    }
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Exception {
+                        com.cd.xq.module.util.tools.Log.e("requestCancelChatRoom--" + throwable.toString());
+                        Tools.toast(mXqActivity.getApplicationContext(),throwable.toString(),false);
+                    }
+                });
+    }
+
 
     private void deleteChartRoom() {
         HashMap<String,Object> params = new HashMap<>();
@@ -700,18 +878,6 @@ public class XqStatusChartUIViewMg extends AbsChartView{
      * 退出房间
      */
     private void requestExitChatRoom(final int status) {
-        //发送退出房间的消息
-        BaseStatus baseStatus = null;
-        if(DataManager.getInstance().getUserInfo().getUser_name()
-                .equals(DataManager.getInstance().getChartBChatRoom().getCreater())) {
-            baseStatus = mStatusManager.getStatus(JMChartRoomSendBean.CHART_DELETE_ROOM);
-        }else {
-            baseStatus = mStatusManager.getStatus(JMChartRoomSendBean.CHART_PARTICIPANTS_EXIT_ROOM);
-        }
-        JMChartRoomSendBean sendBean = baseStatus.getChartSendBeanWillSend(null,
-                BaseStatus.MessageType.TYPE_SEND);
-        mStatusManager.sendRoomMessage(sendBean);
-
         HashMap<String,Object> param = new HashMap<>();
         param.put("userName",DataManager.getInstance().getUserInfo().getUser_name());
         param.put("roomId",DataManager.getInstance().getChartBChatRoom().getRoom_id());
@@ -726,12 +892,165 @@ public class XqStatusChartUIViewMg extends AbsChartView{
                             com.cd.xq.module.util.tools.Log.e("requestCancelChatRoom--" + netResult.getMsg());
                             return;
                         }
+
+                        sendExitOrDeleteMessage(mIsCreater);
+                        JMsgUtil.exitJMChatRoom(DataManager.getInstance().getChartBChatRoom().getRoom_id(),null);
                         mXqActivity.finish();
                     }
                 }, new Consumer<Throwable>() {
                     @Override
                     public void accept(Throwable throwable) throws Exception {
                         com.cd.xq.module.util.tools.Log.e("requestExitChatRoom--" + throwable.toString());
+                        Tools.toast(mXqActivity.getApplicationContext(),throwable.toString(),false);
+                    }
+                });
+    }
+
+    /**
+     * 开始房间
+     */
+    private void requestStartChatRoom() {
+        mApi.startChatRoom(DataManager.getInstance().getChartBChatRoom().getRoom_id())
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Consumer<NetResult>() {
+                    @Override
+                    public void accept(NetResult netResult) throws Exception {
+                        if (netResult.getStatus() != XqErrorCode.SUCCESS) {
+                            com.cd.xq.module.util.tools.Log.e("requestCommitChatRoomResult--" + netResult.getMsg());
+                            return;
+                        }
+                        //房间开始
+                        startRoom();
+                    }
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Exception {
+                        com.cd.xq.module.util.tools.Log.e("requestCommitChatRoomResult--" + throwable.toString());
+                        Tools.toast(mXqActivity.getApplicationContext(),throwable.toString(),false);
+                    }
+                });
+    }
+
+    /**
+     * 提交结果
+     */
+    private void requestCommitChatRoomResult() {
+        HashMap<String,Object> param = new HashMap<>();
+        param.put("roomId",DataManager.getInstance().getChartBChatRoom().getRoom_id());
+        param.put("status",mIsRoomMatchSuccess?1:0); //失败
+        mApi.commitChatRoomResult(param)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Consumer<NetResult>() {
+                    @Override
+                    public void accept(NetResult netResult) throws Exception {
+                        if (netResult.getStatus() != XqErrorCode.SUCCESS) {
+                            com.cd.xq.module.util.tools.Log.e("requestCommitChatRoomResult--" + netResult.getMsg());
+                            return;
+                        }
+                        //标识为未开始，可进行下一次
+                        mIsRoomStarted = false;
+                        mBtnExit.setVisibility(View.VISIBLE);
+                        mBtnStart.setVisibility(View.VISIBLE);
+                        mBtnLive.setVisibility(View.VISIBLE);
+                    }
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Exception {
+                        com.cd.xq.module.util.tools.Log.e("requestCommitChatRoomResult--" + throwable.toString());
+                        Tools.toast(mXqActivity.getApplicationContext(),throwable.toString(),false);
+                    }
+                });
+    }
+
+
+    /**
+     * 离开房间
+     */
+    private void requestLeaveChatRoom() {
+        HashMap<String,Object> param = new HashMap<>();
+        param.put("userName",DataManager.getInstance().getUserInfo().getUser_name());
+        param.put("roomId",DataManager.getInstance().getChartBChatRoom().getRoom_id());
+        mApi.leaveChatRoom(param)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Consumer<NetResult>() {
+                    @Override
+                    public void accept(NetResult netResult) throws Exception {
+                        if (netResult.getStatus() != XqErrorCode.SUCCESS) {
+                            com.cd.xq.module.util.tools.Log.e("requestLeaveChatRoom--" + netResult.getMsg());
+                            return;
+                        }
+
+                        sendExitOrDeleteMessage(false);
+                        mXqActivity.finish();
+                    }
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Exception {
+                        com.cd.xq.module.util.tools.Log.e("requestLeaveChatRoom--" + throwable.toString());
+                        Tools.toast(mXqActivity.getApplicationContext(),throwable.toString(),false);
+                    }
+                });
+    }
+
+    /**
+     * 获取房间成员
+     */
+    public void requestGetChatRoomMemberParticipants() {
+        HashMap<String,Object> param = new HashMap<>();
+        param.put("roomRoleType",1); //获取参与者
+        param.put("roomId",DataManager.getInstance().getChartBChatRoom().getRoom_id());
+        mApi.getChatRoomMember(param)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Consumer<NetResult<List<Member>>>() {
+                    @Override
+                    public void accept(NetResult<List<Member>> netResult) throws Exception {
+                        if (netResult.getStatus() != XqErrorCode.SUCCESS) {
+                            com.cd.xq.module.util.tools.Log.e("requestGetChatRoomMemberParticipants--" + netResult.getMsg());
+                            return;
+                        }
+
+                       //更新房间成员
+                        DataManager.getInstance().getChartBChatRoom().setMembers(netResult.getData());
+                        upDataMembers();
+                    }
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Exception {
+                        com.cd.xq.module.util.tools.Log.e("requestGetChatRoomMemberParticipants--" + throwable.toString());
+                        Tools.toast(mXqActivity.getApplicationContext(),throwable.toString(),false);
+                    }
+                });
+    }
+
+    /**
+     * 获取房间围观者
+     */
+    public void requestGetChatRoomMemberOnLooker() {
+        HashMap<String,Object> param = new HashMap<>();
+        param.put("roomRoleType",2); //获取参与者
+        param.put("roomId",DataManager.getInstance().getChartBChatRoom().getRoom_id());
+        mApi.getChatRoomMember(param)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Consumer<NetResult<List<Member>>>() {
+                    @Override
+                    public void accept(NetResult<List<Member>> netResult) throws Exception {
+                        if (netResult.getStatus() != XqErrorCode.SUCCESS) {
+                            com.cd.xq.module.util.tools.Log.e("requestGetChatRoomMemberOnLooker--" + netResult.getMsg());
+                            return;
+                        }
+
+                        //更新房间成员
+                        DataManager.getInstance().getChartBChatRoom().setOnLookers(netResult.getData());
+                    }
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Exception {
+                        com.cd.xq.module.util.tools.Log.e("requestGetChatRoomMemberOnLooker--" + throwable.toString());
                         Tools.toast(mXqActivity.getApplicationContext(),throwable.toString(),false);
                     }
                 });
@@ -1354,12 +1673,6 @@ public class XqStatusChartUIViewMg extends AbsChartView{
                 return;
             }
 
-            if(chartRoomSendBean.getProcessStatus() == JMChartRoomSendBean.CHART_DELETE_ROOM) {
-                //解散房间
-                Tools.toast(mXqActivity,"房间被解散",true);
-                mXqActivity.finish();
-                return;
-            }
             if(chartRoomSendBean.getProcessStatus() < mStatusManager.getCurrentSendBean().getProcessStatus()
                     && chartRoomSendBean.getMessageType() == BaseStatus.MessageType.TYPE_SEND) {
                 return;
@@ -1432,7 +1745,7 @@ public class XqStatusChartUIViewMg extends AbsChartView{
                         mStatusManager.handlerRoomChart(bean);
                     }
 
-                    updateOnLookerList();
+                    //更新围观列表
                     mIsOnLookerRecCurrentStatus = true;
                 }catch (Exception e) {
                     com.cd.xq.module.util.tools.Log.e("onEventMainThread--" + e.toString());
@@ -1455,7 +1768,7 @@ public class XqStatusChartUIViewMg extends AbsChartView{
                 bundle.putString("target",target);
                 intent.putExtras(bundle);
                 mXqActivity.startActivity(intent);
-                exit();
+                requestExitChatRoom(mIsSelefMatchSuccess?1:0);
             }catch (Exception e) {
 
             }
@@ -1465,7 +1778,7 @@ public class XqStatusChartUIViewMg extends AbsChartView{
     /**
      * 发送当前状态给进入的围观者
      */
-    public void sendToOnLookerCurrentStatus(String userName) {
+    public void sendToEnterUserCurrentStatus(String userName) {
         JMNormalSendBean sendBean = new JMNormalSendBean();
         sendBean.setCode(JMChartRoomSendBean.CHART_ONLOOKER_ENTER_STATUS);
         sendBean.setTargetUserName(userName);

@@ -86,10 +86,9 @@ public class JMsgUtil {
             @Override
             public void gotResult(int responseCode, String responseMessage) {
                 if (0 == responseCode) {
-                    Log.i("yy","sendRoomMessage success --" + chartRoomSendBean.getUserName());
+                    Log.i("yy","sendRoomMessage success --" + chartRoomSendBean.getRoomId());
                 } else {
-                    Log.e("yy","sendRoomMessage failed --" + chartRoomSendBean.getUserName() + "===\n" + responseMessage + "\nroomID="
-                            + chartRoomSendBean.getRoomId());
+                    Log.e("yy","sendRoomMessage failed --" + chartRoomSendBean.getRoomId());
                 }
             }
         });

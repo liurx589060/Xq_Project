@@ -95,15 +95,13 @@ public class StatusMatchBean extends ChatBaseStatus {
         chartUIViewMg.stopTiming();
         chartUIViewMg.resetLiveStatus();
 
-        chartUIViewMg.updateChatRoomMembersList();
+        chartUIViewMg.requestGetChatRoomMemberParticipants();
         chartUIViewMg.setTipText(getPublicString());
         chartUIViewMg.addSystemEventAndRefresh(sendBean);
         chartUIViewMg.speech(sendBean.getMsg());
 
         if(statusResp.isLast()) {
-            JMChartRoomSendBean bean = getNextStatus().getChartSendBeanWillSend(sendBean,MessageType.TYPE_SEND);
-            bean.setIndexNext(getNextStatus().getStartIndex());
-            statusManager.sendRoomMessage(bean);
+            chartUIViewMg.statusMatch(sendBean);
         }
     }
 

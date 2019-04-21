@@ -31,7 +31,7 @@ public class StatusParticipantsExitBean extends ChatBaseStatus {
 
     @Override
     public int getStatus() {
-        return JMChartRoomSendBean.CHART_ONLOOKER_EXIT;
+        return JMChartRoomSendBean.CHART_PARTICIPANTS_EXIT_ROOM;
     }
 
     @Override
@@ -105,6 +105,7 @@ public class StatusParticipantsExitBean extends ChatBaseStatus {
     @Override
     public void handleSend(StatusResp statusResp, JMChartRoomSendBean sendBean) {
         chartUIViewMg.addSystemEventAndRefresh(sendBean);
+        chartUIViewMg.statusParticipantsExit(sendBean);
     }
 
     @Override

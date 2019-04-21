@@ -30,6 +30,8 @@ import com.cd.xq.module.chart.status.statusBeans.StatusMatchBean;
 import com.cd.xq.module.chart.status.statusBeans.StatusOnLookerEnterBean;
 import com.cd.xq.module.chart.status.statusBeans.StatusOnLookerExitBean;
 import com.cd.xq.module.chart.status.statusBeans.StatusParticipantsExitBean;
+import com.cd.xq.module.chart.status.statusBeans.StatusStartLiveBean;
+import com.cd.xq.module.chart.status.statusBeans.StatusStopLiveBean;
 import com.cd.xq.module.util.beans.jmessage.JMChartRoomSendBean;
 import com.cd.xq.module.util.jmessage.JMsgUtil;
 import com.cd.xq.module.util.status.BaseStatus;
@@ -113,6 +115,8 @@ public class StatusManager {
         mHelpStatusMap.put(JMChartRoomSendBean.CHART_HELP_STATUS_ANGEL_DISTURBING,new StatusHelpDoingDisturbBean());
         mHelpStatusMap.put(JMChartRoomSendBean.CHART_HELP_STATUS_ANGEL_QUEST_DISTURB,new StatusHelpQuestDisturbBean());
         mHelpStatusMap.put(JMChartRoomSendBean.CHART_HELP_STATUS_CHART_EXIT_ROOM,new StatusHelpExitBean());
+        mHelpStatusMap.put(JMChartRoomSendBean.CHART_HELP_START_LIVE,new StatusStartLiveBean());
+        mHelpStatusMap.put(JMChartRoomSendBean.CHART_HELP_STOP_LIVE,new StatusStopLiveBean());
         mHelpStatusMap.put(JMChartRoomSendBean.CHART_ONLOOKER_ENTER,new StatusOnLookerEnterBean());
         mHelpStatusMap.put(JMChartRoomSendBean.CHART_ONLOOKER_EXIT,new StatusOnLookerExitBean());
         mHelpStatusMap.put(JMChartRoomSendBean.CHART_HELP_GIFT_CONSUMR_STATUS,new StatusConsumeGiftBean());

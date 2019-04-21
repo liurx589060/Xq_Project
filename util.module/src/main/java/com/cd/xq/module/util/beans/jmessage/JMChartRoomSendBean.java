@@ -31,6 +31,9 @@ public class JMChartRoomSendBean {
     public static final int CHART_HELP_STATUS_CHART_CHANGR_LIVETYPE = 103;       //直播方式更改
     public static final int CHART_HELP_STATUS_CHART_EXIT_ROOM = 104;       //离开房间
     public static final int CHART_HELP_GIFT_CONSUMR_STATUS = 105;//礼物消费
+    public static final int CHART_HELP_START_ROOM = 106;//房间开始
+    public static final int CHART_HELP_START_LIVE = 107;//开始直播
+    public static final int CHART_HELP_STOP_LIVE = 108;//停止直播
 
     public static final int CHART_ONLOOKER_ENTER = 1000;          //围观者进入
     public static final int CHART_ONLOOKER_EXIT = 1001;          //围观者离开

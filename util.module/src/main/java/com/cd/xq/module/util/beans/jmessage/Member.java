@@ -10,6 +10,7 @@ import com.cd.xq.module.util.beans.user.UserInfoBean;
 
 public class Member {
     private int index = 0;
+    private int inRoom = 0;
     private int roomRoleType = Constant.ROOM_ROLETYPE_ONLOOKER;
     private UserInfoBean userInfo;
 
@@ -34,5 +35,13 @@ public class Member {
 
     public int getRoomRoleType() {
         return roomRoleType;
+    }
+
+    public int getInRoom() {
+        return inRoom;
+    }
+
+    public void setInRoom(int inRoom) {
+        this.inRoom = inRoom;
     }
 }

@@ -99,7 +99,6 @@ public class StatusConsumeGiftBean extends ChatBaseStatus {
                 ,XqStatusChartUIViewMg.ChatGiftInstance.class);
         chartUIViewMg.doConsumeGift(item);
         chartUIViewMg.addSystemEventAndRefresh(sendBean);
-        chartUIViewMg.updateOnLookerList();
     }
 
     @Override

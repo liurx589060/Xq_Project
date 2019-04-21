@@ -4,9 +4,11 @@ import com.cd.xq.module.util.beans.BaseResp;
 import com.cd.xq.module.util.beans.NetResult;
 import com.cd.xq.module.util.beans.jmessage.BChatRoom;
 import com.cd.xq.module.util.beans.jmessage.JMChartResp;
+import com.cd.xq.module.util.beans.jmessage.Member;
 import com.cd.xq.module.util.beans.user.BBlackUser;
 import com.cd.xq.module.util.beans.user.UserResp;
 
+import java.util.List;
 import java.util.Map;
 
 import io.reactivex.Observable;
@@ -56,6 +58,12 @@ public interface RequestApi {
     @GET("JMessage/exitChatRoom")
     Observable<NetResult<BChatRoom>> exitChatRoom(@QueryMap Map<String, Object> map);
 
+    @GET("JMessage/commitChatRoomResult")
+    Observable<NetResult> commitChatRoomResult(@QueryMap Map<String, Object> map);
+
+    @GET("JMessage/startChatRoom")
+    Observable<NetResult> startChatRoom(long roomId);
+
     @GET("JMessage/deleteChatRoom")
     Observable<NetResult<BChatRoom>> deleteChatRoom(@QueryMap Map<String, Object> map);
 
@@ -72,7 +80,13 @@ public interface RequestApi {
     Observable<NetResult<BChatRoom>> joinChatRoom(@QueryMap Map<String, Object> map);
 
     @GET("JMessage/enterChatRoom")
-    Observable<NetResult<BChatRoom>> enterChatRoom(@Query("roomId") long roomId);
+    Observable<NetResult<BChatRoom>> enterChatRoom(@Query("roomId") long roomId,@Query("userName") String userName);
+
+    @GET("JMessage/getChatRoomMember")
+    Observable<NetResult<List<Member>>> getChatRoomMember(@QueryMap Map<String, Object> map);
+
+    @GET("JMessage/leaveChatRoom")
+    Observable<NetResult> leaveChatRoom(@QueryMap Map<String, Object> map);
 
     @GET("User/getBlackUserByName")
     Observable<NetResult<BBlackUser>> getBlackUserByName(@QueryMap Map<String, Object> map);

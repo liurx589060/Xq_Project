@@ -301,7 +301,15 @@ public class HomeFragment extends BaseFragment {
         mRoomFloatDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
             @Override
             public void onDismiss(DialogInterface dialogInterface) {
-                toShowFloatBtn();
+                if(mIsSelfRoomDelete) {
+                    if(DataManager.getInstance().getUserInfo().getUser_name().equals(mJmChartResp.getCreater())) {
+                        requestDeleteChatRoom(-1); //预约退出的
+                    }else {
+                        requestExitChatRoom(-1); //预约退出的
+                    }
+                }else {
+                    toShowFloatBtn();
+                }
             }
         });
 
@@ -475,7 +483,7 @@ public class HomeFragment extends BaseFragment {
      */
     private void requestEnterChatRoom() {
         if(mJmChartResp == null) return;
-        mApi.enterChatRoom(mJmChartResp.getRoom_id())
+        mApi.enterChatRoom(mJmChartResp.getRoom_id(),DataManager.getInstance().getUserInfo().getUser_name())
                 .compose(this.<NetResult<BChatRoom>>bindToLifecycle())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -581,7 +589,7 @@ public class HomeFragment extends BaseFragment {
                         //退出聊天室
                         JMsgUtil.exitJMChatRoom(netResult.getData().getRoom_id(),null);
 
-                        if(status == -1) {
+                        if(status == -1 && !mIsSelfRoomDelete) {
                             Tools.toast(getActivity().getApplicationContext(),"退出房间成功",false);
                         }
 
@@ -604,6 +612,10 @@ public class HomeFragment extends BaseFragment {
             mRoomFloatDialog.dismiss();
             linearLayoutFloatRoom.setVisibility(View.GONE);
             return;
+        }
+
+        if(!mRoomFloatDialog.isShowing()) {
+            linearLayoutFloatRoom.setVisibility(View.VISIBLE);
         }
 
         mFloatViewHolder.textAppointTime.setText("开始时间：" + mJmChartResp.getAppoint_time());
@@ -667,10 +679,14 @@ public class HomeFragment extends BaseFragment {
         mFloatViewHolder.btnExit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(DataManager.getInstance().getUserInfo().getUser_name().equals(mJmChartResp.getCreater())) {
-                    requestDeleteChatRoom(-1); //预约退出的
+                if(mIsSelfRoomDelete) {
+                    mRoomFloatDialog.dismiss();
                 }else {
-                    requestExitChatRoom(-1); //预约退出的
+                    if(DataManager.getInstance().getUserInfo().getUser_name().equals(mJmChartResp.getCreater())) {
+                        requestDeleteChatRoom(-1); //预约退出的
+                    }else {
+                        requestExitChatRoom(-1); //预约退出的
+                    }
                 }
             }
         });

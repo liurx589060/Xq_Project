@@ -96,7 +96,7 @@ public class StatusOnLookerEnterBean extends ChatBaseStatus {
     @Override
     public void handleSend(StatusResp statusResp, JMChartRoomSendBean sendBean) {
         chartUIViewMg.addSystemEventAndRefresh(sendBean);
-        chartUIViewMg.updateOnLookerList();
+        chartUIViewMg.statusUpdateOnLookerList(sendBean);
     }
 
     @Override

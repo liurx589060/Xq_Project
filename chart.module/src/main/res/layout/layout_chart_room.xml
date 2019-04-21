@@ -167,4 +167,24 @@
         </LinearLayout>
     </RelativeLayout>
 
+    <Button
+        android:id="@+id/chart_room_activity_btn_start"
+        android:layout_width="@dimen/dp_60"
+        android:layout_height="@dimen/dp_40"
+        android:text="开始"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginTop="@dimen/dp_40"
+        android:layout_marginRight="@dimen/dp_5"/>
+
+    <Button
+        android:id="@+id/chart_room_activity_btn_live"
+        android:layout_width="@dimen/dp_60"
+        android:layout_height="@dimen/dp_40"
+        android:text="直播"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_marginTop="@dimen/dp_40"
+        android:layout_marginLeft="@dimen/dp_5"/>
+
 </RelativeLayout>
