@@ -62,7 +62,7 @@ public interface RequestApi {
     Observable<NetResult> commitChatRoomResult(@QueryMap Map<String, Object> map);
 
     @GET("JMessage/startChatRoom")
-    Observable<NetResult> startChatRoom(@Query("roomId") long roomId);
+    Observable<NetResult<BChatRoom>> startChatRoom(@Query("roomId") long roomId);
 
     @GET("JMessage/deleteChatRoom")
     Observable<NetResult<BChatRoom>> deleteChatRoom(@QueryMap Map<String, Object> map);

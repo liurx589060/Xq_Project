@@ -359,7 +359,7 @@ public class XqStatusChartUIViewMg extends AbsChartView{
         getReportItems();
 
         if(DataManager.getInstance().getUserInfo().getUser_name()
-                .equals(DataManager.getInstance().getChartBChatRoom().getCreater())) {
+                .equals(DataManager.getInstance().getChartBChatRoom().getUser_name())) {
             //创建者
             mIsCreater = true;
         }else {
@@ -690,7 +690,7 @@ public class XqStatusChartUIViewMg extends AbsChartView{
     /**
      * 房间开始
      */
-    public void startRoom() {
+    public void startRoom(String innerId) {
         //房间开始
         //标识为未开始，可进行下一次
         mIsRoomStarted = true;
@@ -700,6 +700,7 @@ public class XqStatusChartUIViewMg extends AbsChartView{
         //通知开始发言
         BaseStatus baseStatus = mStatusManager.getStatus(JMChartRoomSendBean.CHART_STATUS_INTRO_MAN);
         JMChartRoomSendBean bean = baseStatus.getChartSendBeanWillSend(new JMChartRoomSendBean(), BaseStatus.MessageType.TYPE_SEND);
+        bean.setData(innerId);
         bean.setIndexNext(baseStatus.getStartIndex());
         mStatusManager.sendRoomMessage(bean);
     }
@@ -889,6 +890,8 @@ public class XqStatusChartUIViewMg extends AbsChartView{
         param.put("userName",DataManager.getInstance().getUserInfo().getUser_name());
         param.put("roomId",DataManager.getInstance().getChartBChatRoom().getRoom_id());
         param.put("status",status); //失败
+        param.put("innerId",DataManager.getInstance().getChartBChatRoom().getInner_id());
+        param.put("joinType",-1);   //不给变更参与人员
         mApi.exitChatRoom(param)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -920,15 +923,16 @@ public class XqStatusChartUIViewMg extends AbsChartView{
         mApi.startChatRoom(DataManager.getInstance().getChartBChatRoom().getRoom_id())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<NetResult>() {
+                .subscribe(new Consumer<NetResult<BChatRoom>>() {
                     @Override
-                    public void accept(NetResult netResult) throws Exception {
+                    public void accept(NetResult<BChatRoom> netResult) throws Exception {
                         if (netResult.getStatus() != XqErrorCode.SUCCESS) {
                             com.cd.xq.module.util.tools.Log.e("requestCommitChatRoomResult--" + netResult.getMsg());
                             return;
                         }
+
                         //房间开始
-                        startRoom();
+                        startRoom(netResult.getData().getInner_id());
                     }
                 }, new Consumer<Throwable>() {
                     @Override

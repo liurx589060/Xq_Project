@@ -277,7 +277,7 @@ public class HomeFragment extends BaseFragment {
             @Override
             public void onDismiss(DialogInterface dialogInterface) {
                 if(mIsSelfRoomDelete) {
-                    if(DataManager.getInstance().getUserInfo().getUser_name().equals(mJmChartResp.getCreater())) {
+                    if(mJmChartResp != null && DataManager.getInstance().getUserInfo().getUser_name().equals(mJmChartResp.getUser_name())) {
                         requestDeleteChatRoom(-1); //预约退出的
                     }else {
                         requestExitChatRoom(-1); //预约退出的
@@ -310,7 +310,7 @@ public class HomeFragment extends BaseFragment {
      * @param roomRoleType
      * @param roomId
      */
-    private void joinChartRoom(int roomRoleType, long roomId,boolean isMatch) {
+    private void joinChartRoom(int roomRoleType,long roomId,boolean isMatch) {
         if (!DataManager.getInstance().getUserInfo().isOnLine()) {
             Tools.toast(getActivity(), "请先登录...", true);
             return;
@@ -547,7 +547,7 @@ public class HomeFragment extends BaseFragment {
                     @Override
                     public void accept(NetResult<BChatRoom> netResult) throws Exception {
                         if (netResult.getStatus() != XqErrorCode.SUCCESS) {
-                            Log.e("requestCancelChatRoom--" + netResult.getMsg());
+                            Log.e("requestDeleteChatRoom--" + netResult.getMsg());
                             return;
                         }
 
@@ -558,7 +558,7 @@ public class HomeFragment extends BaseFragment {
                 }, new Consumer<Throwable>() {
                     @Override
                     public void accept(Throwable throwable) throws Exception {
-                        Log.e("requestCancelChatRoom--" + throwable.toString());
+                        Log.e("requestDeleteChatRoom--" + throwable.toString());
                         Tools.toast(getActivity().getApplicationContext(),throwable.toString(),false);
                     }
                 });
@@ -574,6 +574,8 @@ public class HomeFragment extends BaseFragment {
        param.put("userName",DataManager.getInstance().getUserInfo().getUser_name());
        param.put("roomId",mJmChartResp.getRoom_id());
        param.put("status",status); //失败
+       param.put("innerId",-1);
+       param.put("joinType",mJmChartResp.getIsQueue());
        mApi.exitChatRoom(param)
                 .compose(this.<NetResult<BChatRoom>>bindToLifecycle())
                 .subscribeOn(Schedulers.io())
@@ -582,7 +584,8 @@ public class HomeFragment extends BaseFragment {
                     @Override
                     public void accept(NetResult<BChatRoom> netResult) throws Exception {
                         if (netResult.getStatus() != XqErrorCode.SUCCESS) {
-                            Log.e("requestCancelChatRoom--" + netResult.getMsg());
+                            Tools.toast(getActivity().getApplication(),netResult.getMsg(),false);
+                            Log.e("requestExitChatRoom--" + netResult.getMsg());
                             return;
                         }
 
@@ -604,7 +607,7 @@ public class HomeFragment extends BaseFragment {
                 }, new Consumer<Throwable>() {
                     @Override
                     public void accept(Throwable throwable) throws Exception {
-                        Log.e("requestCancelChatRoom--" + throwable.toString());
+                        Log.e("requestExitChatRoom--" + throwable.toString());
                         Tools.toast(getActivity().getApplicationContext(),throwable.toString(),false);
                     }
                 });
@@ -667,7 +670,7 @@ public class HomeFragment extends BaseFragment {
             mFloatViewHolder.btnEnter.setVisibility(View.GONE);
         }
         str = "本人角色：";
-        if(DataManager.getInstance().getUserInfo().getUser_name().equals(mJmChartResp.getCreater())) {
+        if(DataManager.getInstance().getUserInfo().getUser_name().equals(mJmChartResp.getUser_name())) {
             //创造者
             str += "创建者";
         }else {
@@ -682,7 +685,7 @@ public class HomeFragment extends BaseFragment {
             mFloatViewHolder.btnExit.setText("关闭");
             mFloatViewHolder.textStatus.setText("被取消");
         }else {
-            if(DataManager.getInstance().getUserInfo().getUser_name().equals(mJmChartResp.getCreater())) {
+            if(DataManager.getInstance().getUserInfo().getUser_name().equals(mJmChartResp.getUser_name())) {
                 mFloatViewHolder.btnExit.setText("删除");
             }else {
                 mFloatViewHolder.btnExit.setText("退出");
@@ -694,7 +697,7 @@ public class HomeFragment extends BaseFragment {
                 if(mIsSelfRoomDelete) {
                     mRoomFloatDialog.dismiss();
                 }else {
-                    if(DataManager.getInstance().getUserInfo().getUser_name().equals(mJmChartResp.getCreater())) {
+                    if(DataManager.getInstance().getUserInfo().getUser_name().equals(mJmChartResp.getUser_name())) {
                         requestDeleteChatRoom(-1); //预约退出的
                     }else {
                         requestExitChatRoom(-1); //预约退出的
@@ -1237,7 +1240,7 @@ public class HomeFragment extends BaseFragment {
      */
     private void showAppointTimeCloseDialog() {
         if(mJmChartResp == null || DataManager.getInstance().isInChatRoom()) return;
-        final boolean isCreater = mJmChartResp.getCreater().equals(DataManager.getInstance().getUserInfo().getUser_name());
+        final boolean isCreater = mJmChartResp.getUser_name().equals(DataManager.getInstance().getUserInfo().getUser_name());
         CommonDialogActivity.ICommonAppointTimeCloseListener listener = new CommonDialogActivity.ICommonAppointTimeCloseListener() {
             @Override
             public void onNegative() {
@@ -1255,7 +1258,7 @@ public class HomeFragment extends BaseFragment {
         };
         CommonDialogActivity.setICommonAppointTimeCloseListener(listener);
         CommonDialogActivity.showDialog(getActivity(),CommonDialogActivity.TYPE_JM_APPOINTTIME_CLOSE_DIALOG
-                ,mJmChartResp.getCreater());
+                ,mJmChartResp.getUser_name());
         requestGetChatRoomByUser();
     }
 

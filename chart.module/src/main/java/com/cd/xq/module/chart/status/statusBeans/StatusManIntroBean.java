@@ -2,6 +2,7 @@ package com.cd.xq.module.chart.status.statusBeans;
 
 import com.cd.xq.module.util.Constant;
 import com.cd.xq.module.util.beans.jmessage.JMChartRoomSendBean;
+import com.cd.xq.module.util.manager.DataManager;
 import com.cd.xq.module.util.status.StatusResp;
 
 /**
@@ -101,6 +102,7 @@ public class StatusManIntroBean extends ChatBaseStatus {
 
     @Override
     public void handleSend(StatusResp statusResp, JMChartRoomSendBean sendBean) {
+        DataManager.getInstance().getChartBChatRoom().setInner_id(sendBean.getData()); //设置该房间的inner_id
         chartUIViewMg.stopTiming();
         chartUIViewMg.resetLiveStatus();
         chartUIViewMg.statusManIntro(sendBean);

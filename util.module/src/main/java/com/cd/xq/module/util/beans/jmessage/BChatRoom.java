@@ -19,12 +19,14 @@ public class BChatRoom {
     private String play_address = "";
     private List<Member> members;
     private List<Member> onLookers;
-    private String creater = "";
+    private String user_name = "";    //创建者
     private String appoint_time = "";
     private String title = "";
     private String describe = "";
     private int work = 2;  //默认结束
     private int room_role_type;
+    private int isQueue = 1;  //加入房间的时候是否为排队   1：参与     2：排队
+    private String inner_id = "";  //匹配房间的ID
 
     public void setMembers(List<Member> members) {
          this.members = members;
@@ -45,14 +47,6 @@ public class BChatRoom {
 
     public void setOnLookers(List<Member> onLookers) {
         this.onLookers = onLookers;
-    }
-
-    public String getCreater() {
-        return creater;
-    }
-
-    public void setCreater(String creater) {
-        this.creater = creater;
     }
 
     public String getAppoint_time() {
@@ -173,5 +167,29 @@ public class BChatRoom {
 
     public void setRoom_role_type(int room_role_type) {
         this.room_role_type = room_role_type;
+    }
+
+    public int getIsQueue() {
+        return isQueue;
+    }
+
+    public void setIsQueue(int isQueue) {
+        this.isQueue = isQueue;
+    }
+
+    public String getInner_id() {
+        return inner_id;
+    }
+
+    public void setInner_id(String inner_id) {
+        this.inner_id = inner_id;
+    }
+
+    public String getUser_name() {
+        return user_name;
+    }
+
+    public void setUser_name(String user_name) {
+        this.user_name = user_name;
     }
 }
