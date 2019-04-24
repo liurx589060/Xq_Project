@@ -1,15 +1,10 @@
 package com.cd.xq.welcome;
 
-import android.annotation.SuppressLint;
-import android.app.Dialog;
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.WindowManager;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -19,26 +14,14 @@ import com.cd.xq.AppService;
 import com.cd.xq.R;
 import com.cd.xq.frame.MainActivity;
 import com.cd.xq.login.LoginActivity;
-import com.cd.xq.login.RegisterActivity;
 import com.cd.xq.module.util.Constant;
-import com.cd.xq.module.util.beans.user.UserInfoBean;
-import com.cd.xq.module.util.beans.user.UserResp;
-import com.cd.xq.module.util.manager.DataManager;
 import com.cd.xq.module.util.network.NetWorkMg;
-import com.cd.xq.module.util.network.RequestApi;
-import com.cd.xq.module.util.tools.DialogFactory;
 import com.cd.xq.module.util.tools.SharedPreferenceUtil;
-import com.cd.xq.module.util.tools.Tools;
-import com.cd.xq.module.util.tools.XqErrorCode;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import cn.jpush.im.android.api.JMessageClient;
-import cn.jpush.im.android.api.model.UserInfo;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.functions.Consumer;
-import io.reactivex.schedulers.Schedulers;
 
 /**
  * Created by Administrator on 2018/10/28.

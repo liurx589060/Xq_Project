@@ -1,7 +1,6 @@
 package com.cd.xq.frame;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -11,7 +10,6 @@ import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
@@ -21,12 +19,11 @@ import com.allenliu.versionchecklib.v2.AllenVersionChecker;
 import com.allenliu.versionchecklib.v2.builder.DownloadBuilder;
 import com.allenliu.versionchecklib.v2.builder.UIData;
 import com.allenliu.versionchecklib.v2.callback.ForceUpdateListener;
-import com.allenliu.versionchecklib.v2.callback.RequestVersionListener;
 import com.cd.xq.AppService;
 import com.cd.xq.R;
 import com.cd.xq.beans.BCheckUpdate;
 import com.cd.xq.login.BlackCheckListener;
-import com.cd.xq.login.RegisterActivity;
+import com.cd.xq.login.RegisterInfoActivity;
 import com.cd.xq.module.util.Constant;
 import com.cd.xq.module.util.base.BaseActivity;
 import com.cd.xq.module.util.base.BaseFragment;
@@ -38,7 +35,6 @@ import com.cd.xq.module.util.manager.DataManager;
 import com.cd.xq.module.util.network.NetWorkMg;
 import com.cd.xq.module.util.network.RequestApi;
 import com.cd.xq.module.util.tools.Log;
-import com.cd.xq.module.util.tools.SharedPreferenceUtil;
 import com.cd.xq.module.util.tools.Tools;
 import com.cd.xq.module.util.tools.XqErrorCode;
 import com.cd.xq.network.XqRequestApi;
@@ -51,7 +47,6 @@ import java.util.ArrayList;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import cn.jmessage.support.google.gson.Gson;
 import cn.jpush.im.android.api.JMessageClient;
 import cn.jpush.im.android.api.model.UserInfo;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -190,9 +185,9 @@ public class MainActivity extends BaseActivity {
 
                             //检测信息是否完整
                             if (CheckUtil.checkToCompleteUserInfo(DataManager.getInstance().getUserInfo())) {
-                                Intent intent = new Intent(MainActivity.this, RegisterActivity.class);
+                                Intent intent = new Intent(MainActivity.this, RegisterInfoActivity.class);
                                 Bundle bundle = new Bundle();
-                                bundle.putInt("from", RegisterActivity.FROM_LEAK_INFO);
+                                bundle.putInt("from", RegisterInfoActivity.FROM_LEAK_INFO);
                                 intent.putExtras(bundle);
                                 startActivityForResult(intent,2);
                             }

@@ -65,7 +65,7 @@
         <activity
             android:screenOrientation="portrait"
             android:configChanges="orientation|keyboard|keyboardHidden|navigation"
-            android:name=".login.RegisterActivity"/>
+            android:name=".login.RegisterInfoActivity"/>
 
         <activity
             android:screenOrientation="portrait"
@@ -146,6 +146,11 @@
             android:screenOrientation="portrait"
             android:configChanges="orientation|keyboard|keyboardHidden|navigation"
             android:name=".frame.CreateRoomActivity"/>
+
+        <activity
+            android:screenOrientation="portrait"
+            android:configChanges="orientation|keyboard|keyboardHidden|navigation"
+            android:name=".login.RegisterActivity"/>
 
         <activity
             android:theme="@style/ActivityTranslucent"

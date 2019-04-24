@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">爱情鸟</string>
     <string name="login_forget_password">忘记\n密码</string>
+    <string name="str_edit_digits">abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789</string>
 </resources>

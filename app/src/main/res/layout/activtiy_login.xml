@@ -110,7 +110,7 @@
             android:id="@+id/login_text_privacy"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="《相亲吧隐私政策》"
+            android:text="《爱情鸟隐私政策》"
             android:textSize="@dimen/sp_10"
             android:textColor="#f80813"/>
     </LinearLayout>

@@ -1,8 +1,6 @@
 package com.cd.xq.frame;
 
-import android.app.Activity;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
@@ -17,9 +15,8 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
-import com.cd.xq.module.util.AppConfig;
 import com.cd.xq.R;
-import com.cd.xq.login.RegisterActivity;
+import com.cd.xq.login.RegisterInfoActivity;
 import com.cd.xq.module.util.Constant;
 import com.cd.xq.module.util.base.BaseFragment;
 import com.cd.xq.module.util.beans.user.UserInfoBean;
@@ -103,9 +100,9 @@ public class MyFragment extends BaseFragment {
     }
 
     private void jumpToRegisterActivity() {
-        Intent intent = new Intent(getActivity(), RegisterActivity.class);
+        Intent intent = new Intent(getActivity(), RegisterInfoActivity.class);
         Bundle bundle = new Bundle();
-        bundle.putInt("from", RegisterActivity.FROM_MY);
+        bundle.putInt("from", RegisterInfoActivity.FROM_MY);
         intent.putExtras(bundle);
         getActivity().startActivityForResult(intent, 1);
     }

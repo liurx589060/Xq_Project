@@ -40,7 +40,6 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import cn.jpush.im.android.api.JMessageClient;
-import cn.jpush.im.android.api.callback.GetUserInfoCallback;
 import cn.jpush.im.android.api.model.UserInfo;
 import cn.jpush.im.api.BasicCallback;
 import cn.smssdk.EventHandler;
@@ -142,9 +141,11 @@ public class LoginActivity extends BaseActivity {
                 }
                 break;
             case R.id.login_btn_register:
-                if(checkEdit()) {
-                    toRegist();
-                }
+//                if(checkEdit()) {
+//                    toRegist();
+//                }
+                Intent intent = new Intent(this,RegisterActivity.class);
+                startActivity(intent);
                 break;
             case R.id.login_text_fpassword:
                 sendSMSCode(this,1);
@@ -313,9 +314,9 @@ public class LoginActivity extends BaseActivity {
                             Tools.toast(getApplicationContext(), "注册成功", false);
                             DataManager.getInstance().setUserInfo(userResp.getData());
                             //跳转到填写详情页面
-                            Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
+                            Intent intent = new Intent(LoginActivity.this, RegisterInfoActivity.class);
                             Bundle bundle = new Bundle();
-                            bundle.putInt("from", RegisterActivity.FROM_LOGIN);
+                            bundle.putInt("from", RegisterInfoActivity.FROM_LOGIN);
                             intent.putExtras(bundle);
                             startActivity(intent);
                         } else if (userResp.getStatus() == XqErrorCode.ERROR_USER_REGIST_EXIST) {
