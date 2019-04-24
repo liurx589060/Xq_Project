@@ -3,7 +3,10 @@ package com.cd.xq.module.chart.status.statusBeans;
 
 import com.cd.xq.module.util.Constant;
 import com.cd.xq.module.util.beans.jmessage.JMChartRoomSendBean;
+import com.cd.xq.module.util.manager.DataManager;
 import com.cd.xq.module.util.status.StatusResp;
+
+import java.util.zip.DataFormatException;
 
 import static com.cd.xq.module.util.status.BaseStatus.HandleType.HANDLE_MATCH;
 
@@ -63,7 +66,15 @@ public class StatusParticipantsEnterBean extends ChatBaseStatus {
     @Override
     public JMChartRoomSendBean getChartSendBeanWillSend(JMChartRoomSendBean receiveBean,MessageType messageType) {
         JMChartRoomSendBean sendBean = createBaseChartRoomSendBean();
-        sendBean.setMsg("嘉宾"+ mUserInfo.getUser_name() +"进入房间");
+        if(DataManager.getInstance().getUserInfo().getRole_type().equals(Constant.ROLRTYPE_ANGEL)) {
+            sendBean.setMsg("爱心大使进入房间");
+        }else if(DataManager.getInstance().getUserInfo().getRole_type().equals(Constant.ROLETYPE_GUEST)){
+            if(DataManager.getInstance().getUserInfo().getGender().equals(Constant.GENDER_MAN)) {
+                sendBean.setMsg("男嘉宾进入房间");
+            }else {
+                sendBean.setMsg("女嘉宾" + DataManager.getInstance().getSelfMember().getIndex() + "进入房间");
+            }
+        }
         sendBean.setProcessStatus(getStatus());
         sendBean.setMessageType(messageType);
 
@@ -99,11 +110,11 @@ public class StatusParticipantsEnterBean extends ChatBaseStatus {
 //        chartUIViewMg.stopTiming();
 //        chartUIViewMg.resetLiveStatus();
 
-        chartUIViewMg.requestGetChatRoomMemberParticipants();
         chartUIViewMg.setTipText(getPublicString());
         chartUIViewMg.addSystemEventAndRefresh(sendBean);
         chartUIViewMg.speech(sendBean.getMsg());
         chartUIViewMg.statusSendToEnterUserCurrentStatus(sendBean.getUserName());
+        chartUIViewMg.requestGetChatRoomMemberParticipants();
 
         if(statusResp.isLast()) {
             chartUIViewMg.statusMatch(sendBean);

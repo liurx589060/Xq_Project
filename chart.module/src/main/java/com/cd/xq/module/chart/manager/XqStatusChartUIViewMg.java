@@ -45,6 +45,7 @@ import com.cd.xq.module.chart.status.statusBeans.StatusParticipantsEnterBean;
 import com.cd.xq.module.chart.status.statusBeans.StatusOnLookerEnterBean;
 import com.cd.xq.module.util.Constant;
 import com.cd.xq.module.util.beans.JMNormalSendBean;
+import com.cd.xq.module.util.beans.JMRoomSendParam;
 import com.cd.xq.module.util.beans.NetResult;
 import com.cd.xq.module.util.beans.jmessage.BChatRoom;
 import com.cd.xq.module.util.beans.jmessage.JMChartResp;
@@ -151,8 +152,6 @@ public class XqStatusChartUIViewMg extends AbsChartView{
     private HeadInfoViewMg mHeadInfoViewMg;
     private View mHeadInfoBgRelayout;
     private boolean mIsEnterRecCurrentStatus = false;  //是否接受过人员进入房间发送的当前状态
-    private boolean mIsRoomMatchSuccess = false;  //是否匹配成功
-    private boolean mIsSelefMatchSuccess = false;  //是否自己匹配成功
     private boolean mIsGoToDouble = false;  //是否接受过进入双人聊天室
     private PresentGiftViewMg mPresentGiftViewMg;  //赠送礼物弹窗
 
@@ -673,10 +672,6 @@ public class XqStatusChartUIViewMg extends AbsChartView{
         mSystemAdapter.notifyDataSetChanged();
     }
 
-    public void updateChatRoomMembersList() {
-        getChartRoomMembersList(DataManager.getInstance().getChartBChatRoom().getRoom_id());
-    }
-
     public void statusUpdateOnLookerList(JMChartRoomSendBean sendBean) {
         //更新围观列表
         requestGetChatRoomMemberOnLooker();
@@ -745,48 +740,20 @@ public class XqStatusChartUIViewMg extends AbsChartView{
         mXqActivity.finish();
     }
 
+    public void statusManFinalSelected(JMChartRoomSendBean sendBean) {
+        if(DataManager.getInstance().getUserInfo().getRole_type().equals(Constant.ROLRTYPE_ANGEL)) {
+            //上报结果
+            requestCommitChatRoomResult(sendBean.getMsg());
+        }
+    }
+
     /**
      * 所有流程已结束
      * @param sendBean
      */
     public void statusChatFinal(JMChartRoomSendBean sendBean) {
-        if(DataManager.getInstance().getUserInfo().getRole_type().equals(Constant.ROLRTYPE_ANGEL)) {
-            //上报结果
-            requestCommitChatRoomResult();
-        }
         mBtnExit.setVisibility(View.VISIBLE);
         mIsRoomStarted = false;
-    }
-
-    @SuppressLint("CheckResult")
-    private void getChartRoomMembersList(long roomId) {
-        mApi.getChartRoomMemeberList(roomId)
-                .subscribeOn(Schedulers.io())
-                .compose(mXqActivity.<JMChartResp>bindToLifecycle())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<JMChartResp>() {
-                    @Override
-                    public void accept(JMChartResp jmChartResp) throws Exception {
-                        if(jmChartResp == null) {
-                            Log.e("yy","jmChartResp is null");
-                            Tools.toast(mXqActivity,"jmChartResp is null",true);
-                            return;
-                        }
-                        if(jmChartResp.getStatus() != XqErrorCode.SUCCESS) {
-                            Log.e("yy",jmChartResp.getMsg());
-                            Tools.toast(mXqActivity,jmChartResp.getMsg(),true);
-                            return;
-                        }
-                        DataManager.getInstance().setChartBChatRoom(jmChartResp.getData());
-                        upDataMembers();
-                    }
-                }, new Consumer<Throwable>() {
-                    @Override
-                    public void accept(Throwable throwable) throws Exception {
-                        Log.e("yy",throwable.toString());
-                        Tools.toast(mXqActivity,throwable.toString(),true);
-                    }
-                });
     }
 
     private void sendExitOrDeleteMessage(boolean isCreater) {
@@ -807,9 +774,9 @@ public class XqStatusChartUIViewMg extends AbsChartView{
             //房间已经开始
             if(mIsCreater) {
                 //创建者
-                requestDeleteChatRoom(mIsRoomMatchSuccess?1:0);
+                requestDeleteChatRoom(mStatusManager.isSelfMatchSuccess()?1:0);
             }else {
-                requestExitChatRoom(mIsSelefMatchSuccess?1:0);
+                requestExitChatRoom(mStatusManager.isSelfMatchSuccess()?1:0);
             }
         }else {
             //离开房间
@@ -835,7 +802,7 @@ public class XqStatusChartUIViewMg extends AbsChartView{
                     @Override
                     public void accept(NetResult<BChatRoom> netResult) throws Exception {
                         if (netResult.getStatus() != XqErrorCode.SUCCESS) {
-                            com.cd.xq.module.util.tools.Log.e("requestCancelChatRoom--" + netResult.getMsg());
+                            com.cd.xq.module.util.tools.Log.e("requestDeleteChatRoom--" + netResult.getMsg());
                             return;
                         }
 
@@ -844,40 +811,8 @@ public class XqStatusChartUIViewMg extends AbsChartView{
                 }, new Consumer<Throwable>() {
                     @Override
                     public void accept(Throwable throwable) throws Exception {
-                        com.cd.xq.module.util.tools.Log.e("requestCancelChatRoom--" + throwable.toString());
+                        com.cd.xq.module.util.tools.Log.e("requestDeleteChatRoom--" + throwable.toString());
                         Tools.toast(mXqActivity.getApplicationContext(),throwable.toString(),false);
-                    }
-                });
-    }
-
-
-    private void deleteChartRoom() {
-        HashMap<String,Object> params = new HashMap<>();
-        params.put("roomId",DataManager.getInstance().getChartBChatRoom().getRoom_id());
-        params.put("userName",DataManager.getInstance().getUserInfo().getUser_name());
-        params.put("status",mIsRoomMatchSuccess?1:0);
-        mApi.deleteChartRoom(params)
-                .subscribeOn(Schedulers.io())
-                .compose(mXqActivity.<JMChartResp>bindToLifecycle())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<JMChartResp>() {
-                    @Override
-                    public void accept(JMChartResp jmChartResp) throws Exception {
-                        if(jmChartResp == null) {
-                            Log.e("yy","jmChartResp is null");
-                            Tools.toast(mXqActivity,"delete room failed",true);
-                            mXqActivity.finish();
-                            return;
-                        }
-                        if(jmChartResp.getStatus() != XqErrorCode.SUCCESS) {
-                            Log.e("yy",jmChartResp.getMsg());
-                            Tools.toast(mXqActivity,jmChartResp.getMsg(),true);
-                            mXqActivity.finish();
-                            return;
-                        }
-
-                        norifyRoomExit(JMNormalSendBean.NORMAL_EXIT_ROOM);
-                        mXqActivity.finish();
                     }
                 });
     }
@@ -891,7 +826,7 @@ public class XqStatusChartUIViewMg extends AbsChartView{
         param.put("roomId",DataManager.getInstance().getChartBChatRoom().getRoom_id());
         param.put("status",status); //失败
         param.put("innerId",DataManager.getInstance().getChartBChatRoom().getInner_id());
-        param.put("joinType",-1);   //不给变更参与人员
+        param.put("joinType",status==1?1:-1);   //不给变更参与人员
         mApi.exitChatRoom(param)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -927,7 +862,7 @@ public class XqStatusChartUIViewMg extends AbsChartView{
                     @Override
                     public void accept(NetResult<BChatRoom> netResult) throws Exception {
                         if (netResult.getStatus() != XqErrorCode.SUCCESS) {
-                            com.cd.xq.module.util.tools.Log.e("requestCommitChatRoomResult--" + netResult.getMsg());
+                            com.cd.xq.module.util.tools.Log.e("requestStartChatRoom--" + netResult.getMsg());
                             return;
                         }
 
@@ -937,7 +872,7 @@ public class XqStatusChartUIViewMg extends AbsChartView{
                 }, new Consumer<Throwable>() {
                     @Override
                     public void accept(Throwable throwable) throws Exception {
-                        com.cd.xq.module.util.tools.Log.e("requestCommitChatRoomResult--" + throwable.toString());
+                        com.cd.xq.module.util.tools.Log.e("requestStartChatRoom--" + throwable.toString());
                         Tools.toast(mXqActivity.getApplicationContext(),throwable.toString(),false);
                     }
                 });
@@ -946,10 +881,21 @@ public class XqStatusChartUIViewMg extends AbsChartView{
     /**
      * 提交结果
      */
-    private void requestCommitChatRoomResult() {
+    private void requestCommitChatRoomResult(final String text) {
         HashMap<String,Object> param = new HashMap<>();
         param.put("roomId",DataManager.getInstance().getChartBChatRoom().getRoom_id());
-        param.put("status",mIsRoomMatchSuccess?1:0); //失败
+        param.put("status",mStatusManager.isRoomMatchSuccess()?1:0); //失败
+        if(mStatusManager.isRoomMatchSuccess()) {
+            //成功，则上报匹配成功的男女嘉宾
+            StatusManFinalSelectBean manFinalSelectBean = (StatusManFinalSelectBean) mStatusManager
+                    .getStatus(JMChartRoomSendBean.CHART_STATUS_MAN_SELECT_FINAL);
+            int ladyIndex = manFinalSelectBean.getSelectLadyIndex();
+            String manUser = mManMembersMap.get(0).getUser_name();
+            String ladyUser = mLadyMembersMap.get(ladyIndex).getUser_name();
+            param.put("manUser",manUser);
+            param.put("ladyUser",ladyUser);
+        }
+        param.put("innerId",DataManager.getInstance().getChartBChatRoom().getInner_id());
         mApi.commitChatRoomResult(param)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -961,11 +907,18 @@ public class XqStatusChartUIViewMg extends AbsChartView{
                             return;
                         }
                         //60S后进行下一次，标识为未开始，可进行下一次
+
+                        //发送结束的消息
+                        BaseStatus baseStatus = mStatusManager.getStatus(JMChartRoomSendBean.CHART_STATUS_CHAT_FINAL);
+                        JMChartRoomSendBean bean = baseStatus.getChartSendBeanWillSend(null, BaseStatus.MessageType.TYPE_SEND);
+                        bean.setMsg(text);
+                        mStatusManager.handlerRoomChart(bean);
+
+                        //初始化
                         int time = mStatusManager.getStatus(JMChartRoomSendBean.CHART_INITIAL).getLiveTimeCount();
                         mHandler.postDelayed(new Runnable() {
                             @Override
                             public void run() {
-                                mBtnStart.setVisibility(View.VISIBLE);
                                 mBtnLive.setVisibility(View.VISIBLE);
                                 //发送初始化
                                 BaseStatus baseStatus = mStatusManager.getStatus(JMChartRoomSendBean.CHART_INITIAL);
@@ -1074,80 +1027,6 @@ public class XqStatusChartUIViewMg extends AbsChartView{
                         Tools.toast(mXqActivity.getApplicationContext(),throwable.toString(),false);
                     }
                 });
-    }
-
-    @SuppressLint("CheckResult")
-    private void exitChartRoom() {
-        HashMap<String,Object> params = new HashMap<>();
-        params.put("roomId",DataManager.getInstance().getChartBChatRoom().getRoom_id());
-        params.put("userName",DataManager.getInstance().getUserInfo().getUser_name());
-        params.put("roomRoleType",DataManager.getInstance().getSelfMember().getRoomRoleType());
-        params.put("status",mIsSelefMatchSuccess?1:0);
-        mApi.exitChartRoom(params)
-                .subscribeOn(Schedulers.io())
-                .compose(mXqActivity.<JMChartResp>bindToLifecycle())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<JMChartResp>() {
-                    @Override
-                    public void accept(JMChartResp jmChartResp) throws Exception {
-                        if(jmChartResp == null) {
-                            Log.e("yy","jmChartResp is null");
-                            Tools.toast(mXqActivity,"exit room failed",true);
-                            mXqActivity.finish();
-                            return;
-                        }
-                        if(jmChartResp.getStatus() != XqErrorCode.SUCCESS) {
-                            Log.e("yy",jmChartResp.getMsg());
-                            Tools.toast(mXqActivity,jmChartResp.getMsg(),true);
-                            mXqActivity.finish();
-                            return;
-                        }
-
-                        int progressStatus = 0;
-                        if(DataManager.getInstance().getSelfMember().getUserInfo().getRole_type().equals(Constant.ROLETYPE_GUEST)) {
-                            progressStatus = JMChartRoomSendBean.CHART_HELP_STATUS_CHART_EXIT_ROOM;
-                        }else if(DataManager.getInstance().getSelfMember().getRoomRoleType() == Constant.ROOM_ROLETYPE_ONLOOKER) {
-                            progressStatus = JMChartRoomSendBean.CHART_ONLOOKER_EXIT;
-                        }
-                        ArrayList<Member> list = new ArrayList<>();
-                        list.addAll(DataManager.getInstance().getChartBChatRoom().getMembers());
-                        list.addAll(DataManager.getInstance().getChartBChatRoom().getOnLookers());
-                        for (Member member:list) {
-                            if(!member.getUserInfo().getUser_name().equals(DataManager.getInstance().getUserInfo().getUser_name())) {
-                                JMNormalSendBean normalSendBean = new JMNormalSendBean();
-                                normalSendBean.setCode(progressStatus);
-                                normalSendBean.setTargetUserName(member.getUserInfo().getUser_name());
-                                normalSendBean.setTime(Tools.getCurrentDateTime());
-                                normalSendBean.setRoomId(DataManager.getInstance().getChartBChatRoom().getRoom_id());
-                                normalSendBean.setMsg(DataManager.getInstance().getUserInfo().getNick_name() + "--离开房间");
-                                JMsgUtil.sendNomalMessage(normalSendBean);
-                            }
-                        }
-
-                        mXqActivity.finish();
-                    }
-                }, new Consumer<Throwable>() {
-                    @Override
-                    public void accept(Throwable throwable) throws Exception {
-                        Log.e("yy",throwable.toString());
-                        Tools.toast(mXqActivity,throwable.toString(),true);
-                    }
-                });
-    }
-
-    private void norifyRoomExit(int code) {
-        ArrayList<Member> list = new ArrayList<>();
-        list.addAll(DataManager.getInstance().getChartBChatRoom().getMembers());
-        list.addAll(DataManager.getInstance().getChartBChatRoom().getOnLookers());
-        for (Member member:list) {
-            if(!member.getUserInfo().getUser_name().equals(DataManager.getInstance().getUserInfo().getUser_name())) {
-                JMNormalSendBean normalSendBean = new JMNormalSendBean();
-                normalSendBean.setCode(code);
-                normalSendBean.setRoomId(DataManager.getInstance().getChartBChatRoom().getRoom_id());
-                normalSendBean.setTargetUserName(member.getUserInfo().getUser_name());
-                JMsgUtil.sendNomalMessage(normalSendBean);
-            }
-        }
     }
 
     public void sendDoubleRoom() {
@@ -1267,7 +1146,7 @@ public class XqStatusChartUIViewMg extends AbsChartView{
                     }
                 }
             }else {
-                if(mIsRoomMatchSuccess && manSelectedResultList.contains(String.valueOf(index))) {
+                if(mStatusManager.isRoomMatchSuccess() && manSelectedResultList.contains(String.valueOf(index))) {
                     //选中的女生
                     viewInstance.setLightLabelStatus(true);
                 }else {
@@ -1787,7 +1666,7 @@ public class XqStatusChartUIViewMg extends AbsChartView{
                 bundle.putString("target",target);
                 intent.putExtras(bundle);
                 mXqActivity.startActivity(intent);
-                requestExitChatRoom(mIsSelefMatchSuccess?1:0);
+                requestExitChatRoom(mStatusManager.isSelfMatchSuccess()?1:0);
             }catch (Exception e) {
 
             }

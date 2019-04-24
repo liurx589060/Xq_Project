@@ -53,26 +53,28 @@ public class StatusManFinalSelectBean extends StatusManFirstSelectBean {
         if(finalResult) {
             text = "恭喜匹配成功";
             mIsRoomMatchSuccess = true;
-            if (DataManager.getInstance().getSelfMember().getRoomRoleType() == Constant.ROOM_ROLETYPE_PARTICIPANTS
-                    && DataManager.getInstance().getUserInfo().getGender().equals(Constant.GENDER_LADY)
-                    && mSelectLadyIndex == DataManager.getInstance().getSelfMember().getIndex()) {
-                mIsSelfMatchSuccess = true;
-            }
+            if(DataManager.getInstance().getUserInfo().getRole_type().equals(Constant.ROLETYPE_GUEST)) {
+                if (DataManager.getInstance().getSelfMember().getRoomRoleType() == Constant.ROOM_ROLETYPE_PARTICIPANTS
+                        && DataManager.getInstance().getUserInfo().getGender().equals(Constant.GENDER_LADY)
+                        && mSelectLadyIndex == DataManager.getInstance().getSelfMember().getIndex()) {
+                    mIsSelfMatchSuccess = true;
+                }
 
-            if (DataManager.getInstance().getSelfMember().getRoomRoleType() == Constant.ROOM_ROLETYPE_PARTICIPANTS
-                    && DataManager.getInstance().getUserInfo().getGender().equals(Constant.GENDER_MAN)) {
-                //男生
-                mIsSelfMatchSuccess = true;
+                if (DataManager.getInstance().getSelfMember().getRoomRoleType() == Constant.ROOM_ROLETYPE_PARTICIPANTS
+                        && DataManager.getInstance().getUserInfo().getGender().equals(Constant.GENDER_MAN)) {
+                    //男生
+                    mIsSelfMatchSuccess = true;
+                }
             }
-            //更新
-            chartUIViewMg.updateChatRoomMembersList();
         }
 
         statusManager.setRoomMatchSuccess(mIsRoomMatchSuccess);
         statusManager.setSelfMatchSuccess(mIsSelfMatchSuccess);
+        sendBean.setMsg(text);
+        chartUIViewMg.statusManFinalSelected(sendBean);
         //显示在系统事件中
-        JMChartRoomSendBean bean = getNextStatus().getChartSendBeanWillSend(null, BaseStatus.MessageType.TYPE_SEND);
-        bean.setMsg(text);
-        statusManager.handlerRoomChart(bean);
+//        JMChartRoomSendBean bean = getNextStatus().getChartSendBeanWillSend(null, BaseStatus.MessageType.TYPE_SEND);
+//        bean.setMsg(text);
+//        statusManager.handlerRoomChart(bean);
     }
 }

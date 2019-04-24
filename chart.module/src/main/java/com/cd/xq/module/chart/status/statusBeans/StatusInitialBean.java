@@ -26,7 +26,7 @@ public class StatusInitialBean extends ChatBaseStatus {
 
     @Override
     public int getLiveTimeCount() {
-        return 0;
+        return 60;
     }
 
     @Override
@@ -94,6 +94,7 @@ public class StatusInitialBean extends ChatBaseStatus {
         chartUIViewMg.addSystemEventAndRefresh(sendBean);
         chartUIViewMg.stopTiming();
         chartUIViewMg.resetLiveStatus();
+        chartUIViewMg.setTipText(getPublicString());
         chartUIViewMg.statusInitialRoom(sendBean);
     }
 

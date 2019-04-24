@@ -92,7 +92,7 @@ public class StatusHelpExitBean extends ChatBaseStatus {
     @Override
     public void handleSend(StatusResp statusResp, JMChartRoomSendBean sendBean) {
         chartUIViewMg.addSystemEventAndRefresh(sendBean);
-        chartUIViewMg.updateChatRoomMembersList();
+        //chartUIViewMg.updateChatRoomMembersList();
     }
 
     @Override

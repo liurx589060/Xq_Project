@@ -85,6 +85,7 @@ public class StatusChartFinalBean extends ChatBaseStatus {
     public void handleSend(StatusResp statusResp, JMChartRoomSendBean sendBean) {
         chartUIViewMg.stopTiming();
         chartUIViewMg.resetLiveStatus();
+        chartUIViewMg.startTiming(this,sendBean,statusResp);
 
         chartUIViewMg.addSystemEventAndRefresh(sendBean);
         String text = sendBean.getMsg() + ",流程已结束";

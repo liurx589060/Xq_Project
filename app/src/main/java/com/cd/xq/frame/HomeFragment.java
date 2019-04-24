@@ -847,7 +847,7 @@ public class HomeFragment extends BaseFragment {
 //        }else {
 //            param.put("work",0);
 //        }
-        param.put("work",0);
+        param.put("work","0,1");
         mXqApi.getChatRoomList(param)
                 .subscribeOn(Schedulers.io())
                 .compose(this.<NetResult<List<BChatRoom>>>bindToLifecycle())
