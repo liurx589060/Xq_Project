@@ -10,8 +10,8 @@
         android:orientation="vertical">
 
         <RelativeLayout
-            android:layout_width="@dimen/dp_240"
-            android:layout_height="@dimen/dp_33"
+            android:layout_width="@dimen/dp_250"
+            android:layout_height="@dimen/dp_40"
             android:background="@drawable/chart_room_describe_bg"
             android:layout_gravity="center_horizontal">
 
@@ -28,7 +28,7 @@
 
         <RelativeLayout
             android:layout_width="@dimen/dp_80"
-            android:layout_height="@dimen/dp_20"
+            android:layout_height="@dimen/dp_30"
             android:background="@drawable/chart_room_time_bg"
             android:layout_gravity="center_horizontal">
 

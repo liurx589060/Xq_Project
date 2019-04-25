@@ -19,7 +19,9 @@ public class StatusLadyFirstSelectBean extends ChatBaseStatus {
     public void initial() {
         super.initial();
         mCompleteCount = 0;
-        ladySelectedResultMap.clear();
+        if(ladySelectedResultMap != null) {
+            ladySelectedResultMap.clear();
+        }
     }
 
     public StatusLadyFirstSelectBean() {
@@ -75,9 +77,9 @@ public class StatusLadyFirstSelectBean extends ChatBaseStatus {
     public JMChartRoomSendBean getChartSendBeanWillSend(JMChartRoomSendBean receiveBean, MessageType messageType) {
         JMChartRoomSendBean sendBean = createBaseChartRoomSendBean();
         if(messageType == MessageType.TYPE_SEND) {
-            sendBean.setMsg("请女生做出选择");
+            sendBean.setMsg("请女嘉宾做出选择");
         }else if (messageType == MessageType.TYPE_RESPONSE) {
-            sendBean.setMsg(mUserInfo.getUser_name() + "已做出选择");
+            sendBean.setMsg("女嘉宾" + (mSelfMember.getIndex() + 1) + "已做出选择");
         }
         sendBean.setProcessStatus(getStatus());
         sendBean.setMessageType(messageType);

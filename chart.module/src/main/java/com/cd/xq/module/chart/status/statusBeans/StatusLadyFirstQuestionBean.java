@@ -67,9 +67,9 @@ public class StatusLadyFirstQuestionBean extends StatusLadyChartFirstBean {
             }else {
                 nextIndex = getNextIndex(receiveBean) + 1;
             }
-            sendBean.setMsg("请女" + nextIndex + "回答");
+            sendBean.setMsg("请女嘉宾" + nextIndex + "回答");
         }else if (messageType == MessageType.TYPE_RESPONSE) {
-            sendBean.setMsg(mUserInfo.getUser_name() + "嘉宾开始");
+            sendBean.setMsg("女嘉宾" + (getNextIndex(receiveBean)+1) + "开始");
         }
         sendBean.setProcessStatus(getStatus());
         sendBean.setMessageType(messageType);

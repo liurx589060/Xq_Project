@@ -70,9 +70,9 @@ public class StatusManIntroBean extends ChatBaseStatus {
             }else {
                 nextIndex = getNextIndex(receiveBean) + 1;
             }
-            sendBean.setMsg("请男" + nextIndex + "嘉宾发言");
+            sendBean.setMsg("请男嘉宾发言");
         }else if (messageType == MessageType.TYPE_RESPONSE) {
-            sendBean.setMsg(mUserInfo.getUser_name() + "嘉宾开始介绍");
+            sendBean.setMsg("男嘉宾开始介绍");
         }
         sendBean.setProcessStatus(getStatus());
         sendBean.setMessageType(messageType);

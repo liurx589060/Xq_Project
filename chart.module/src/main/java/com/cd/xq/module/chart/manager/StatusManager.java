@@ -159,6 +159,17 @@ public class StatusManager {
             Map.Entry<Integer,ChatBaseStatus> en = (Map.Entry) helpEntry.next();
             en.getValue().initial();
         }
+
+        setCurrentSendBean(new JMChartRoomSendBean());
+        setCurrentStatus(new EmptyChatBean());
+        setCurrentStatusResp(new StatusResp());
+        setDisturbing(false);
+        setLadyAccept(false);
+        setManSelected(-1);
+        setQuestDisturb(false);
+        setRoomMatchSuccess(false);
+        setSelfMatchSuccess(false);
+        setDisturbAngelIndex(-1);
     }
 
     public void handlerRoomChart(JMChartRoomSendBean sendBean) {

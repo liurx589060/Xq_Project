@@ -68,11 +68,8 @@ public abstract class BaseStatus {
     private BaseStatus mNextStatus;
 
     public BaseStatus() {
-        mBChatRoom = DataManager.getInstance().getChartBChatRoom();
-        mUserInfo = DataManager.getInstance().getUserInfo();
-        mSelfMember = DataManager.getInstance().getSelfMember();
-
         mHandledIndexList = new ArrayList<>();
+        initial();
     }
 
     public void initial() {
@@ -80,6 +77,11 @@ public abstract class BaseStatus {
         mOrder = -1;
         mStartIndex = 0;
         mHandledIndexList.clear();
+
+        mBChatRoom = DataManager.getInstance().getChartBChatRoom();
+        mUserInfo = DataManager.getInstance().getUserInfo();
+        mSelfMember = DataManager.getInstance().getSelfMember();
+        mBChatRoom.setInner_id(null);
     }
 
     /**

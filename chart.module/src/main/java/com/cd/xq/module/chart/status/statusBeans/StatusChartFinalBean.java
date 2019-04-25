@@ -1,6 +1,8 @@
 package com.cd.xq.module.chart.status.statusBeans;
 
 
+import android.view.View;
+
 import com.cd.xq.module.util.Constant;
 import com.cd.xq.module.util.beans.jmessage.JMChartRoomSendBean;
 import com.cd.xq.module.util.status.BaseStatus;
@@ -78,7 +80,12 @@ public class StatusChartFinalBean extends ChatBaseStatus {
 
     @Override
     public void onEnd() {
-
+        chartUIViewMg.statusEndChatFinal();
+        //发送初始化
+        BaseStatus baseStatus = statusManager.getStatus(JMChartRoomSendBean.CHART_INITIAL);
+        JMChartRoomSendBean bean = baseStatus.getChartSendBeanWillSend(null, BaseStatus.MessageType.TYPE_SEND);
+        bean.setIndexNext(baseStatus.getStartIndex());
+        statusManager.handlerRoomChart(bean);
     }
 
     @Override

@@ -68,9 +68,9 @@ public class StatusManFirstSelectBean extends ChatBaseStatus {
     public JMChartRoomSendBean getChartSendBeanWillSend(JMChartRoomSendBean receiveBean, MessageType messageType) {
         JMChartRoomSendBean sendBean = createBaseChartRoomSendBean();
         if(messageType == MessageType.TYPE_SEND) {
-            sendBean.setMsg("请男生做出选择");
+            sendBean.setMsg("请男嘉宾做出选择");
         }else if (messageType == MessageType.TYPE_RESPONSE) {
-            sendBean.setMsg(mUserInfo.getUser_name() + "已做出选择");
+            sendBean.setMsg("男嘉宾已做出选择");
         }
         sendBean.setProcessStatus(getStatus());
         sendBean.setMessageType(messageType);

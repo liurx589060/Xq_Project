@@ -11,7 +11,7 @@ public class JMChartRoomSendBean {
     public static final int CHART_INITIAL = Integer.MAX_VALUE;  //最初状态
     public static final int CHART_PRE_START_LIVE = -100;//开始直播
 
-    public static final int CHART_STATUS_PARTICIPANTS_ENTER = 1;          //人员进场
+//    public static final int CHART_STATUS_PARTICIPANTS_ENTER = 1;          //人员进场
     public static final int CHART_STATUS_INTRO_MAN = 2;         //男生自我介绍
     public static final int CHART_STATUS_LADY_SELECT_FIRST = 3; //女生第一次选择
     public static final int CHART_STATUS_INTRO_LADY = 4;        //女生聊天第一轮
@@ -44,6 +44,7 @@ public class JMChartRoomSendBean {
 
     public static final int CHART_GOTO_DOUBLE_ROOM = 2000;//转入双人聊天室
     public static final int CHART_DELETE_ROOM = 2001;//房间解散
+    public static final int CHART_STATUS_PARTICIPANTS_ENTER = 2002;          //人员进场
     public static final int CHART_PARTICIPANTS_EXIT_ROOM = 2002;//参与者离开房间
 
     public static final int LIVE_CAMERA = 0x101;

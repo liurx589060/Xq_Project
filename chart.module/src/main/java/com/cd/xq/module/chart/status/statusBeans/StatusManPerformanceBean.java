@@ -40,9 +40,9 @@ public class StatusManPerformanceBean extends StatusManIntroBean {
             }else {
                 nextIndex = getNextIndex(receiveBean) + 1;
             }
-            sendBean.setMsg("请男" + nextIndex + "嘉宾才艺表演");
+            sendBean.setMsg("请男嘉宾才艺表演");
         }else if (messageType == MessageType.TYPE_RESPONSE) {
-            sendBean.setMsg(mUserInfo.getUser_name() + "嘉宾开始才艺表演");
+            sendBean.setMsg("男嘉宾开始才艺表演");
         }
         sendBean.setProcessStatus(getStatus());
         sendBean.setMessageType(messageType);

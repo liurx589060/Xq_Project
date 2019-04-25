@@ -26,7 +26,7 @@ public class EmptyChatBean extends ChatBaseStatus {
 
     @Override
     public int getStatus() {
-        return 0;
+        return -1;
     }
 
     @Override

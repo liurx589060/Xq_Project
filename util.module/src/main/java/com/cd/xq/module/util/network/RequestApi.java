@@ -80,7 +80,7 @@ public interface RequestApi {
     Observable<NetResult<BChatRoom>> joinChatRoom(@QueryMap Map<String, Object> map);
 
     @GET("JMessage/enterChatRoom")
-    Observable<NetResult<BChatRoom>> enterChatRoom(@Query("roomId") long roomId,@Query("userName") String userName);
+    Observable<NetResult<BChatRoom>> enterChatRoom(@QueryMap Map<String, Object> map);
 
     @GET("JMessage/getChatRoomMember")
     Observable<NetResult<List<Member>>> getChatRoomMember(@QueryMap Map<String, Object> map);

@@ -72,7 +72,7 @@ public class StatusParticipantsExitBean extends ChatBaseStatus {
             if(DataManager.getInstance().getUserInfo().getGender().equals(Constant.GENDER_MAN)) {
                 str += "男嘉宾";
             }else {
-                str += "女嘉宾" + DataManager.getInstance().getSelfMember().getIndex();
+                str += "女嘉宾" + (DataManager.getInstance().getSelfMember().getIndex() + 1);
             }
         }
         sendBean.setMsg(str +"离开房间");

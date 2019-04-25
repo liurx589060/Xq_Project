@@ -490,7 +490,10 @@ public class HomeFragment extends BaseFragment {
      */
     private void requestEnterChatRoom() {
         if(mJmChartResp == null) return;
-        mApi.enterChatRoom(mJmChartResp.getRoom_id(),DataManager.getInstance().getUserInfo().getUser_name())
+        HashMap<String,Object> param = new HashMap<>();
+        param.put("userName",DataManager.getInstance().getUserInfo().getUser_name());
+        param.put("roomId",mJmChartResp.getRoom_id());
+        mApi.enterChatRoom(param)
                 .compose(this.<NetResult<BChatRoom>>bindToLifecycle())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())

@@ -69,7 +69,7 @@ public class StatusLadyChartFirstBean extends ChatBaseStatus {
             }
             sendBean.setMsg("请女" + nextIndex + "嘉宾发言");
         }else if (messageType == MessageType.TYPE_RESPONSE) {
-            sendBean.setMsg(mUserInfo.getUser_name() + "嘉宾开始");
+            sendBean.setMsg("女嘉宾" + (mSelfMember.getIndex()+1) + "开始");
         }
         sendBean.setProcessStatus(getStatus());
         sendBean.setMessageType(messageType);

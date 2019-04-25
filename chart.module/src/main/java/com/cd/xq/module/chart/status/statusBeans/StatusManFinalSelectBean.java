@@ -72,9 +72,5 @@ public class StatusManFinalSelectBean extends StatusManFirstSelectBean {
         statusManager.setSelfMatchSuccess(mIsSelfMatchSuccess);
         sendBean.setMsg(text);
         chartUIViewMg.statusManFinalSelected(sendBean);
-        //显示在系统事件中
-//        JMChartRoomSendBean bean = getNextStatus().getChartSendBeanWillSend(null, BaseStatus.MessageType.TYPE_SEND);
-//        bean.setMsg(text);
-//        statusManager.handlerRoomChart(bean);
     }
 }

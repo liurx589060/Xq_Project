@@ -72,7 +72,7 @@ public class StatusParticipantsEnterBean extends ChatBaseStatus {
             if(DataManager.getInstance().getUserInfo().getGender().equals(Constant.GENDER_MAN)) {
                 sendBean.setMsg("男嘉宾进入房间");
             }else {
-                sendBean.setMsg("女嘉宾" + DataManager.getInstance().getSelfMember().getIndex() + "进入房间");
+                sendBean.setMsg("女嘉宾" + (DataManager.getInstance().getSelfMember().getIndex() + 1) + "进入房间");
             }
         }
         sendBean.setProcessStatus(getStatus());
