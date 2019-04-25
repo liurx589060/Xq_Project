@@ -26,6 +26,7 @@ import com.cd.xq.module.util.glide.GlideCircleTransform;
 import com.cd.xq.module.util.manager.DataManager;
 import com.cd.xq.module.util.network.NetWorkMg;
 import com.cd.xq.module.util.network.RequestApi;
+import com.cd.xq.module.util.tools.BitmapUtil;
 import com.cd.xq.module.util.tools.Log;
 import com.cd.xq.module.util.tools.Tools;
 import com.cd.xq.module.util.tools.XqErrorCode;
@@ -67,10 +68,6 @@ public class RegisterInfoActivity extends BaseActivity {
     RelativeLayout registerRelayoutMarrage;
     @BindView(R.id.register_text_marrage)
     TextView registerTextMarrage;
-    @BindView(R.id.register_text_phone)
-    TextView registerTextPhone;
-    @BindView(R.id.register_relayout_phone)
-    RelativeLayout registerRelayoutPhone;
     private int mFrom = FROM_LOGIN;
     private RequestApi mApi;
     private boolean isUpdate;
@@ -169,7 +166,6 @@ public class RegisterInfoActivity extends BaseActivity {
         registerTextZhiye.setText(userInfo.getProfessional() + SUFFIX);
         registerTextRole.setText(userInfo.getRole_type() + SUFFIX);
         registerTextMarrage.setText((userInfo.getMarrige() == Constant.ROLE_MARRIED ? "已婚" : "未婚") + SUFFIX);
-        registerTextPhone.setText(userInfo.getPhone() + SUFFIX);
         registerEditPs.setText(userInfo.getSpecial_info());
 
         registerImgHead.setOnClickListener(new View.OnClickListener() {
@@ -182,7 +178,7 @@ public class RegisterInfoActivity extends BaseActivity {
 
     @OnClick({R.id.register_relayout_role, R.id.register_relayout_nick, R.id.register_relayout_gender, R.id.register_relayout_age, R.id.register_relayout_tall,
             R.id.register_relayout_xueli, R.id.register_relayout_jiguan, R.id.register_relayout_zhiye, R.id.register_relayout_gzdd, R.id.register_img_head,
-            R.id.register_relayout_marrage, R.id.register_relayout_phone})
+            R.id.register_relayout_marrage})
     public void onViewClicked(View view) {
         UserInfoBean userInfo = DataManager.getInstance().getUserInfo();
         switch (view.getId()) {
@@ -211,9 +207,6 @@ public class RegisterInfoActivity extends BaseActivity {
             break;
             case R.id.register_relayout_age:
                 showEditDialog("年龄", registerTextAge.getText().toString(), registerTextAge);
-                break;
-            case R.id.register_relayout_phone:
-                showEditDialog("手机号码", registerTextPhone.getText().toString(), registerTextPhone);
                 break;
             case R.id.register_relayout_marrage: {
                 int checkIndex = -1;
@@ -349,7 +342,6 @@ public class RegisterInfoActivity extends BaseActivity {
             marrage = Constant.ROLE_UNMARRIED;
         }
         mUserInfo.setMarrige(marrage);
-        mUserInfo.setPhone(registerTextPhone.getText().toString().replace(SUFFIX, ""));
         mUserInfo.setNative_place(registerTextJiguan.getText().toString().replace(SUFFIX, ""));
         mUserInfo.setProfessional(registerTextZhiye.getText().toString().replace(SUFFIX, ""));
         mUserInfo.setScholling(registerTextXueli.getText().toString().replace(SUFFIX, ""));
@@ -410,7 +402,8 @@ public class RegisterInfoActivity extends BaseActivity {
                     public void cropAfter(Object o) {
                         //裁剪结果后，上传图片
                         Log.d("yy", "" + o.toString());
-                        upLoadHeadImage(o.toString(), DataManager.getInstance().getUserInfo().getUser_name());
+                        String compressImagePath = BitmapUtil.compressImage(o.toString());
+                        upLoadHeadImage(compressImagePath, DataManager.getInstance().getUserInfo().getUser_name());
                     }
 
                     @Override

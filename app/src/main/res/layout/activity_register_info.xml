@@ -7,6 +7,7 @@
     android:orientation="vertical"
     android:focusable="true"
     android:focusableInTouchMode="true"
+    android:background="#ffffff"
     >
 
     <RelativeLayout
@@ -40,21 +41,19 @@
 
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/register_img_head"
-            android:layout_width="@dimen/dp_80"
-            android:layout_height="@dimen/dp_80"
-            android:layout_alignParentLeft="true"
-            android:layout_marginLeft="@dimen/dp_20"
+            android:layout_width="@dimen/dp_65"
+            android:layout_height="@dimen/dp_65"
+            android:layout_centerHorizontal="true"
             android:layout_alignParentTop="true"
-            android:layout_marginTop="@dimen/dp_60"
+            android:layout_marginTop="@dimen/dp_30"
             android:src="@drawable/chart_room_default_head"
             app:civ_border_width="@dimen/dp_0"
             app:civ_border_color="#000000"/>
 
         <EditText
             android:id="@+id/register_edit_ps"
-            android:layout_toRightOf="@+id/register_img_head"
-            android:layout_alignParentTop="true"
-            android:layout_marginTop="@dimen/dp_50"
+            android:layout_below="@+id/register_img_head"
+            android:layout_marginTop="@dimen/dp_10"
             android:layout_marginRight="@dimen/dp_20"
             android:layout_marginLeft="@dimen/dp_20"
             android:layout_width="match_parent"
@@ -165,35 +164,6 @@
                     android:layout_centerVertical="true"
                     android:layout_marginRight="@dimen/dp_20"
                     android:text="请选择性别   >"
-                    android:textSize="@dimen/sp_16" />
-            </RelativeLayout>
-
-            <RelativeLayout
-                android:id="@+id/register_relayout_phone"
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/dp_50"
-                android:background="@drawable/selector_register_layout_bg"
-                android:visibility="gone">
-
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentLeft="true"
-                    android:layout_centerVertical="true"
-                    android:layout_marginLeft="@dimen/dp_20"
-                    android:text="手机号码"
-                    android:textColor="#333333"
-                    android:textSize="@dimen/sp_20" />
-
-                <TextView
-                    android:id="@+id/register_text_phone"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentRight="true"
-                    android:layout_centerVertical="true"
-                    android:layout_marginRight="@dimen/dp_20"
-                    android:text="请选择手机号码   >"
                     android:textSize="@dimen/sp_16" />
             </RelativeLayout>
 

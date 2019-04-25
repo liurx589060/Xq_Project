@@ -12,10 +12,13 @@ import android.text.TextWatcher;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import com.cd.xq.R;
 import com.cd.xq.module.util.base.BaseActivity;
+import com.cd.xq.module.util.base.DefaultWebActivity;
 import com.cd.xq.module.util.manager.DataManager;
+import com.cd.xq.module.util.network.NetWorkMg;
 import com.cd.xq.module.util.tools.Log;
 import com.cd.xq.module.util.tools.Tools;
 
@@ -43,6 +46,8 @@ public class RegisterActivity extends BaseActivity {
     EditText editPassword;
     @BindView(R.id.btn_verify_phone)
     Button btnVerifyPhone;
+    @BindView(R.id.text_protocol)
+    TextView textProtocol;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -67,9 +72,9 @@ public class RegisterActivity extends BaseActivity {
 
             @Override
             public void afterTextChanged(Editable editable) {
-                if(!TextUtils.isEmpty(editPassword.getText().toString()) && !TextUtils.isEmpty(editUserName.getText().toString())) {
+                if (!TextUtils.isEmpty(editPassword.getText().toString()) && !TextUtils.isEmpty(editUserName.getText().toString())) {
                     btnVerifyPhone.setEnabled(true);
-                }else {
+                } else {
                     btnVerifyPhone.setEnabled(false);
                 }
             }
@@ -84,7 +89,7 @@ public class RegisterActivity extends BaseActivity {
         super.onDestroy();
     }
 
-    @OnClick({R.id.notify_btn_back, R.id.btn_verify_phone})
+    @OnClick({R.id.notify_btn_back, R.id.btn_verify_phone,R.id.text_protocol})
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.notify_btn_back:
@@ -92,6 +97,10 @@ public class RegisterActivity extends BaseActivity {
                 break;
             case R.id.btn_verify_phone:
                 dialogConfirmVerifyPhone();
+                break;
+            case R.id.text_protocol:
+                String url = "http://" + NetWorkMg.IP_ADDRESS + "/thinkphp/file/html/xq_protocol.html";
+                DefaultWebActivity.startWeb(this,url,"用户协议");
                 break;
         }
     }
@@ -120,6 +129,7 @@ public class RegisterActivity extends BaseActivity {
 
     /**
      * 验证手机号
+     *
      * @param context
      */
     private void sendSMSCode(Context context) {
@@ -130,7 +140,7 @@ public class RegisterActivity extends BaseActivity {
             public void afterEvent(int event, int result, Object data) {
                 if (result == SMSSDK.RESULT_COMPLETE) {
                     // 处理成功的结果
-                    HashMap<String,Object> phoneMap = (HashMap<String, Object>) data;
+                    HashMap<String, Object> phoneMap = (HashMap<String, Object>) data;
                     String country = (String) phoneMap.get("country"); // 国家代码，如“86”
                     String phone = (String) phoneMap.get("phone"); // 手机号码，如“13800138000”
                     // TODO 利用国家代码和手机号码进行后续的操作
@@ -138,12 +148,12 @@ public class RegisterActivity extends BaseActivity {
                     DataManager.getInstance().getRegisterUserInfo().setUser_name(editUserName.getText().toString());
                     DataManager.getInstance().getRegisterUserInfo().setPassword(editPassword.getText().toString());
 
-                    Intent intent = new Intent(RegisterActivity.this,RegisterInfoActivity.class);
+                    Intent intent = new Intent(RegisterActivity.this, RegisterInfoActivity.class);
                     startActivity(intent);
                     finish();
-                } else{
+                } else {
                     // TODO 处理错误的结果
-                    Tools.toast(getApplicationContext(),"验证失败--" + result,false);
+                    Tools.toast(getApplicationContext(), "验证失败--" + result, false);
                     Log.e("sendSMSCode---" + result);
                 }
             }
