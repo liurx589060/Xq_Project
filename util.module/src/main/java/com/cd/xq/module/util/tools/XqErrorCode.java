@@ -14,7 +14,7 @@ public class XqErrorCode {
     public static int ERROR_LACK_PARAMS = 7002;//缺少参数
     public static int ERROR_DELETE_CHARTEOOM = 7003;//删除聊天室失败
     public static int ERROR_CREATE_CHARTEOOM = 7004;//创建聊天室失败
-    public static int ERROR_JOIN_CHARTEOOM = 7005;//创建聊天室失败
+    public static int ERROR_JOIN_CHARTEOOM = 7005;//加入聊天室失败
     public static int ERROR_ALREADY_APPOINT_CHATROOM = 7006;//已经有预约的房间
     public static int ERROR_NOT_FIND_CHATROOM = 7007; //找不到房间
     public static int ERROR_FULL_CHATROOM = 7008; //房间满员
