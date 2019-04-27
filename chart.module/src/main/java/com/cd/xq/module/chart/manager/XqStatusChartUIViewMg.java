@@ -565,9 +565,9 @@ public class XqStatusChartUIViewMg extends AbsChartView{
             }
             mAngelViewInstance.textIndex.setText(text);
             if(angelBeanResult.getGender().equals(Constant.GENDER_LADY)) {
-                mAngelViewInstance.imageGender.setImageResource(R.drawable.chart_room_gender_lady);
+                mAngelViewInstance.imageGender.setImageResource(R.drawable.angel_lady);
             }else {
-                mAngelViewInstance.imageGender.setImageResource(R.drawable.chart_room_gender_man);
+                mAngelViewInstance.imageGender.setImageResource(R.drawable.angel_man);
             }
             mAngelViewInstance.imageGender.setVisibility(View.VISIBLE);
             loadImage(angelBeanResult.getHead_image(),mAngelViewInstance.imageHead);

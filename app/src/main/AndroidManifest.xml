@@ -167,6 +167,12 @@
             android:name=".InviteRoomDlgActivity"/>
 
         <activity
+            android:excludeFromRecents="true"
+            android:screenOrientation="portrait"
+            android:configChanges="orientation|keyboard|keyboardHidden|navigation"
+            android:name=".login.RegisterInfoDialogActivity"/>
+
+        <activity
             android:theme="@style/ActivityTranslucent"
             android:excludeFromRecents="true"
             android:screenOrientation="portrait"

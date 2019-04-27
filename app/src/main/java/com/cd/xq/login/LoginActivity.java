@@ -144,7 +144,10 @@ public class LoginActivity extends BaseActivity {
 //                if(checkEdit()) {
 //                    toRegist();
 //                }
-                Intent intent = new Intent(this,RegisterActivity.class);
+//                Intent intent = new Intent(this,RegisterActivity.class);
+//                startActivity(intent);
+
+                Intent intent = new Intent(this,RegisterInfoActivity.class);
                 startActivity(intent);
                 break;
             case R.id.login_text_fpassword:

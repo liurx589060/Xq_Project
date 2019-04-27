@@ -11,10 +11,10 @@ public class Constant {
     public static String thumbUrl = "http://p.nanrenwo.net/uploads/allimg/161104/8450-161104134439-50.jpg";
     public static String SP_NAME = "xq_cd";
 
-    public static String ROLRTYPE_ANGEL = "angel";
-    public static String ROLETYPE_GUEST = "guest";
-    public static String ROLETYPE_LOOKER = "looker";
-    public static String ROLETYPE_ALL = "guest|angel|looker";
+    public static String ROLRTYPE_ANGEL = "爱心大使";
+    public static String ROLETYPE_GUEST = "嘉宾";
+    public static String ROLETYPE_AUDIENCE = "观众";
+    public static String ROLETYPE_ALL = "爱心大使|嘉宾|观众";
     public static int ROLE_MARRIED = 2;   //已婚
     public static int ROLE_UNMARRIED = 1;   //未婚
     public static int ROOM_ROLETYPE_PARTICIPANTS = 1;   //参与者

@@ -12,7 +12,6 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.cd.xq.module.util.tools.Log;
-import com.cd.xq.module.util.tools.Tools;
 import com.cd.xq_util.com.R;
 import com.tencent.smtt.sdk.CookieSyncManager;
 import com.tencent.smtt.sdk.WebChromeClient;
@@ -24,7 +23,7 @@ import com.tencent.smtt.sdk.WebViewClient;
  * Created by Administrator on 2019/2/18.
  */
 
-public class DefaultWebActivity extends BaseActivity {
+public class DefaultWebActivity extends Activity {
     private WebView mWebView;
     private ProgressBar mProgressBar;
     private ImageView mImgBack;
@@ -89,7 +88,7 @@ public class DefaultWebActivity extends BaseActivity {
             }
         });
 
-        initWebView(mWebView);
+        initWebView(mWebView,false);
 
         mWebView.setWebViewClient(new WebViewClient() {
             @Override
@@ -121,7 +120,7 @@ public class DefaultWebActivity extends BaseActivity {
      * 初始化webView
      * @param webView
      */
-    protected void initWebView(WebView webView) {
+    protected void initWebView(WebView webView,boolean isCache) {
         WebSettings webSetting = webView.getSettings();
         webSetting.setAllowFileAccess(true);
         webSetting.setLayoutAlgorithm(WebSettings.LayoutAlgorithm.NARROW_COLUMNS);
@@ -132,7 +131,7 @@ public class DefaultWebActivity extends BaseActivity {
         // webSetting.setLoadWithOverviewMode(true);
         webSetting.setAppCacheEnabled(true);
         webSetting.setCacheMode(WebSettings.LOAD_NO_CACHE); //不使用缓存
-        if(!mIsCache) {
+        if(!isCache) {
             webSetting.setCacheMode(WebSettings.LOAD_NO_CACHE); //不使用缓存
         }
         // webSetting.setDatabaseEnabled(true);

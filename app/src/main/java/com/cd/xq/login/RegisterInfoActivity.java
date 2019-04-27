@@ -2,13 +2,18 @@ package com.cd.xq.login;
 
 import android.annotation.TargetApi;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.text.InputType;
+import android.text.TextUtils;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -118,6 +123,7 @@ public class RegisterInfoActivity extends BaseActivity {
     EditText registerEditPs;
 
     private String SUFFIX = "  >";
+    private UserInfoBean mTempUserInfo;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -129,7 +135,18 @@ public class RegisterInfoActivity extends BaseActivity {
         }
 
         if (mFrom == FROM_LEAK_INFO || mFrom == FROM_LOGIN) {
-            registerBtnClose.setVisibility(View.INVISIBLE);
+            if(mFrom == FROM_LEAK_INFO) {
+                registerBtnClose.setVisibility(View.INVISIBLE);
+            }
+            mTempUserInfo = new UserInfoBean();
+        }else {
+            //有些不能改变
+            registerRelayoutGender.setEnabled(false);
+            registerRelayoutRol.setEnabled(false);
+            registerRelayoutMarrage.setEnabled(false);
+
+            Gson gson = new Gson();
+            mTempUserInfo = gson.fromJson(gson.toJson(DataManager.getInstance().getUserInfo()),UserInfoBean.class);
         }
         init();
     }
@@ -145,7 +162,7 @@ public class RegisterInfoActivity extends BaseActivity {
     }
 
     private void setData() {
-        UserInfoBean userInfo = DataManager.getInstance().getUserInfo();
+        UserInfoBean userInfo = mTempUserInfo;
         if (userInfo == null) {
             return;
         }
@@ -156,17 +173,42 @@ public class RegisterInfoActivity extends BaseActivity {
                 .dontAnimate()
                 .centerCrop()
                 .into(registerImgHead);
-        registerTextGender.setText(userInfo.getGender() + SUFFIX);
-        registerTextAge.setText(String.valueOf(userInfo.getAge()) + SUFFIX);
-        registerTextGzdd.setText(userInfo.getJob_address() + SUFFIX);
-        registerTextJiguan.setText(userInfo.getNative_place() + SUFFIX);
-        registerTextNick.setText(userInfo.getNick_name() + SUFFIX);
-        registerTextTall.setText(String.valueOf(userInfo.getTall()) + "cm" + SUFFIX);
-        registerTextXueli.setText(userInfo.getScholling() + SUFFIX);
-        registerTextZhiye.setText(userInfo.getProfessional() + SUFFIX);
-        registerTextRole.setText(userInfo.getRole_type() + SUFFIX);
-        registerTextMarrage.setText((userInfo.getMarrige() == Constant.ROLE_MARRIED ? "已婚" : "未婚") + SUFFIX);
-        registerEditPs.setText(userInfo.getSpecial_info());
+        if(!TextUtils.isEmpty(userInfo.getGender())) {
+            registerTextGender.setText(userInfo.getGender() + (registerRelayoutGender.isEnabled()?SUFFIX:""));
+        }
+        if(userInfo.getAge() != -1) {
+            registerTextAge.setText(String.valueOf(userInfo.getAge()) + (registerRelayoutAge.isEnabled()?SUFFIX:""));
+        }
+        if(!TextUtils.isEmpty(userInfo.getJob_address())) {
+            registerTextGzdd.setText(userInfo.getJob_address() + (registerRelayoutGzdd.isEnabled()?SUFFIX:""));
+        }
+        if(!TextUtils.isEmpty(userInfo.getNative_place())) {
+            registerTextJiguan.setText(userInfo.getNative_place() + (registerRelayoutJiguan.isEnabled()?SUFFIX:""));
+        }
+        if(!TextUtils.isEmpty(userInfo.getNick_name())) {
+            registerTextNick.setText(userInfo.getNick_name() + (registerRelayoutNick.isEnabled()?SUFFIX:""));
+        }
+        if(userInfo.getTall() != -1) {
+            registerTextTall.setText(String.valueOf(userInfo.getTall()) + "cm" + (registerRelayoutTall.isEnabled()?SUFFIX:""));
+        }
+        if(!TextUtils.isEmpty(userInfo.getScholling())) {
+            registerTextXueli.setText(userInfo.getScholling() + (registerRelayoutXueli.isEnabled()?SUFFIX:""));
+        }
+        if(!TextUtils.isEmpty(userInfo.getProfessional())) {
+            registerTextZhiye.setText(userInfo.getProfessional() + (registerRelayoutZhiye.isEnabled()?SUFFIX:""));
+        }
+        if(!TextUtils.isEmpty(userInfo.getRole_type())) {
+            registerTextRole.setText(userInfo.getRole_type() + (registerRelayoutRol.isEnabled()?SUFFIX:""));
+        }else {
+            registerTextRole.setText("请选择角色" + (registerRelayoutZhiye.isEnabled()?SUFFIX:""));
+        }
+        if(userInfo.getMarrige() != -1) {
+            registerTextMarrage.setText((userInfo.getMarrige() == Constant.ROLE_MARRIED ? "已婚" : "未婚")
+                    + (registerRelayoutMarrage.isEnabled()?SUFFIX:""));
+        }
+        if(!TextUtils.isEmpty(userInfo.getSpecial_info())) {
+            registerEditPs.setText(userInfo.getSpecial_info());
+        }
 
         registerImgHead.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -180,7 +222,7 @@ public class RegisterInfoActivity extends BaseActivity {
             R.id.register_relayout_xueli, R.id.register_relayout_jiguan, R.id.register_relayout_zhiye, R.id.register_relayout_gzdd, R.id.register_img_head,
             R.id.register_relayout_marrage})
     public void onViewClicked(View view) {
-        UserInfoBean userInfo = DataManager.getInstance().getUserInfo();
+        UserInfoBean userInfo = mTempUserInfo;
         switch (view.getId()) {
             case R.id.register_relayout_role: {
                 int checkIndex = -1;
@@ -188,8 +230,14 @@ public class RegisterInfoActivity extends BaseActivity {
                     checkIndex = 0;
                 } else if (userInfo.getRole_type().equals(Constant.ROLETYPE_GUEST)) {
                     checkIndex = 1;
+                } else if (userInfo.getRole_type().equals(Constant.ROLETYPE_AUDIENCE)) {
+                    checkIndex = 2;
                 }
-                showSelectDialog("角色", new String[]{"angel", "guest"}, registerTextRole, checkIndex);
+                if(userInfo.getMarrige() == Constant.ROLE_MARRIED) {
+                    showSelectDialog("角色身份", new String[]{"观众"}, registerTextRole, 0);
+                }else {
+                    showSelectDialog("角色身份", new String[]{"爱心大使","嘉宾","观众"}, registerTextRole, checkIndex);
+                }
             }
             break;
             case R.id.register_relayout_nick:
@@ -215,7 +263,7 @@ public class RegisterInfoActivity extends BaseActivity {
                 } else if (userInfo.getMarrige() == Constant.ROLE_UNMARRIED) {
                     checkIndex = 1;
                 }
-                showSelectDialog("当前婚姻", new String[]{"已婚", "未婚"}, registerTextMarrage, checkIndex);
+                showSelectDialog("当前婚姻", new String[]{"已婚(视作观众身份)", "未婚"}, registerTextMarrage, checkIndex);
             }
             break;
             case R.id.register_relayout_tall:
@@ -263,8 +311,10 @@ public class RegisterInfoActivity extends BaseActivity {
 
     private void showEditDialog(String title, String hintText, final View view) {
         String rHintText = hintText.replace(SUFFIX, "");
-        final EditText editText = new EditText(this);
-        if (view == registerTextTall) {
+        View contentView = LayoutInflater.from(this).inflate(R.layout.layout_registerinfo_edit_dialog,null);
+        final EditText editText = contentView.findViewById(R.id.edit_dialog);
+        if (view == registerTextTall
+                || view == registerTextAge) {
             rHintText = rHintText.replace("cm", "");
             editText.setInputType(InputType.TYPE_CLASS_NUMBER);
         }
@@ -276,22 +326,36 @@ public class RegisterInfoActivity extends BaseActivity {
         }
         final AlertDialog.Builder inputDialog =
                 new AlertDialog.Builder(this);
-        inputDialog.setTitle(title).setView(editText);
+        inputDialog.setTitle(title).setView(contentView);
         inputDialog.setPositiveButton("确定",
                 new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        String text;
-                        text = editText.getText().toString();
-
-                        if (view == registerTextTall) {
-                            text += "cm" + SUFFIX;
-                        } else {
-                            text += SUFFIX;
+                        String text = editText.getText().toString();
+                        if(view == registerTextNick) {
+                            mTempUserInfo.setNick_name(text);
+                        }else if(view == registerTextAge) {
+                            int age = 0;
+                            try{
+                                age = Integer.parseInt(text);
+                            }catch (Exception e) {
+                            }
+                            mTempUserInfo.setAge(age);
+                        }else if(view == registerTextTall) {
+                            int tall = 0;
+                            try{
+                                tall = Integer.parseInt(text);
+                            }catch (Exception e) {
+                            }
+                            mTempUserInfo.setTall(tall);
+                        }else if(view == registerTextJiguan) {
+                            mTempUserInfo.setNative_place(text);
+                        }else if(view == registerTextZhiye) {
+                            mTempUserInfo.setProfessional(text);
+                        }else if(view == registerTextGzdd) {
+                            mTempUserInfo.setJob_address(text);
                         }
-                        if (view instanceof TextView) {
-                            ((TextView) view).setText(text);
-                        }
+                        setData();
                         dialog.dismiss();
                     }
                 });
@@ -302,19 +366,48 @@ public class RegisterInfoActivity extends BaseActivity {
             }
         });
         AlertDialog dialog = inputDialog.create();
-        dialog.setCanceledOnTouchOutside(false);
+//        dialog.setCanceledOnTouchOutside(false);
         dialog.show();
+
+        //解决dilaog中EditText无法弹出输入的问题
+        dialog.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM);
+        //弹出对话框后直接弹出键盘
+        editText.setFocusableInTouchMode(true);
+        editText.requestFocus();
+        editText.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                InputMethodManager inputManager =(InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+                inputManager.showSoftInput(editText, 0);
+            }
+        }, 50);
     }
 
     private void showSelectDialog(String title, final String[] items, final View view, int checkedItem) {
-        AlertDialog dialog = new AlertDialog.Builder(this)
+        AlertDialog.Builder builder = new AlertDialog.Builder(this)
                 .setTitle(title)//设置对话框的标题
                 .setSingleChoiceItems(items, checkedItem, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        if (view instanceof TextView) {
-                            ((TextView) view).setText(items[which] + SUFFIX);
+                        String text = items[which];
+                        if(view == registerTextRole) {
+                            mTempUserInfo.setRole_type(text);
+                        }else if(view == registerTextGender) {
+                            mTempUserInfo.setGender(text);
+                        }else if(view == registerTextMarrage) {
+                            if(which==0) {
+                                //已婚
+                                mTempUserInfo.setMarrige(Constant.ROLE_MARRIED);
+                                mTempUserInfo.setRole_type(Constant.ROLETYPE_AUDIENCE);
+                            }else {
+                                //未婚
+                                mTempUserInfo.setMarrige(Constant.ROLE_UNMARRIED);
+                                mTempUserInfo.setRole_type("");
+                            }
+                        }else if(view == registerTextXueli) {
+                            mTempUserInfo.setScholling(text);
                         }
+                        setData();
                         dialog.dismiss();
                     }
                 })
@@ -323,30 +416,27 @@ public class RegisterInfoActivity extends BaseActivity {
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.dismiss();
                     }
-                }).create();
+                });
+        if(view == registerTextRole) {
+            builder.setNeutralButton("角色详情",null);
+        }
+        AlertDialog dialog = builder.create();
         dialog.show();
-        dialog.setCanceledOnTouchOutside(false);
+//        dialog.setCanceledOnTouchOutside(false);
+        dialog.getButton(AlertDialog.BUTTON_NEUTRAL).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String url = "http://" + NetWorkMg.IP_ADDRESS + "/thinkphp/file/html/role_info.html";
+                RegisterInfoDialogActivity.startWeb(RegisterInfoActivity.this,
+                        url,
+                        "角色详情");
+            }
+        });
     }
 
 
     private void updateUserInfo() {
-        UserInfoBean mUserInfo = DataManager.getInstance().getUserInfo();
-        mUserInfo.setNick_name(registerTextNick.getText().toString().replace(SUFFIX, ""));
-        mUserInfo.setAge(parseInt(registerTextAge.getText().toString().replace(SUFFIX, "")));
-        mUserInfo.setGender(registerTextGender.getText().toString().replace(SUFFIX, ""));
-        mUserInfo.setJob_address(registerTextGzdd.getText().toString().replace(SUFFIX, ""));
-        int marrage = -1;
-        if (registerTextMarrage.getText().toString().contains("已婚")) {
-            marrage = Constant.ROLE_MARRIED;
-        } else if (registerTextMarrage.getText().toString().contains("未婚")) {
-            marrage = Constant.ROLE_UNMARRIED;
-        }
-        mUserInfo.setMarrige(marrage);
-        mUserInfo.setNative_place(registerTextJiguan.getText().toString().replace(SUFFIX, ""));
-        mUserInfo.setProfessional(registerTextZhiye.getText().toString().replace(SUFFIX, ""));
-        mUserInfo.setScholling(registerTextXueli.getText().toString().replace(SUFFIX, ""));
-        mUserInfo.setTall(parseInt(registerTextTall.getText().toString().replace("cm", "").replace(SUFFIX, "")));
-        mUserInfo.setRole_type(registerTextRole.getText().toString().replace(SUFFIX, ""));
+        UserInfoBean mUserInfo = mTempUserInfo;
         mUserInfo.setSpecial_info(registerEditPs.getText().toString());
 
         Map<String, Object> params = new HashMap<>();

@@ -17,6 +17,7 @@ import android.widget.RadioGroup;
 import android.widget.Toast;
 
 import com.bigkoo.pickerview.builder.TimePickerBuilder;
+import com.bigkoo.pickerview.listener.OnTimeSelectChangeListener;
 import com.bigkoo.pickerview.listener.OnTimeSelectListener;
 import com.bigkoo.pickerview.view.TimePickerView;
 import com.cd.xq.AppConstant;
@@ -130,8 +131,7 @@ public class CreateRoomActivity extends BaseActivity {
     private void initTimeDialog() {
         Calendar startDate = Calendar.getInstance();
         Calendar endDate = Calendar.getInstance();
-        startDate.setTimeInMillis(System.currentTimeMillis());
-        endDate.setTimeInMillis(System.currentTimeMillis() + 20 * 60 * 1000);
+        endDate.setTimeInMillis(System.currentTimeMillis() + 10 * 60 * 60 * 1000);
         mDialogAll = new TimePickerBuilder(this, new OnTimeSelectListener() {
             @Override
             public void onTimeSelect(Date date, View v) {
@@ -142,23 +142,20 @@ public class CreateRoomActivity extends BaseActivity {
                 .setType(new boolean[]{false, false, true, true, true, false})// 默认全部显示
                 .setCancelText("取消")//取消按钮文字
                 .setSubmitText("确认")//确认按钮文字
-                .setContentTextSize(getResources().getDimensionPixelOffset(R.dimen.sp_12))
-                .setTitleSize(getResources().getDimensionPixelOffset(R.dimen.sp_10))//标题文字大小
-                .setTitleText("")//标题文字
-                .setOutSideCancelable(false)//点击屏幕，点在控件外部范围时，是否取消显示
-                .isCyclic(false)//是否循环滚动
-                .setSubmitColor(Color.BLUE)//确定按钮文字颜色
-                .setCancelColor(Color.BLUE)//取消按钮文字颜色
-                .setTitleBgColor(Color.parseColor("#ffffff"))//标题背景颜色 Night mode
-                .setContentTextSize(getResources().getDimensionPixelOffset(R.dimen.sp_12))
-                .setTextColorCenter(Color.parseColor("#000000"))
-                .setTextColorOut(Color.parseColor("#666666"))
-                .setBgColor(Color.parseColor("#dddddd"))//滚轮背景颜色 Night mode
-                .setDate(startDate)// 如果不设置的话，默认是系统时间*/
-                .setRangDate(startDate, endDate)//起始终止年月日设定
-                .setLabel("年", "月", "日", "时", "分", "秒")//默认设置为年月日时分秒
+                .setDate(startDate)
+                .setRangDate(startDate, endDate)
+                .setContentTextSize(18)
+                .setLabel("年", "月", "日", "时", "分", "秒")
+                .setLineSpacingMultiplier(1.5f)
+                .setTextXOffset(0, 0, 40, 40, 40, 0)
                 .isCenterLabel(false) //是否只显示中间选中项的label文字，false则每项item全部都带有label。
-                .isDialog(false)//是否显示为对话框样式
+                .setDividerColor(0xFF24AD9D)
+                .setTimeSelectChangeListener(new OnTimeSelectChangeListener() {
+                    @Override
+                    public void onTimeSelectChanged(Date date) {
+
+                    }
+                })
                 .build();
     }
 

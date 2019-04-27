@@ -50,16 +50,27 @@
             app:civ_border_width="@dimen/dp_0"
             app:civ_border_color="#000000"/>
 
+        <TextView
+            android:id="@+id/text_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="个人特殊情况说明:"
+            android:textSize="@dimen/sp_16"
+            android:textColor="#ff0000"
+            android:layout_marginLeft="@dimen/dp_20"
+            android:layout_below="@+id/register_img_head"
+            android:layout_marginTop="@dimen/dp_10"/>
+
         <EditText
             android:id="@+id/register_edit_ps"
-            android:layout_below="@+id/register_img_head"
+            android:layout_below="@+id/text_label"
             android:layout_marginTop="@dimen/dp_10"
             android:layout_marginRight="@dimen/dp_20"
             android:layout_marginLeft="@dimen/dp_20"
             android:layout_width="match_parent"
             android:layout_height="@dimen/dp_90"
             android:hint="个人特殊说明（如：本人要求身高170以上）(选填)"
-            android:textSize="@dimen/sp_10"
+            android:textSize="@dimen/sp_12"
             android:textColor="#333333"
             android:gravity="top"
             android:padding="@dimen/dp_6"
@@ -96,7 +107,7 @@
                     android:layout_alignParentLeft="true"
                     android:layout_centerVertical="true"
                     android:layout_marginLeft="@dimen/dp_20"
-                    android:text="角色"
+                    android:text="角色身份"
                     android:textColor="#333333"
                     android:textSize="@dimen/sp_20" />
 

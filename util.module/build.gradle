@@ -91,7 +91,9 @@ dependencies {
     //api 'com.jzxiang.pickerview:TimePickerDialog:1.0.1'
 
     //PickerView
-    api 'com.contrarywind:Android-PickerView:4.1.7'
+    //api 'com.contrarywind:Android-PickerView:4.1.8'
+    api(name:'pickerview-release',ext:'aar')
+    api(name:'wheelview-release',ext:'aar')
 }
 
 //configurations.all {
