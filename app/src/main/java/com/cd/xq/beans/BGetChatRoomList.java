@@ -3,12 +3,15 @@ package com.cd.xq.beans;
 public class BGetChatRoomList {
     private long room_id;
     private int status;
-    private String enter_time = "";
-    private String exit_time = "";
+    private int room_status;
+    private String start_time = "";
+    private String end_time = "";
     private int room_role_type;
     private String creater = "";
     private String describe = "";
+    private String title = "";
     private int isPublic;
+    private String inner_id = "";
 
     public long getRoom_id() {
         return room_id;
@@ -24,22 +27,6 @@ public class BGetChatRoomList {
 
     public void setStatus(int status) {
         this.status = status;
-    }
-
-    public String getEnter_time() {
-        return enter_time;
-    }
-
-    public void setEnter_time(String enter_time) {
-        this.enter_time = enter_time;
-    }
-
-    public String getExit_time() {
-        return exit_time;
-    }
-
-    public void setExit_time(String exit_time) {
-        this.exit_time = exit_time;
     }
 
     public int getRoom_role_type() {
@@ -72,5 +59,45 @@ public class BGetChatRoomList {
 
     public void setIsPublic(int isPublic) {
         this.isPublic = isPublic;
+    }
+
+    public int getRoom_status() {
+        return room_status;
+    }
+
+    public void setRoom_status(int room_status) {
+        this.room_status = room_status;
+    }
+
+    public String getStart_time() {
+        return start_time;
+    }
+
+    public void setStart_time(String start_time) {
+        this.start_time = start_time;
+    }
+
+    public String getEnd_time() {
+        return end_time;
+    }
+
+    public void setEnd_time(String end_time) {
+        this.end_time = end_time;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getInner_id() {
+        return inner_id;
+    }
+
+    public void setInner_id(String inner_id) {
+        this.inner_id = inner_id;
     }
 }

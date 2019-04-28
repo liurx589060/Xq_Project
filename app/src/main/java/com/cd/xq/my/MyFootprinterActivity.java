@@ -2,6 +2,7 @@ package com.cd.xq.my;
 
 import android.graphics.Rect;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.DividerItemDecoration;
@@ -16,6 +17,7 @@ import android.widget.TextView;
 import com.cd.xq.R;
 import com.cd.xq.beans.BGetChatRoomList;
 import com.cd.xq.beans.BGetConsumeHistory;
+import com.cd.xq.module.util.Constant;
 import com.cd.xq.module.util.base.BaseActivity;
 import com.cd.xq.module.util.beans.NetResult;
 import com.cd.xq.module.util.common.MultiItemDivider;
@@ -160,23 +162,27 @@ public class MyFootprinterActivity extends BaseActivity {
             if(bean == null) return;
             holder.textCreator.setText(bean.getCreater());
             String exitTime = "";
-            if(bean.getExit_time() != null) {
-                exitTime = bean.getExit_time();
+            if(bean.getEnd_time() != null) {
+                exitTime = bean.getEnd_time();
             }else {
                 try{
                     Calendar calendar = Calendar.getInstance();
-                    SimpleDateFormat sdf = new SimpleDateFormat( " yyyy-MM-dd HH:mm:ss " );
-                    calendar.setTime(sdf.parse(bean.getEnter_time()));
-                    calendar.set(Calendar.HOUR,2); //往后的两小时
+                    SimpleDateFormat sdf = new SimpleDateFormat( "yyyy-MM-dd HH:mm:ss" );
+                    calendar.setTime(sdf.parse(bean.getStart_time()));
+                    calendar.add(Calendar.HOUR,2); //往后的两小时
                     exitTime = sdf.format(calendar.getTime());
                 }catch (Exception e) {
                     Log.e("MyFootprinterActivity--" + e.toString());
                 }
             }
             holder.textEndTime.setText(exitTime);
-            holder.textStartTime.setText(bean.getEnter_time());
-            holder.textRoomId.setText(String.valueOf(bean.getRoom_id()));
-            holder.textStatus.setText(bean.getStatus()==1?"成功":"失败");
+            holder.textStartTime.setText(bean.getStart_time());
+            holder.textRoomId.setText(String.valueOf(bean.getInner_id()));
+            if(DataManager.getInstance().getUserInfo().getRole_type().equals(Constant.ROLRTYPE_ANGEL)) {
+                holder.textStatus.setText(bean.getRoom_status()==1?"成功":"失败");
+            }else {
+                holder.textStatus.setText(bean.getStatus()==1?"成功":"失败");
+            }
         }
 
         @Override

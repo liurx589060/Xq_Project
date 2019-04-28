@@ -227,6 +227,10 @@ public class HomeFragment extends BaseFragment {
         requestGetBanner();
         initSmartRefreshLayout();
         initRoomFloatDialog();
+
+        if(DataManager.getInstance().getUserInfo().isOnLine()) {
+            onLogin();
+        }
     }
 
     private void toShowFloatBtn() {
@@ -435,7 +439,7 @@ public class HomeFragment extends BaseFragment {
      */
     private void requestGetChatRoomByUser() {
         mApi.getChatRoomByUser(DataManager.getInstance().getUserInfo().getUser_name())
-                .compose(this.<NetResult<BChatRoom>>bindToLifecycle())
+//                .compose(this.<NetResult<BChatRoom>>bindToLifecycle())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Consumer<NetResult<BChatRoom>>() {

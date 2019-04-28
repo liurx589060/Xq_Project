@@ -551,6 +551,19 @@ public class XqStatusChartUIViewMg extends AbsChartView{
             }
         }
 
+        if((mAngelMembersMap.size()+mManMembersMap.size()+mLadyMembersMap.size())
+                >= (DataManager.getInstance().getChartBChatRoom().getLimit_lady()
+                + DataManager.getInstance().getChartBChatRoom().getLimit_man())
+                + DataManager.getInstance().getChartBChatRoom().getLimit_angel()) {
+
+            if(DataManager.getInstance().getUserInfo().getRole_type().equals(Constant.ROLRTYPE_ANGEL)
+                    && !mIsRoomStarted) {
+                mBtnStart.setVisibility(View.VISIBLE);
+            }
+        }else {
+            mBtnStart.setVisibility(View.GONE);
+        }
+
         UserInfoBean angelBean = mAngelMembersMap.get(0);
         mAngelViewInstance.textIndex.setVisibility(View.GONE);
         mAngelViewInstance.imageIndex.setVisibility(View.VISIBLE);
@@ -744,10 +757,10 @@ public class XqStatusChartUIViewMg extends AbsChartView{
 
     public void statusMatch(JMChartRoomSendBean sendBean) {
         //显示开始按钮
-        if(DataManager.getInstance().getUserInfo().getRole_type().equals(Constant.ROLRTYPE_ANGEL)
-                && !mIsRoomStarted) {
-            mBtnStart.setVisibility(View.VISIBLE);
-        }
+//        if(DataManager.getInstance().getUserInfo().getRole_type().equals(Constant.ROLRTYPE_ANGEL)
+//                && !mIsRoomStarted) {
+//            mBtnStart.setVisibility(View.VISIBLE);
+//        }
     }
 
     /**

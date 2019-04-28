@@ -131,6 +131,7 @@ public class CreateRoomActivity extends BaseActivity {
     private void initTimeDialog() {
         Calendar startDate = Calendar.getInstance();
         Calendar endDate = Calendar.getInstance();
+        startDate.add(Calendar.MINUTE,5);
         endDate.setTimeInMillis(System.currentTimeMillis() + 10 * 60 * 60 * 1000);
         mDialogAll = new TimePickerBuilder(this, new OnTimeSelectListener() {
             @Override

@@ -8,6 +8,8 @@ import com.cd.xq.module.util.beans.jmessage.JMChartRoomSendBean;
 import com.cd.xq.module.util.manager.DataManager;
 import com.cd.xq.module.util.status.BaseStatus;
 import com.cd.xq.module.util.status.StatusResp;
+import com.cd.xq.module.util.tools.Log;
+import com.cd.xq.module.util.tools.Tools;
 
 import java.util.Map;
 
@@ -72,5 +74,7 @@ public class StatusManFinalSelectBean extends StatusManFirstSelectBean {
         statusManager.setSelfMatchSuccess(mIsSelfMatchSuccess);
         sendBean.setMsg(text);
         chartUIViewMg.statusManFinalSelected(sendBean);
+        Tools.toast(activity,"自己匹配成功--" + mIsSelfMatchSuccess,false);
+        Log.e("yy","自己匹配成功--" + mIsSelfMatchSuccess);
     }
 }

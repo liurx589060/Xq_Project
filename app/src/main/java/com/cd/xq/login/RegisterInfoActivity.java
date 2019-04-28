@@ -141,9 +141,9 @@ public class RegisterInfoActivity extends BaseActivity {
             mTempUserInfo = new UserInfoBean();
         }else {
             //有些不能改变
-            registerRelayoutGender.setEnabled(false);
-            registerRelayoutRol.setEnabled(false);
-            registerRelayoutMarrage.setEnabled(false);
+//            registerRelayoutGender.setEnabled(false);
+//            registerRelayoutRol.setEnabled(false);
+//            registerRelayoutMarrage.setEnabled(false);
 
             Gson gson = new Gson();
             mTempUserInfo = gson.fromJson(gson.toJson(DataManager.getInstance().getUserInfo()),UserInfoBean.class);

@@ -17,6 +17,7 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.cd.xq.R;
 import com.cd.xq.login.RegisterInfoActivity;
+import com.cd.xq.module.util.AppConfig;
 import com.cd.xq.module.util.Constant;
 import com.cd.xq.module.util.base.BaseFragment;
 import com.cd.xq.module.util.beans.user.UserInfoBean;
@@ -139,9 +140,11 @@ public class MyFragment extends BaseFragment {
     private void init() {
         setData();
 
-//        ipEdit.setVisibility(View.GONE);
-//        btnSave.setVisibility(View.GONE);
-//        checkboxRemote.setVisibility(View.GONE);
+        if(!AppConfig.isShowIp) {
+            ipEdit.setVisibility(View.GONE);
+            btnSave.setVisibility(View.GONE);
+            checkboxRemote.setVisibility(View.GONE);
+        }
 
         myImgNotifyDot.setVisibility(View.GONE);
         myTextEdit.setOnClickListener(new View.OnClickListener() {
@@ -204,7 +207,7 @@ public class MyFragment extends BaseFragment {
     @Override
     public void onLogin() {
         super.onLogin();
-        init();
+        setData();
     }
 
     @OnClick({R.id.my_relayout_yue, R.id.my_relayout_liquan, R.id.my_relayout_shouyi, R.id

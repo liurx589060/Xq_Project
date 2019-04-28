@@ -17,6 +17,7 @@ import android.widget.TextView;
 import com.cd.xq.AppConstant;
 import com.cd.xq.R;
 import com.cd.xq.frame.MainActivity;
+import com.cd.xq.module.util.AppConfig;
 import com.cd.xq.module.util.Constant;
 import com.cd.xq.module.util.base.BaseActivity;
 import com.cd.xq.module.util.base.DefaultWebActivity;
@@ -101,6 +102,7 @@ public class LoginActivity extends BaseActivity {
         if(mFrom == FROM_WELCOME) {
             loginBtnClose.setVisibility(View.INVISIBLE);
         }
+
         init();
     }
 
@@ -114,7 +116,9 @@ public class LoginActivity extends BaseActivity {
         });
 
         mBtnSetting = findViewById(R.id.Test);
-//        mBtnSetting.setVisibility(View.GONE);
+        if(!AppConfig.isShowIp) {
+            mBtnSetting.setVisibility(View.GONE);
+        }
         mBtnSetting.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
