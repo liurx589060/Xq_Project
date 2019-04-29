@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -21,6 +22,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.cd.xq.AppConstant;
 import com.cd.xq.R;
 import com.cd.xq.frame.MainActivity;
 import com.cd.xq.module.util.Constant;
@@ -36,6 +38,7 @@ import com.cd.xq.module.util.tools.Log;
 import com.cd.xq.module.util.tools.Tools;
 import com.cd.xq.module.util.tools.XqErrorCode;
 import com.google.gson.Gson;
+import com.trello.rxlifecycle2.android.ActivityEvent;
 
 import java.io.File;
 import java.util.HashMap;
@@ -50,8 +53,16 @@ import cn.finalteam.rxgalleryfinal.rxbus.RxBusResultDisposable;
 import cn.finalteam.rxgalleryfinal.rxbus.event.ImageRadioResultEvent;
 import cn.finalteam.rxgalleryfinal.ui.RxGalleryListener;
 import cn.finalteam.rxgalleryfinal.ui.base.IRadioImageCheckedListener;
+import cn.jpush.im.android.api.JMessageClient;
+import cn.jpush.im.android.api.model.UserInfo;
+import cn.jpush.im.api.BasicCallback;
+import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.ObservableSource;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.functions.Consumer;
+import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
@@ -124,6 +135,9 @@ public class RegisterInfoActivity extends BaseActivity {
 
     private String SUFFIX = "  >";
     private UserInfoBean mTempUserInfo;
+    private final String STR_REGISTER = "注册";
+    private final String STR_EDIT = "编辑";
+    private final String STR_UODATE = "更新";
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -139,19 +153,60 @@ public class RegisterInfoActivity extends BaseActivity {
                 registerBtnClose.setVisibility(View.INVISIBLE);
             }
             if(mFrom == FROM_LOGIN) {
-                registerDone.setText("注册");
+                setStatus(STR_REGISTER);
+                registerImgHead.setVisibility(View.GONE);
             }
-            mTempUserInfo = new UserInfoBean();
+            mTempUserInfo = DataManager.getInstance().getRegisterUserInfo();
         }else {
             //有些不能改变
-//            registerRelayoutGender.setEnabled(false);
-//            registerRelayoutRol.setEnabled(false);
-//            registerRelayoutMarrage.setEnabled(false);
-
+            setStatus(STR_EDIT);
             Gson gson = new Gson();
             mTempUserInfo = gson.fromJson(gson.toJson(DataManager.getInstance().getUserInfo()),UserInfoBean.class);
         }
         init();
+    }
+
+    private void setStatus(String str) {
+        registerDone.setText(str);
+        if(registerDone.getText().toString().equals(STR_EDIT)) {
+            //编辑，状态不可用
+            registerRelayoutRol.setEnabled(false);
+            registerRelayoutNick.setEnabled(false);
+            registerRelayoutGender.setEnabled(false);
+            registerRelayoutMarrage.setEnabled(false);
+            registerRelayoutAge.setEnabled(false);
+            registerRelayoutTall.setEnabled(false);
+            registerRelayoutXueli.setEnabled(false);
+            registerRelayoutJiguan.setEnabled(false);
+            registerRelayoutZhiye.setEnabled(false);
+            registerRelayoutGzdd.setEnabled(false);
+            registerEditPs.setEnabled(false);
+        }else if(registerDone.getText().toString().equals(STR_REGISTER)){
+            registerRelayoutRol.setEnabled(true);
+            registerRelayoutNick.setEnabled(true);
+            registerRelayoutGender.setEnabled(true);
+            registerRelayoutMarrage.setEnabled(true);
+            registerRelayoutAge.setEnabled(true);
+            registerRelayoutTall.setEnabled(true);
+            registerRelayoutXueli.setEnabled(true);
+            registerRelayoutJiguan.setEnabled(true);
+            registerRelayoutZhiye.setEnabled(true);
+            registerRelayoutGzdd.setEnabled(true);
+            registerEditPs.setEnabled(true);
+        }else if(registerDone.getText().toString().equals(STR_UODATE)) {
+            registerRelayoutRol.setEnabled(false);
+            registerRelayoutNick.setEnabled(true);
+            registerRelayoutGender.setEnabled(false);
+            registerRelayoutMarrage.setEnabled(false);
+            registerRelayoutAge.setEnabled(true);
+            registerRelayoutTall.setEnabled(true);
+            registerRelayoutXueli.setEnabled(true);
+            registerRelayoutJiguan.setEnabled(true);
+            registerRelayoutZhiye.setEnabled(true);
+            registerRelayoutGzdd.setEnabled(true);
+            registerEditPs.setEnabled(true);
+        }
+        setData();
     }
 
     private void init() {
@@ -301,7 +356,13 @@ public class RegisterInfoActivity extends BaseActivity {
 
     @OnClick(R.id.register_done)
     public void onRegisterDoneClicked() {
-        updateUserInfo();
+        if(registerDone.getText().toString().equals(STR_EDIT)) {
+            setStatus(STR_UODATE);
+        }else if(registerDone.getText().toString().equals(STR_UODATE)) {
+            updateUserInfo();
+        }else if(registerDone.getText().toString().equals(STR_REGISTER)) {
+            toRegister();
+        }
     }
 
     @OnClick(R.id.register_btn_close)
@@ -437,6 +498,65 @@ public class RegisterInfoActivity extends BaseActivity {
         });
     }
 
+    private void toRegister() {
+        //先注册
+        final String pss = Tools.MD5(AppConstant.MD5_PREFIX + mTempUserInfo.getPassword());
+        Observable.create(new ObservableOnSubscribe<Integer>() {
+            @Override
+            public void subscribe(final ObservableEmitter<Integer> observableEmitter) throws Exception {
+                JMessageClient.register(mTempUserInfo.getUser_name(), pss
+                        , new BasicCallback() {
+                            @Override
+                            public void gotResult(int i, String s) {
+                                if (i == 0 || i == 898001) {//成功或者已注册过
+                                    observableEmitter.onNext(i);
+                                    saveUser(JMessageClient.getMyInfo().getUserName(), pss, JMessageClient.getMyInfo().getAppKey());
+                                } else {
+                                    observableEmitter.onError(new Throwable("JMessage regist error"));
+                                }
+                            }
+                        });
+            }
+        }).observeOn(Schedulers.io()).flatMap(new Function<Integer, ObservableSource<UserResp>>() {
+            @Override
+            public ObservableSource<UserResp> apply(Integer integer) throws Exception {
+                try {
+                    return mApi.regist(mTempUserInfo.getUser_name(), pss);
+                } catch (Exception e) {
+                    return Observable.error(e);
+                }
+            }
+        }).subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Consumer<UserResp>() {
+                    @Override
+                    public void accept(UserResp userResp) throws Exception {
+                        if (userResp.getStatus() == XqErrorCode.SUCCESS) {//注册成功
+                            updateUserInfo();
+                        }else {
+                            Log.e("toRegister--" + userResp.getMsg());
+                            Tools.toast(getApplicationContext(),"注册失败",false);
+                        }
+                    }
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Exception {
+                        Log.e("toRegister--" + throwable.toString());
+                        Tools.toast(getApplicationContext(),"注册失败",false);
+                    }
+                });
+    }
+
+    private void saveUser(String userName, String password, String appKey) {
+        UserInfo userInfo = JMessageClient.getMyInfo();
+        Log.i("avatar=" + userInfo.getAvatar());
+        SharedPreferences sp = getSharedPreferences(Constant.SP_NAME, Context.MODE_PRIVATE);
+        sp.edit().putString("userName", userName)
+                .putString("password", password)
+                .putString("appKey", appKey)
+                .apply();
+    }
+
 
     private void updateUserInfo() {
         UserInfoBean mUserInfo = mTempUserInfo;
@@ -466,6 +586,7 @@ public class RegisterInfoActivity extends BaseActivity {
                     public void accept(UserResp userResp) throws Exception {
                         Log.i(new Gson().toJson(userResp));
                         DataManager.getInstance().setUserInfo(userResp.getData());
+                        DataManager.getInstance().setRegisterUserInfo(null);
                         if (mFrom == FROM_LOGIN) {
                             Tools.toast(getApplicationContext(), "注册成功", false);
                             Intent intent = new Intent(RegisterInfoActivity.this, MainActivity.class);
@@ -495,6 +616,7 @@ public class RegisterInfoActivity extends BaseActivity {
                         //裁剪结果后，上传图片
                         Log.d("yy", "" + o.toString());
                         String compressImagePath = BitmapUtil.compressImage(o.toString());
+                        mTempUserInfo.setHead_image(compressImagePath);
                         upLoadHeadImage(compressImagePath, DataManager.getInstance().getUserInfo().getUser_name());
                     }
 
@@ -577,15 +699,5 @@ public class RegisterInfoActivity extends BaseActivity {
                 }
             }
         });
-    }
-
-    private int parseInt(String str) {
-        int result = 0;
-        try {
-            result = Integer.parseInt(str);
-        } catch (Exception e) {
-            Log.e("yy", e.toString());
-        }
-        return result;
     }
 }

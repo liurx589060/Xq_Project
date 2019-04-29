@@ -147,10 +147,12 @@ public class LoginActivity extends BaseActivity {
                 }
                 break;
             case R.id.login_btn_register:
-                VerifyCodeActivity.startVerify(this,VerifyCodeActivity.REQUEST_REGISTER,null);
+                Intent intent2 = new Intent(this,RegisterActivity.class);
+                startActivity(intent2);
                 break;
             case R.id.login_text_fpassword:
-                VerifyCodeActivity.startVerify(this,VerifyCodeActivity.REQUEST_CHANGE_PASS,"13609613560");
+                Intent intent = new Intent(this,ChangePassInfoActivity.class);
+                startActivity(intent);
                 break;
         }
     }

@@ -1,11 +1,7 @@
 package com.cd.xq.login;
 
-import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v7.app.AlertDialog;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
@@ -17,19 +13,21 @@ import android.widget.TextView;
 import com.cd.xq.R;
 import com.cd.xq.module.util.base.BaseActivity;
 import com.cd.xq.module.util.base.DefaultWebActivity;
+import com.cd.xq.module.util.beans.BaseResp;
 import com.cd.xq.module.util.manager.DataManager;
+import com.cd.xq.module.util.network.NetParse;
 import com.cd.xq.module.util.network.NetWorkMg;
-import com.cd.xq.module.util.tools.Log;
+import com.cd.xq.module.util.network.RequestApi;
 import com.cd.xq.module.util.tools.Tools;
-
-import java.util.HashMap;
+import com.cd.xq.module.util.tools.XqErrorCode;
+import com.trello.rxlifecycle2.android.ActivityEvent;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import cn.smssdk.EventHandler;
-import cn.smssdk.SMSSDK;
-import cn.smssdk.gui.RegisterPage;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
 
 /**
  * 注册
@@ -48,12 +46,17 @@ public class RegisterActivity extends BaseActivity {
     Button btnVerifyPhone;
     @BindView(R.id.text_protocol)
     TextView textProtocol;
+    @BindView(R.id.text_tip)
+    TextView textTip;
+
+    private RequestApi mApi;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
         ButterKnife.bind(this);
+        mApi = NetWorkMg.newRetrofit().create(RequestApi.class);
 
         init();
     }
@@ -89,75 +92,50 @@ public class RegisterActivity extends BaseActivity {
         super.onDestroy();
     }
 
-    @OnClick({R.id.notify_btn_back, R.id.btn_verify_phone,R.id.text_protocol})
+    @OnClick({R.id.notify_btn_back, R.id.btn_verify_phone, R.id.text_protocol})
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.notify_btn_back:
                 finish();
                 break;
             case R.id.btn_verify_phone:
-                VerifyCodeActivity.startVerify(this,VerifyCodeActivity.REQUEST_REGISTER,null);
+                requestCheckUserExist();
                 break;
             case R.id.text_protocol:
                 String url = "http://" + NetWorkMg.IP_ADDRESS + "/thinkphp/file/html/xq_protocol.html";
-                DefaultWebActivity.startWeb(this,url,"用户协议");
+                DefaultWebActivity.startWeb(this, url, "用户协议");
                 break;
         }
     }
 
-    /**
-     * 确认验证对话框
-     */
-    private void dialogConfirmVerifyPhone() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("提示")
-                .setMessage("验证的手机号将与注册的账号绑定，将作为本人的联系方式以及以后用于密码找回")
-                .setPositiveButton("确定", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        sendSMSCode(RegisterActivity.this);
-                    }
-                })
-                .setNegativeButton("取消", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
 
+    private void requestCheckUserExist() {
+        textTip.setText("");
+        mApi.checkUserExist(editUserName.getText().toString())
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .compose(this.<BaseResp>bindUntilEvent(ActivityEvent.DESTROY))
+                .subscribe(new Consumer<BaseResp>() {
+                    @Override
+                    public void accept(BaseResp baseResp) throws Exception {
+                        if (baseResp.getStatus() == XqErrorCode.ERROR_USER_NOT_EXIST) {
+                            DataManager.getInstance().getRegisterUserInfo().setUser_name(editUserName.getText().toString());
+                            DataManager.getInstance().getRegisterUserInfo().setPassword(editPassword.getText().toString());
+                            VerifyCodeActivity.startVerify(RegisterActivity.this,
+                                    VerifyCodeActivity.REQUEST_REGISTER,
+                                    null);
+                            finish();
+                        }else {
+                            Tools.toast(getApplicationContext(), "用户已存在", false);
+                            textTip.setText("用户已存在");
+                            return;
+                        }
+                    }
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Exception {
+                        NetParse.parseError(RegisterActivity.this, throwable);
                     }
                 });
-        builder.create().show();
-    }
-
-    /**
-     * 验证手机号
-     *
-     * @param context
-     */
-    private void sendSMSCode(Context context) {
-        RegisterPage page = new RegisterPage();
-        //如果使用我们的ui，没有申请模板编号的情况下需传null
-        page.setTempCode(null);
-        page.setRegisterCallback(new EventHandler() {
-            public void afterEvent(int event, int result, Object data) {
-                if (result == SMSSDK.RESULT_COMPLETE) {
-                    // 处理成功的结果
-                    HashMap<String, Object> phoneMap = (HashMap<String, Object>) data;
-                    String country = (String) phoneMap.get("country"); // 国家代码，如“86”
-                    String phone = (String) phoneMap.get("phone"); // 手机号码，如“13800138000”
-                    // TODO 利用国家代码和手机号码进行后续的操作
-                    DataManager.getInstance().getRegisterUserInfo().setPhone(phone);
-                    DataManager.getInstance().getRegisterUserInfo().setUser_name(editUserName.getText().toString());
-                    DataManager.getInstance().getRegisterUserInfo().setPassword(editPassword.getText().toString());
-
-                    Intent intent = new Intent(RegisterActivity.this, RegisterInfoActivity.class);
-                    startActivity(intent);
-                    finish();
-                } else {
-                    // TODO 处理错误的结果
-                    Tools.toast(getApplicationContext(), "验证失败--" + result, false);
-                    Log.e("sendSMSCode---" + result);
-                }
-            }
-        });
-        page.show(context);
     }
 }

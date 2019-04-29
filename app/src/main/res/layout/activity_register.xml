@@ -40,14 +40,23 @@
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
             android:orientation="vertical"
-            android:layout_marginTop="@dimen/dp_60"
+            android:layout_marginTop="@dimen/dp_30"
             >
+
+            <TextView
+                android:id="@+id/text_tip"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="#ff0000"
+                android:layout_marginTop="@dimen/dp_10"
+                android:textSize="@dimen/sp_16"/>
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="@dimen/sp_18"
                 android:text="注册更精彩"
+                android:layout_marginTop="@dimen/dp_20"
                 android:textColor="#000000"/>
 
             <LinearLayout

@@ -1,7 +1,6 @@
 package com.cd.xq.login;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
@@ -22,7 +21,6 @@ import android.widget.TextView;
 import com.cd.xq.R;
 import com.cd.xq.module.util.base.BaseActivity;
 import com.cd.xq.module.util.manager.DataManager;
-import com.cd.xq.module.util.tools.Log;
 import com.cd.xq.module.util.tools.Tools;
 
 import java.util.HashMap;
@@ -50,6 +48,8 @@ public class VerifyCodeActivity extends BaseActivity {
     EditText editCode;
     @BindView(R.id.btn_verify_code)
     Button btnVerifyCode;
+    @BindView(R.id.text_tip)
+    TextView textTip;
 
     private Handler mHandler;
     private final int TOTAL_COUNT = 60;
@@ -57,18 +57,33 @@ public class VerifyCodeActivity extends BaseActivity {
     private Runnable mTimeRunnable;
     private EventHandler mSMSEventHandler;
     private int mRequestCode;
+    private String mUserName;
 
     /**
-     *
-     * @param phoneNum        传入指定手机号   不指定则传null
+     * @param phoneNum 传入指定手机号   不指定则传null
      */
-    public static void startVerify(Activity activity,int requestCode, String phoneNum) {
-        Intent intent = new Intent(activity,VerifyCodeActivity.class);
+    public static void startVerify(Activity activity, int requestCode, String phoneNum) {
+        Intent intent = new Intent(activity, VerifyCodeActivity.class);
         Bundle bundle = new Bundle();
-        if(phoneNum != null) {
-            bundle.putString("phoneNum",phoneNum);
+        if (phoneNum != null) {
+            bundle.putString("phoneNum", phoneNum);
         }
-        bundle.putInt("requestCode",requestCode);
+        bundle.putInt("requestCode", requestCode);
+        intent.putExtras(bundle);
+        activity.startActivity(intent);
+    }
+
+    /**
+     * @param phoneNum 传入指定手机号   不指定则传null
+     */
+    public static void startVerify(Activity activity, int requestCode, String phoneNum, String userName) {
+        Intent intent = new Intent(activity, VerifyCodeActivity.class);
+        Bundle bundle = new Bundle();
+        if (phoneNum != null) {
+            bundle.putString("phoneNum", phoneNum);
+            bundle.putString("userName", userName);
+        }
+        bundle.putInt("requestCode", requestCode);
         intent.putExtras(bundle);
         activity.startActivity(intent);
     }
@@ -85,10 +100,11 @@ public class VerifyCodeActivity extends BaseActivity {
 
     private void init() {
         Bundle bundle = getIntent().getExtras();
-        if(bundle != null) {
+        if (bundle != null) {
             String phoneNum = bundle.getString("phoneNum");
+            mUserName = bundle.getString("userName");
             mRequestCode = bundle.getInt("requestCode");
-            if(phoneNum != null) {
+            if (phoneNum != null) {
                 editPhone.setText(phoneNum);
                 editPhone.setEnabled(false);
             }
@@ -108,9 +124,9 @@ public class VerifyCodeActivity extends BaseActivity {
 
             @Override
             public void afterTextChanged(Editable editable) {
-                if(TextUtils.isEmpty(editCode.getText().toString())) {
+                if (TextUtils.isEmpty(editCode.getText().toString())) {
                     btnVerifyCode.setEnabled(false);
-                }else {
+                } else {
                     btnVerifyCode.setEnabled(true);
                 }
             }
@@ -136,33 +152,37 @@ public class VerifyCodeActivity extends BaseActivity {
                             if (result == SMSSDK.RESULT_COMPLETE) {
                                 // TODO 处理成功得到验证码的结果
                                 // 请注意，此时只是完成了发送验证码的请求，验证码短信还需要几秒钟之后才送达
-                                Tools.toast(getApplicationContext(),"验证码发送成功",false);
+                                Tools.toast(getApplicationContext(), "验证码发送成功", false);
                             } else {
                                 // TODO 处理错误的结果
                                 ((Throwable) data).printStackTrace();
-                                Tools.toast(getApplicationContext(),"验证码发送失败",false);
+                                Tools.toast(getApplicationContext(), "验证码发送失败", false);
                             }
                         } else if (event == SMSSDK.EVENT_SUBMIT_VERIFICATION_CODE) {
                             if (result == SMSSDK.RESULT_COMPLETE) {
                                 // TODO 处理验证码验证通过的结果
-                                HashMap<String,Object> phoneMap = (HashMap<String, Object>) data;
+                                HashMap<String, Object> phoneMap = (HashMap<String, Object>) data;
                                 String country = (String) phoneMap.get("country"); // 国家代码，如“86”
                                 String phone = (String) phoneMap.get("phone"); // 手机号码，如“13800138000”
 
                                 DataManager.getInstance().getRegisterUserInfo().setPhone(phone);
-                                if(mRequestCode == REQUEST_REGISTER) {
+                                if (mRequestCode == REQUEST_REGISTER) {
                                     //注册
-                                    Intent intent = new Intent(VerifyCodeActivity.this,RegisterInfoActivity.class);
+                                    Intent intent = new Intent(VerifyCodeActivity.this, RegisterInfoActivity.class);
                                     startActivity(intent);
-                                }else if(mRequestCode == REQUEST_CHANGE_PASS){
-                                    Intent intent = new Intent(VerifyCodeActivity.this,ResetPasswordActivity.class);
+                                } else if (mRequestCode == REQUEST_CHANGE_PASS) {
+                                    Intent intent = new Intent(VerifyCodeActivity.this, ResetPasswordActivity.class);
+                                    Bundle bundle = new Bundle();
+                                    bundle.putString("userName", mUserName);
+                                    intent.putExtras(bundle);
                                     startActivity(intent);
                                 }
                                 finish();
                             } else {
                                 // TODO 处理错误的结果
                                 ((Throwable) data).printStackTrace();
-                                Tools.toast(getApplicationContext(),"验证码错误",false);
+                                Tools.toast(getApplicationContext(), "验证码错误", false);
+                                textTip.setText("验证码错误");
                             }
                         }
                         // TODO 其他接口的返回结果也类似，根据event判断当前数据属于哪个接口
@@ -176,26 +196,26 @@ public class VerifyCodeActivity extends BaseActivity {
     }
 
     private void setTextBtnCodeStatus(boolean isActive) {
-        if(isActive) {
+        if (isActive) {
             textBtnCode.setTextColor(Color.parseColor("#32b7b9"));
-        }else {
+        } else {
             textBtnCode.setTextColor(Color.parseColor("#aaaaaa"));
         }
         textBtnCode.setEnabled(isActive);
     }
 
     private void startTimeCountDown() {
-        if(mTimeRunnable == null) {
+        if (mTimeRunnable == null) {
             mTimeRunnable = new Runnable() {
                 @Override
                 public void run() {
                     int time = TOTAL_COUNT - mCurrentTime;
-                    if(time > 0) {
+                    if (time > 0) {
                         textBtnCode.setText(String.valueOf(time + " S"));
                         setTextBtnCodeStatus(false);
                         mCurrentTime++;
-                        mHandler.postDelayed(this,1000);
-                    }else {
+                        mHandler.postDelayed(this, 1000);
+                    } else {
                         textBtnCode.setText("获取验证码");
                         setTextBtnCodeStatus(true);
                         mCurrentTime = 0;
@@ -209,23 +229,27 @@ public class VerifyCodeActivity extends BaseActivity {
     }
 
     private void requestSMSCode(final String country, final String phone) {
-        SMSSDK.setAskPermisionOnReadContact(true);
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("获取验证码")
-                .setMessage("此手机号码将作为往后修改密码的手机号码，且同意此手机号作为本人的联系方式")
-                .setPositiveButton("确定", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        startTimeCountDown();
-                        SMSSDK.getVerificationCode(country, phone);
-                    }
-                }).setNegativeButton("取消", new DialogInterface.OnClickListener() {
-                    @Override
-                     public void onClick(DialogInterface dialogInterface, int i) {
+        if (mRequestCode == REQUEST_REGISTER) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("获取验证码")
+                    .setMessage("此手机号码将作为往后修改密码的手机号码，且同意此手机号作为本人的联系方式")
+                    .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            startTimeCountDown();
+                            SMSSDK.getVerificationCode(country, phone);
+                        }
+                    }).setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
 
-                    }
-                });
-        builder.create().show();
+                }
+            });
+            builder.create().show();
+        } else if (mRequestCode == REQUEST_CHANGE_PASS) {
+            startTimeCountDown();
+            SMSSDK.getVerificationCode(country, phone);
+        }
     }
 
     @OnClick({R.id.btn_back, R.id.text_btn_code, R.id.btn_verify_code})
@@ -235,10 +259,11 @@ public class VerifyCodeActivity extends BaseActivity {
                 finish();
                 break;
             case R.id.text_btn_code:
-                requestSMSCode("86",editPhone.getText().toString());
+                requestSMSCode("86", editPhone.getText().toString());
                 break;
             case R.id.btn_verify_code:
                 // 提交验证码，其中的code表示验证码，如“1357”
+                textTip.setText("");
                 SMSSDK.submitVerificationCode("86", editPhone.getText().toString(), editCode.getText().toString());
                 break;
         }
@@ -247,7 +272,7 @@ public class VerifyCodeActivity extends BaseActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if(mTimeRunnable != null) {
+        if (mTimeRunnable != null) {
             mHandler.removeCallbacks(mTimeRunnable);
         }
         SMSSDK.unregisterEventHandler(mSMSEventHandler);

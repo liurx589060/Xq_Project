@@ -55,6 +55,13 @@ public class ResetPasswordActivity extends BaseActivity {
 
         mApi = NetWorkMg.newRetrofit().create(XqRequestApi.class);
         mLoadingDialog = DialogFactory.createLoadingDialog(this);
+        Bundle bundle = getIntent().getExtras();
+        if(bundle != null) {
+            String name = bundle.getString("userName","");
+            resetPasswordEditUserName.setText(name);
+        }else {
+            resetPasswordEditUserName.setText("");
+        }
     }
 
     private void commitResetPassword() {

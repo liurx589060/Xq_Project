@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#ffffff">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/dp_40"
+            android:background="#ffffff"
+            >
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="修改密码"
+                android:textColor="#000000"
+                android:textSize="@dimen/sp_20"
+                android:textStyle="bold"
+                android:layout_centerInParent="true"/>
+
+            <Button
+                android:id="@+id/btn_back"
+                android:layout_width="@dimen/dp_20"
+                android:layout_height="@dimen/dp_20"
+                android:layout_alignParentLeft="true"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="@dimen/dp_14"
+                android:background="@drawable/image_back"/>
+
+        </RelativeLayout>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="@dimen/dp_250"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:layout_marginTop="@dimen/dp_100"
+        android:layout_gravity="center_horizontal">
+
+        <TextView
+            android:id="@+id/text_tip"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="#ff0000"
+            android:textSize="@dimen/sp_16"/>
+
+        <EditText
+            android:id="@+id/edit_userName"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/dp_40"
+            android:hint="请输入用户名"
+            android:textColorHint="#999999"
+            android:textColor="#333333"
+            android:background="@android:color/transparent"
+            android:textSize="@dimen/sp_14"
+            android:layout_marginTop="@dimen/dp_10"
+            android:inputType="textEmailAddress"
+            android:digits="@string/str_edit_digits"/>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0.5dp"
+            android:layout_marginTop="@dimen/dp_m_5"
+            android:background="#dddddd"/>
+
+        <Button
+            android:id="@+id/btn_next"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/dp_35"
+            android:background="@drawable/selector_btn_verify_phone"
+            android:text="下一步"
+            android:textSize="@dimen/sp_16"
+            android:layout_marginTop="@dimen/dp_20"
+            android:enabled="false"
+            android:textColor="#ffffff"
+            />
+
+    </LinearLayout>
+
+</LinearLayout>
