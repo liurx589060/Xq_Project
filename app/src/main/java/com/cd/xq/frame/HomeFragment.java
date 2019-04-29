@@ -30,6 +30,7 @@ import com.cd.xq.beans.BCheckRoomExpiry;
 import com.cd.xq.beans.BGetBanner;
 import com.cd.xq.friend.FriendActivity;
 import com.cd.xq.login.BlackCheckListener;
+import com.cd.xq.login.VerifyCodeActivity;
 import com.cd.xq.module.chart.ChartRoomActivity;
 import com.cd.xq.module.chart.beans.BConsumeGift;
 import com.cd.xq.module.chart.beans.BGetGiftItem;
@@ -181,18 +182,20 @@ public class HomeFragment extends BaseFragment {
         mBtnAngel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (!DataManager.getInstance().getUserInfo().isOnLine()) {
-                    Tools.toast(getActivity(), "请先登录...", true);
-                    return;
-                }
+//                if (!DataManager.getInstance().getUserInfo().isOnLine()) {
+//                    Tools.toast(getActivity(), "请先登录...", true);
+//                    return;
+//                }
+//
+//                if (!DataManager.getInstance().getUserInfo().getRole_type().equals(Constant.ROLRTYPE_ANGEL)) {
+//                    Tools.toast(getActivity(), "您不是爱心大使", true);
+//                    return;
+//                }
+//
+//                Intent intent = new Intent(getActivity(), CreateRoomActivity.class);
+//                getActivity().startActivity(intent);
 
-                if (!DataManager.getInstance().getUserInfo().getRole_type().equals(Constant.ROLRTYPE_ANGEL)) {
-                    Tools.toast(getActivity(), "您不是爱心大使", true);
-                    return;
-                }
-
-                Intent intent = new Intent(getActivity(), CreateRoomActivity.class);
-                getActivity().startActivity(intent);
+                VerifyCodeActivity.startVerify(getActivity(),VerifyCodeActivity.REQUEST_REGISTER,null);
             }
         });
 

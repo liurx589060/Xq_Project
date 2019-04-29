@@ -138,6 +138,9 @@ public class RegisterInfoActivity extends BaseActivity {
             if(mFrom == FROM_LEAK_INFO) {
                 registerBtnClose.setVisibility(View.INVISIBLE);
             }
+            if(mFrom == FROM_LOGIN) {
+                registerDone.setText("注册");
+            }
             mTempUserInfo = new UserInfoBean();
         }else {
             //有些不能改变

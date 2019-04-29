@@ -96,7 +96,7 @@ public class RegisterActivity extends BaseActivity {
                 finish();
                 break;
             case R.id.btn_verify_phone:
-                dialogConfirmVerifyPhone();
+                VerifyCodeActivity.startVerify(this,VerifyCodeActivity.REQUEST_REGISTER,null);
                 break;
             case R.id.text_protocol:
                 String url = "http://" + NetWorkMg.IP_ADDRESS + "/thinkphp/file/html/xq_protocol.html";

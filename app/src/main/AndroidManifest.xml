@@ -153,6 +153,11 @@
             android:name=".login.RegisterActivity"/>
 
         <activity
+            android:screenOrientation="portrait"
+            android:configChanges="orientation|keyboard|keyboardHidden|navigation"
+            android:name=".login.VerifyCodeActivity"/>
+
+        <activity
             android:theme="@style/ActivityTranslucent"
             android:excludeFromRecents="true"
             android:screenOrientation="portrait"
