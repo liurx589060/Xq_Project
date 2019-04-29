@@ -22,6 +22,7 @@ import com.cd.xq.module.util.tools.Log;
 import com.cd.xq.module.util.tools.Tools;
 import com.cd.xq.network.XqRequestApi;
 import com.cd.xq.utils.AppTools;
+import com.trello.rxlifecycle2.android.ActivityEvent;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -69,7 +70,7 @@ public class MyAboutActivity extends BaseActivity {
      */
     private void requestCheckUpdate() {
         mApi.checkUpdate(Tools.getVersionCode(this))
-                .compose(this.<NetResult<BCheckUpdate>>bindToLifecycle())
+                .compose(this.<NetResult<BCheckUpdate>>bindUntilEvent(ActivityEvent.DESTROY))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Consumer<NetResult<BCheckUpdate>>() {

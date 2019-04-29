@@ -23,6 +23,7 @@ import com.cd.xq.module.util.tools.Log;
 import com.cd.xq.module.util.tools.Tools;
 import com.cd.xq.module.util.tools.XqErrorCode;
 import com.cd.xq_chart.module.R;
+import com.trello.rxlifecycle2.android.FragmentEvent;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -85,7 +86,7 @@ public class PackageFragment extends InnerGiftFragment {
     private void requestGetGiftList() {
         //获取未消耗的礼物
         mApi.getGiftList(DataManager.getInstance().getUserInfo().getUser_name())
-                .compose(this.<NetResult<List<BGetGiftItem>>>bindToLifecycle())
+                .compose(this.<NetResult<List<BGetGiftItem>>>bindUntilEvent(FragmentEvent.DESTROY))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Consumer<NetResult<List<BGetGiftItem>>>() {
@@ -127,7 +128,7 @@ public class PackageFragment extends InnerGiftFragment {
         params.put("toUser",mGiftViewMg.getTargetUser().getUserInfo().getUser_name());
         params.put("handleType",2);  //用包裹消费
         mApi.consumeGift(params)
-                .compose(this.<NetResult<BConsumeGift>>bindToLifecycle())
+                .compose(this.<NetResult<BConsumeGift>>bindUntilEvent(FragmentEvent.DESTROY))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Consumer<NetResult<BConsumeGift>>() {

@@ -44,6 +44,7 @@ import com.cd.xq.module.util.tools.XqErrorCode;
 import com.cd.xq.my.MyGiftBuyActivity;
 import com.cd.xq.network.XqRequestApi;
 import com.google.gson.Gson;
+import com.trello.rxlifecycle2.android.ActivityEvent;
 
 import org.greenrobot.eventbus.EventBus;
 
@@ -167,7 +168,7 @@ public class CreateRoomActivity extends BaseActivity {
         }
         //创建房间
         mApi.checkRoomExpiry(DataManager.getInstance().getUserInfo().getUser_name(), 1)
-                .compose(this.<NetResult<BCheckRoomExpiry>>bindToLifecycle())
+                .compose(this.<NetResult<BCheckRoomExpiry>>bindUntilEvent(ActivityEvent.DESTROY))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Consumer<NetResult<BCheckRoomExpiry>>() {
@@ -228,7 +229,6 @@ public class CreateRoomActivity extends BaseActivity {
         params.put("toUser", DataManager.getInstance().getUserInfo().getUser_name());
         params.put("handleType", handleType);  //消费方式
         mChatApi.consumeGift(params)
-                .compose(this.<NetResult<BConsumeGift>>bindToLifecycle())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Consumer<NetResult<BConsumeGift>>() {
@@ -452,7 +452,6 @@ public class CreateRoomActivity extends BaseActivity {
 
         mCommonApi.appointChatRoom(params)
                 .subscribeOn(Schedulers.io())
-                .compose(this.<JMChartResp>bindToLifecycle())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Consumer<JMChartResp>() {
                     @Override

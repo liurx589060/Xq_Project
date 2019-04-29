@@ -32,6 +32,7 @@ import com.cd.xq.module.util.tools.Log;
 import com.cd.xq.module.util.tools.Tools;
 import com.cd.xq.module.util.tools.XqErrorCode;
 import com.cd.xq.network.XqRequestApi;
+import com.trello.rxlifecycle2.android.ActivityEvent;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -107,7 +108,7 @@ public class MyBalanceActivity extends BaseActivity {
 
     private void requestUserInfo() {
         mCommonApi.getUserInfoByUserName(DataManager.getInstance().getUserInfo().getUser_name())
-                .compose(this.<UserResp>bindToLifecycle())
+                .compose(this.<UserResp>bindUntilEvent(ActivityEvent.DESTROY))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Consumer<UserResp>() {
@@ -132,7 +133,7 @@ public class MyBalanceActivity extends BaseActivity {
      */
     private void requestPayItem() {
         mChatApi.getPayItem()
-                .compose(this.<NetResult<List<BGetPayItem>>>bindToLifecycle())
+                .compose(this.<NetResult<List<BGetPayItem>>>bindUntilEvent(ActivityEvent.DESTROY))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Consumer<NetResult<List<BGetPayItem>>>() {
@@ -178,7 +179,6 @@ public class MyBalanceActivity extends BaseActivity {
      */
     private void requestHandlePayCallback(BMakePayOrder bean) {
         mChatApi.handlePayCallback(bean.getOrder_id())
-                .compose(this.<NetResult>bindToLifecycle())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Consumer<NetResult>() {
@@ -212,7 +212,7 @@ public class MyBalanceActivity extends BaseActivity {
         params.put("coin",bean.getCoin());
         params.put("money",bean.getMoney());
         mChatApi.makePayOrder(params)
-                .compose(this.<NetResult<BMakePayOrder>>bindToLifecycle())
+                .compose(this.<NetResult<BMakePayOrder>>bindUntilEvent(ActivityEvent.DESTROY))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Consumer<NetResult<BMakePayOrder>>() {

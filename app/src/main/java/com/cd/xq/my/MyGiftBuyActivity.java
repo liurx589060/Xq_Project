@@ -29,6 +29,7 @@ import com.cd.xq.module.util.tools.Log;
 import com.cd.xq.module.util.tools.Tools;
 import com.cd.xq.module.util.tools.XqErrorCode;
 import com.cd.xq.network.XqRequestApi;
+import com.trello.rxlifecycle2.android.ActivityEvent;
 
 import org.greenrobot.eventbus.EventBus;
 
@@ -94,7 +95,7 @@ public class MyGiftBuyActivity extends BaseActivity {
 
     private void requestGetGiftItem() {
         mApi.getGiftItem(1)
-                .compose(this.<NetResult<List<BGetGiftItem>>>bindToLifecycle())
+                .compose(this.<NetResult<List<BGetGiftItem>>>bindUntilEvent(ActivityEvent.DESTROY))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Consumer<NetResult<List<BGetGiftItem>>>() {
@@ -144,7 +145,6 @@ public class MyGiftBuyActivity extends BaseActivity {
         params.put("giftId",item.getGift_id());
         params.put("coin",item.getCoin());
         mApi.buyGiftByCoin(params)
-                .compose(this.<NetResult<Long>>bindToLifecycle())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Consumer<NetResult<Long>>() {

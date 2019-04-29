@@ -13,6 +13,8 @@ import com.cd.xq.module.util.beans.user.BBlackUser;
 import com.cd.xq.module.util.interfaces.ICheckBlackListener;
 import com.cd.xq.module.util.network.NetWorkMg;
 import com.cd.xq.module.util.network.RequestApi;
+import com.trello.rxlifecycle2.android.ActivityEvent;
+import com.trello.rxlifecycle2.android.FragmentEvent;
 import com.trello.rxlifecycle2.components.support.RxAppCompatActivity;
 
 import java.security.MessageDigest;
@@ -109,7 +111,7 @@ public class Tools {
         params.put("status",1);
         api.getBlackUserByName(params)
                 .subscribeOn(Schedulers.io())
-                .compose(((RxAppCompatActivity)activity).<NetResult<BBlackUser>>bindToLifecycle())
+                .compose(((RxAppCompatActivity)activity).<NetResult<BBlackUser>>bindUntilEvent(ActivityEvent.DESTROY))
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Consumer<NetResult<BBlackUser>>() {
                     @Override

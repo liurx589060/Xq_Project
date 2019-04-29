@@ -2,6 +2,7 @@ package com.cd.xq.frame;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
@@ -10,6 +11,7 @@ import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
@@ -40,6 +42,7 @@ import com.cd.xq.module.util.tools.XqErrorCode;
 import com.cd.xq.network.XqRequestApi;
 import com.cd.xq.utils.AppTools;
 import com.cd.xq.utils.CheckUtil;
+import com.trello.rxlifecycle2.android.ActivityEvent;
 
 import org.greenrobot.eventbus.EventBus;
 
@@ -89,11 +92,12 @@ public class MainActivity extends BaseActivity {
 
         mApi = NetWorkMg.newRetrofit().create(RequestApi.class);
         UserInfo userInfo = JMessageClient.getMyInfo();
-        if(userInfo != null && (!DataManager.getInstance().getUserInfo().isOnLine())) {
-            //自动登陆
-            DataManager.getInstance().setJmUserName(userInfo.getUserName());
-            toAutoLogin();
-        }
+//        if(userInfo != null && (!DataManager.getInstance().getUserInfo().isOnLine())) {
+//            //自动登陆
+//            DataManager.getInstance().setJmUserName(userInfo.getUserName());
+//            toAutoLogin();
+//        }
+
         init();
 
         //检测是否更新
@@ -105,7 +109,7 @@ public class MainActivity extends BaseActivity {
      */
     private void requestCheckUpdate() {
         mXqApi.checkUpdate(Tools.getVersionCode(this))
-                .compose(this.<NetResult<BCheckUpdate>>bindToLifecycle())
+                .compose(this.<NetResult<BCheckUpdate>>bindUntilEvent(ActivityEvent.DESTROY))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Consumer<NetResult<BCheckUpdate>>() {
@@ -131,6 +135,13 @@ public class MainActivity extends BaseActivity {
                             });
                         }
                         builder.executeMission(MainActivity.this);
+
+                        UserInfo userInfo = JMessageClient.getMyInfo();
+                        if(userInfo != null && (!DataManager.getInstance().getUserInfo().isOnLine())) {
+                            //自动登陆
+                            DataManager.getInstance().setJmUserName(userInfo.getUserName());
+                            toAutoLogin();
+                        }
                     }
                 }, new Consumer<Throwable>() {
                     @Override
@@ -168,7 +179,7 @@ public class MainActivity extends BaseActivity {
     private void autoLogin(String userName,String password) {
         mApi.login(userName,password)
                 .subscribeOn(Schedulers.io())
-                .compose(this.<UserResp>bindToLifecycle())
+                .compose(this.<UserResp>bindUntilEvent(ActivityEvent.DESTROY))
                 .retry(3)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Consumer<UserResp>() {

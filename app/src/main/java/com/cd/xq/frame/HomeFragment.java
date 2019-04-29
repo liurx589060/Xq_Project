@@ -66,6 +66,8 @@ import com.scwang.smartrefresh.layout.constant.SpinnerStyle;
 import com.scwang.smartrefresh.layout.footer.BallPulseFooter;
 import com.scwang.smartrefresh.layout.listener.OnRefreshListener;
 import com.stx.xhb.xbanner.XBanner;
+import com.trello.rxlifecycle2.android.ActivityEvent;
+import com.trello.rxlifecycle2.android.FragmentEvent;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -336,7 +338,7 @@ public class HomeFragment extends BaseFragment {
         }
         mApi.joinChatRoom(params)
                 .subscribeOn(Schedulers.io())
-                .compose(this.<NetResult<BChatRoom>>bindToLifecycle())
+                .compose(this.<NetResult<BChatRoom>>bindUntilEvent(FragmentEvent.DESTROY))
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Consumer<NetResult<BChatRoom>>() {
                     @Override
@@ -409,7 +411,7 @@ public class HomeFragment extends BaseFragment {
      */
     private void requestGetBanner() {
         mXqApi.getBanner()
-                .compose(this.<NetResult<List<BGetBanner>>>bindToLifecycle())
+                .compose(this.<NetResult<List<BGetBanner>>>bindUntilEvent(FragmentEvent.DESTROY))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Consumer<NetResult<List<BGetBanner>>>() {
@@ -439,7 +441,7 @@ public class HomeFragment extends BaseFragment {
      */
     private void requestGetChatRoomByUser() {
         mApi.getChatRoomByUser(DataManager.getInstance().getUserInfo().getUser_name())
-//                .compose(this.<NetResult<BChatRoom>>bindToLifecycle())
+                .compose(this.<NetResult<BChatRoom>>bindUntilEvent(FragmentEvent.DESTROY))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Consumer<NetResult<BChatRoom>>() {
@@ -492,7 +494,7 @@ public class HomeFragment extends BaseFragment {
         param.put("userName",DataManager.getInstance().getUserInfo().getUser_name());
         param.put("roomId",mJmChartResp.getRoom_id());
         mApi.enterChatRoom(param)
-                .compose(this.<NetResult<BChatRoom>>bindToLifecycle())
+                .compose(this.<NetResult<BChatRoom>>bindUntilEvent(FragmentEvent.DESTROY))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Consumer<NetResult<BChatRoom>>() {
@@ -541,7 +543,7 @@ public class HomeFragment extends BaseFragment {
         param.put("roomId",mJmChartResp.getRoom_id());
         param.put("status",status); //失败
         mApi.deleteChatRoom(param)
-                .compose(this.<NetResult<BChatRoom>>bindToLifecycle())
+                .compose(this.<NetResult<BChatRoom>>bindUntilEvent(FragmentEvent.DESTROY))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Consumer<NetResult<BChatRoom>>() {
@@ -578,7 +580,7 @@ public class HomeFragment extends BaseFragment {
        param.put("innerId",-1);
        param.put("joinType",mJmChartResp.getIsQueue());
        mApi.exitChatRoom(param)
-               .compose(this.<NetResult<BChatRoom>>bindToLifecycle())
+               .compose(this.<NetResult<BChatRoom>>bindUntilEvent(FragmentEvent.DESTROY))
                .subscribeOn(Schedulers.io())
                .observeOn(AndroidSchedulers.mainThread())
                .subscribe(new Consumer<NetResult<BChatRoom>>() {
@@ -838,7 +840,7 @@ public class HomeFragment extends BaseFragment {
         param.put("work","0,1");
         mXqApi.getChatRoomList(param)
                 .subscribeOn(Schedulers.io())
-                .compose(this.<NetResult<List<BChatRoom>>>bindToLifecycle())
+                .compose(this.<NetResult<List<BChatRoom>>>bindUntilEvent(FragmentEvent.DESTROY))
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Consumer<NetResult<List<BChatRoom>>>() {
                     @Override
@@ -1021,7 +1023,7 @@ public class HomeFragment extends BaseFragment {
     private void toCommitJoinParticipant() {
         //加入房间
         mXqApi.checkRoomExpiry(DataManager.getInstance().getUserInfo().getUser_name(), 2)
-                .compose(this.<NetResult<BCheckRoomExpiry>>bindToLifecycle())
+                .compose(this.<NetResult<BCheckRoomExpiry>>bindUntilEvent(FragmentEvent.DESTROY))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Consumer<NetResult<BCheckRoomExpiry>>() {
@@ -1082,7 +1084,6 @@ public class HomeFragment extends BaseFragment {
         params.put("toUser", DataManager.getInstance().getUserInfo().getUser_name());
         params.put("handleType", handleType);  //消费方式
         mChatApi.consumeGift(params)
-                .compose(this.<NetResult<BConsumeGift>>bindToLifecycle())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Consumer<NetResult<BConsumeGift>>() {

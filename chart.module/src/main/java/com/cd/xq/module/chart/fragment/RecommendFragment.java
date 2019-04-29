@@ -26,6 +26,7 @@ import com.cd.xq.module.util.tools.Log;
 import com.cd.xq.module.util.tools.Tools;
 import com.cd.xq.module.util.tools.XqErrorCode;
 import com.cd.xq_chart.module.R;
+import com.trello.rxlifecycle2.android.FragmentEvent;
 
 import org.greenrobot.eventbus.EventBus;
 
@@ -89,7 +90,7 @@ public class RecommendFragment extends InnerGiftFragment {
      */
     private void requestGetGiftItem() {
         mApi.getGiftItem(2)
-                .compose(this.<NetResult<List<BGetGiftItem>>>bindToLifecycle())
+                .compose(this.<NetResult<List<BGetGiftItem>>>bindUntilEvent(FragmentEvent.DESTROY))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Consumer<NetResult<List<BGetGiftItem>>>() {
@@ -154,7 +155,6 @@ public class RecommendFragment extends InnerGiftFragment {
         params.put("toUser",mGiftViewMg.getTargetUser().getUserInfo().getUser_name());
         params.put("handleType",1);  //直接用金币消费
         mApi.consumeGift(params)
-                .compose(this.<NetResult<BConsumeGift>>bindToLifecycle())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Consumer<NetResult<BConsumeGift>>() {

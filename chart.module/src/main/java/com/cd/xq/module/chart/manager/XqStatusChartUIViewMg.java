@@ -67,6 +67,8 @@ import com.hc.lib.msc.HCMscParams;
 import com.hc.lib.msc.ISpeechListener;
 import com.hc.lib.msc.MscDefaultSpeech;
 import com.iflytek.cloud.SpeechError;
+import com.trello.rxlifecycle2.android.ActivityEvent;
+import com.trello.rxlifecycle2.android.FragmentEvent;
 
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
@@ -505,7 +507,7 @@ public class XqStatusChartUIViewMg extends AbsChartView{
         params.put("roomId",DataManager.getInstance().getChartBChatRoom().getRoom_id());
         mChatApi.reportUser(params)
                 .subscribeOn(Schedulers.io())
-                .compose(mXqActivity.<NetResult<String>>bindToLifecycle())
+                .compose(mXqActivity.<NetResult<String>>bindUntilEvent(ActivityEvent.DESTROY))
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Consumer<NetResult<String>>() {
                     @Override
@@ -1963,7 +1965,7 @@ public class XqStatusChartUIViewMg extends AbsChartView{
     private void getReportItems() {
         mChatApi.getReportItems()
                 .subscribeOn(Schedulers.io())
-                .compose(mXqActivity.<NetResult<List<BGetReportItem>>>bindToLifecycle())
+                .compose(mXqActivity.<NetResult<List<BGetReportItem>>>bindUntilEvent(ActivityEvent.DESTROY))
                 .retryWhen(new Function<Observable<Throwable>, ObservableSource<?>>() {
                     @Override
                     public ObservableSource<?> apply(final Observable<Throwable> throwableObservable) throws Exception {

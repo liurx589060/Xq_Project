@@ -28,6 +28,7 @@ import com.cd.xq.module.util.tools.Log;
 import com.cd.xq.module.util.tools.Tools;
 import com.cd.xq.module.util.tools.XqErrorCode;
 import com.cd.xq.network.XqRequestApi;
+import com.trello.rxlifecycle2.android.ActivityEvent;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -100,7 +101,7 @@ public class MyFootprinterActivity extends BaseActivity {
     private void requestGetChatRoomListByUser() {
         //获取未消耗的礼物
         mApi.getChatRoomListByUser(DataManager.getInstance().getUserInfo().getUser_name())
-                .compose(this.<NetResult<List<BGetChatRoomList>>>bindToLifecycle())
+                .compose(this.<NetResult<List<BGetChatRoomList>>>bindUntilEvent(ActivityEvent.DESTROY))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Consumer<NetResult<List<BGetChatRoomList>>>() {

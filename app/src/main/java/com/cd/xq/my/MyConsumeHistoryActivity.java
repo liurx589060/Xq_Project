@@ -28,6 +28,7 @@ import com.cd.xq.module.util.tools.Log;
 import com.cd.xq.module.util.tools.Tools;
 import com.cd.xq.module.util.tools.XqErrorCode;
 import com.cd.xq.network.XqRequestApi;
+import com.trello.rxlifecycle2.android.ActivityEvent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -92,7 +93,7 @@ public class MyConsumeHistoryActivity extends BaseActivity {
     private void requestGetConsumeHistory() {
         //获取未消耗的礼物
         mApi.getConsumeHistory(DataManager.getInstance().getUserInfo().getUser_name())
-                .compose(this.<NetResult<List<BGetConsumeHistory>>>bindToLifecycle())
+                .compose(this.<NetResult<List<BGetConsumeHistory>>>bindUntilEvent(ActivityEvent.DESTROY))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Consumer<NetResult<List<BGetConsumeHistory>>>() {

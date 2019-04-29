@@ -25,6 +25,7 @@ import com.cd.xq.module.util.tools.Log;
 import com.cd.xq.module.util.tools.Tools;
 import com.cd.xq.module.util.tools.XqErrorCode;
 import com.cd.xq.network.XqRequestApi;
+import com.trello.rxlifecycle2.android.ActivityEvent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -83,7 +84,7 @@ public class MyChargeHistoryActivity extends BaseActivity {
     private void requestGetPayHistory() {
         //获取所有成功的记录
         mApi.getPayHistory(DataManager.getInstance().getUserInfo().getUser_name(), 1)
-                .compose(this.<NetResult<List<BGetPayHistory>>>bindToLifecycle())
+                .compose(this.<NetResult<List<BGetPayHistory>>>bindUntilEvent(ActivityEvent.DESTROY))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Consumer<NetResult<List<BGetPayHistory>>>() {

@@ -32,6 +32,8 @@ import com.cd.xq.module.util.tools.Log;
 import com.cd.xq.module.util.tools.Tools;
 import com.cd.xq.module.util.tools.XqErrorCode;
 import com.cd.xq.utils.AppTools;
+import com.trello.rxlifecycle2.android.ActivityEvent;
+import com.trello.rxlifecycle2.android.FragmentEvent;
 
 import org.greenrobot.eventbus.EventBus;
 
@@ -165,7 +167,7 @@ public class LoginActivity extends BaseActivity {
         mApi.checkUserExist(loginEditUserName.getText().toString())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .compose(this.<BaseResp>bindToLifecycle())
+                .compose(this.<BaseResp>bindUntilEvent(ActivityEvent.DESTROY))
                 .subscribe(new Consumer<BaseResp>() {
                     @Override
                     public void accept(BaseResp baseResp) throws Exception {
@@ -312,7 +314,7 @@ public class LoginActivity extends BaseActivity {
             }
         }).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .compose(this.<UserResp>bindToLifecycle())
+                .compose(this.<UserResp>bindUntilEvent(ActivityEvent.DESTROY))
                 .subscribe(new Consumer<UserResp>() {
                     @Override
                     public void accept(UserResp userResp) throws Exception {

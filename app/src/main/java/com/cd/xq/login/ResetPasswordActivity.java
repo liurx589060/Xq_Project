@@ -85,7 +85,6 @@ public class ResetPasswordActivity extends BaseActivity {
         String password = Tools.MD5(AppConstant.MD5_PREFIX + password_1);
         mApi.changePassword(userName,password)
                 .subscribeOn(Schedulers.io())
-                .compose(this.<NetResult<String>>bindToLifecycle())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Consumer<NetResult<String>>() {
                     @Override
