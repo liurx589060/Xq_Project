@@ -1,5 +1,6 @@
 package com.cd.xq.login;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.text.Editable;

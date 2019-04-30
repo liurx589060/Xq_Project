@@ -118,7 +118,7 @@
                     android:layout_alignParentRight="true"
                     android:layout_centerVertical="true"
                     android:layout_marginRight="@dimen/dp_20"
-                    android:text="请选择角色   >"
+                    android:hint="请选择角色   >"
                     android:textSize="@dimen/sp_16" />
             </RelativeLayout>
 
@@ -146,7 +146,7 @@
                     android:layout_alignParentRight="true"
                     android:layout_centerVertical="true"
                     android:layout_marginRight="@dimen/dp_20"
-                    android:text="请输入昵称   >"
+                    android:hint="请输入昵称   >"
                     android:textSize="@dimen/sp_16" />
             </RelativeLayout>
 
@@ -174,7 +174,7 @@
                     android:layout_alignParentRight="true"
                     android:layout_centerVertical="true"
                     android:layout_marginRight="@dimen/dp_20"
-                    android:text="请选择性别   >"
+                    android:hint="请选择性别   >"
                     android:textSize="@dimen/sp_16" />
             </RelativeLayout>
 
@@ -202,7 +202,7 @@
                     android:layout_alignParentRight="true"
                     android:layout_centerVertical="true"
                     android:layout_marginRight="@dimen/dp_20"
-                    android:text="请输入当前婚姻   >"
+                    android:hint="请输入当前婚姻   >"
                     android:textSize="@dimen/sp_16" />
             </RelativeLayout>
 
@@ -230,7 +230,7 @@
                     android:layout_alignParentRight="true"
                     android:layout_centerVertical="true"
                     android:layout_marginRight="@dimen/dp_20"
-                    android:text="请输入年龄   >"
+                    android:hint="请输入年龄   >"
                     android:textSize="@dimen/sp_16" />
             </RelativeLayout>
 
@@ -258,7 +258,7 @@
                     android:layout_alignParentRight="true"
                     android:layout_centerVertical="true"
                     android:layout_marginRight="@dimen/dp_20"
-                    android:text="请输入身高   >"
+                    android:hint="请输入身高   >"
                     android:textSize="@dimen/sp_16" />
             </RelativeLayout>
 
@@ -286,7 +286,7 @@
                     android:layout_alignParentRight="true"
                     android:layout_centerVertical="true"
                     android:layout_marginRight="@dimen/dp_20"
-                    android:text="请选择学历   >"
+                    android:hint="请选择学历   >"
                     android:textSize="@dimen/sp_16" />
             </RelativeLayout>
 
@@ -314,7 +314,7 @@
                     android:layout_alignParentRight="true"
                     android:layout_centerVertical="true"
                     android:layout_marginRight="@dimen/dp_20"
-                    android:text="请输入籍贯   >"
+                    android:hint="请输入籍贯   >"
                     android:textSize="@dimen/sp_16" />
             </RelativeLayout>
 
@@ -342,7 +342,7 @@
                     android:layout_alignParentRight="true"
                     android:layout_centerVertical="true"
                     android:layout_marginRight="@dimen/dp_20"
-                    android:text="请输入职业   >"
+                    android:hint="请输入职业   >"
                     android:textSize="@dimen/sp_16" />
             </RelativeLayout>
 
@@ -370,7 +370,7 @@
                     android:layout_alignParentRight="true"
                     android:layout_centerVertical="true"
                     android:layout_marginRight="@dimen/dp_20"
-                    android:text="请输入工作地点   >"
+                    android:hint="请输入工作地点   >"
                     android:textSize="@dimen/sp_16" />
             </RelativeLayout>
 

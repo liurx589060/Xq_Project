@@ -157,31 +157,6 @@ public class LoginActivity extends BaseActivity {
         }
     }
 
-    private void toRegist() {
-        mLoadingDialog.show();
-        mApi.checkUserExist(loginEditUserName.getText().toString())
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .compose(this.<BaseResp>bindUntilEvent(ActivityEvent.DESTROY))
-                .subscribe(new Consumer<BaseResp>() {
-                    @Override
-                    public void accept(BaseResp baseResp) throws Exception {
-                        mLoadingDialog.dismiss();
-                        if(baseResp.getStatus() == XqErrorCode.ERROR_USER_NOT_EXIST) {
-                            sendSMSCode(LoginActivity.this,2);
-                        }else if(baseResp.getStatus() == XqErrorCode.SUCCESS){
-                            Tools.toast(getApplicationContext(),"用户已存在",false);
-                        }
-                    }
-                }, new Consumer<Throwable>() {
-                    @Override
-                    public void accept(Throwable throwable) throws Exception {
-                        mLoadingDialog.dismiss();
-                        Log.e("toRegist--" + throwable.toString());
-                    }
-                });
-    }
-
     private void toLogin() {
         mLoadingDialog.show();
         final String userName = loginEditUserName.getText().toString();
@@ -278,64 +253,6 @@ public class LoginActivity extends BaseActivity {
                 });
     }
 
-    @SuppressLint("CheckResult")
-    private void regist(final String userName,String password) {
-        mLoadingDialog.show();
-        final String pss = Tools.MD5(AppConstant.MD5_PREFIX + password);
-        Observable.create(new ObservableOnSubscribe<Integer>() {
-            @Override
-            public void subscribe(final ObservableEmitter<Integer> observableEmitter) throws Exception {
-                JMessageClient.register(userName, pss
-                        , new BasicCallback() {
-                            @Override
-                            public void gotResult(int i, String s) {
-                                if (i == 0 || i == 898001) {//成功或者已注册过
-                                    observableEmitter.onNext(i);
-                                    saveUser(JMessageClient.getMyInfo().getUserName(), pss, JMessageClient.getMyInfo().getAppKey());
-                                } else {
-                                    observableEmitter.onError(new Throwable("JMessage regist error"));
-                                }
-                            }
-                        });
-            }
-        }).observeOn(Schedulers.io()).flatMap(new Function<Integer, ObservableSource<UserResp>>() {
-            @Override
-            public ObservableSource<UserResp> apply(Integer integer) throws Exception {
-                try {
-                    return mApi.regist(userName, pss);
-                } catch (Exception e) {
-                    return Observable.error(e);
-                }
-            }
-        }).subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .compose(this.<UserResp>bindUntilEvent(ActivityEvent.DESTROY))
-                .subscribe(new Consumer<UserResp>() {
-                    @Override
-                    public void accept(UserResp userResp) throws Exception {
-                        mLoadingDialog.dismiss();
-                        if (userResp.getStatus() == XqErrorCode.SUCCESS) {//注册成功
-                            Tools.toast(getApplicationContext(), "注册成功", false);
-                            DataManager.getInstance().setUserInfo(userResp.getData());
-                            //跳转到填写详情页面
-                            Intent intent = new Intent(LoginActivity.this, RegisterInfoActivity.class);
-                            Bundle bundle = new Bundle();
-                            bundle.putInt("from", RegisterInfoActivity.FROM_LOGIN);
-                            intent.putExtras(bundle);
-                            startActivity(intent);
-                        } else if (userResp.getStatus() == XqErrorCode.ERROR_USER_REGIST_EXIST) {
-                            Tools.toast(getApplicationContext(), "已存在该账号", true);
-                        }
-                    }
-                }, new Consumer<Throwable>() {
-                    @Override
-                    public void accept(Throwable throwable) throws Exception {
-                        mLoadingDialog.dismiss();
-                        Tools.toast(getApplicationContext(), "注册失败--" + throwable.toString(), true);
-                    }
-                });
-    }
-
     private void saveUser(String userName, String password, String appKey) {
         UserInfo userInfo = JMessageClient.getMyInfo();
         Log.i("avatar=" + userInfo.getAvatar());
@@ -344,36 +261,6 @@ public class LoginActivity extends BaseActivity {
                 .putString("password", password)
                 .putString("appKey", appKey)
                 .apply();
-    }
-
-    private void sendSMSCode(Context context, final int typeForm) {
-        RegisterPage page = new RegisterPage();
-        //如果使用我们的ui，没有申请模板编号的情况下需传null
-        page.setTempCode(null);
-        page.setRegisterCallback(new EventHandler() {
-            public void afterEvent(int event, int result, Object data) {
-                if (result == SMSSDK.RESULT_COMPLETE) {
-                    // 处理成功的结果
-                    HashMap<String,Object> phoneMap = (HashMap<String, Object>) data;
-                    String country = (String) phoneMap.get("country"); // 国家代码，如“86”
-                    String phone = (String) phoneMap.get("phone"); // 手机号码，如“13800138000”
-                    // TODO 利用国家代码和手机号码进行后续的操作
-                    if(typeForm == 1) {
-                        //忘记密码
-                        Intent intent = new Intent(LoginActivity.this,ResetPasswordActivity.class);
-                        startActivity(intent);
-                    }else if(typeForm == 2){
-                        //注册
-                        regist(loginEditUserName.getText().toString(),loginEditPassword.getText().toString());
-                    }
-                } else{
-                    // TODO 处理错误的结果
-                    Tools.toast(getApplicationContext(),"验证失败--" + result,false);
-                    Log.e("sendSMSCode---" + result);
-                }
-            }
-        });
-        page.show(context);
     }
 
     private boolean checkEdit() {

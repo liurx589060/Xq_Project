@@ -6,6 +6,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.AssetManager;
+import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -20,7 +22,11 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.bigkoo.pickerview.builder.OptionsPickerBuilder;
+import com.bigkoo.pickerview.listener.OnOptionsSelectListener;
+import com.bigkoo.pickerview.view.OptionsPickerView;
 import com.bumptech.glide.Glide;
 import com.cd.xq.AppConstant;
 import com.cd.xq.R;
@@ -40,8 +46,15 @@ import com.cd.xq.module.util.tools.XqErrorCode;
 import com.google.gson.Gson;
 import com.trello.rxlifecycle2.android.ActivityEvent;
 
+import org.json.JSONArray;
+
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import butterknife.BindView;
@@ -139,6 +152,11 @@ public class RegisterInfoActivity extends BaseActivity {
     private final String STR_EDIT = "编辑";
     private final String STR_UODATE = "更新";
 
+    private List<JsonBean> options1Items;
+    private ArrayList<ArrayList<String>> options2Items;
+    private ArrayList<ArrayList<ArrayList<String>>> options3Items;
+    private boolean mIsProvinceLoaded;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -154,7 +172,6 @@ public class RegisterInfoActivity extends BaseActivity {
             }
             if(mFrom == FROM_LOGIN) {
                 setStatus(STR_REGISTER);
-                registerImgHead.setVisibility(View.GONE);
             }
             mTempUserInfo = DataManager.getInstance().getRegisterUserInfo();
         }else {
@@ -164,6 +181,7 @@ public class RegisterInfoActivity extends BaseActivity {
             mTempUserInfo = gson.fromJson(gson.toJson(DataManager.getInstance().getUserInfo()),UserInfoBean.class);
         }
         init();
+        getProvinceJsonData(null);
     }
 
     private void setStatus(String str) {
@@ -209,7 +227,80 @@ public class RegisterInfoActivity extends BaseActivity {
         setData();
     }
 
+    private void getProvinceJsonData(final Runnable doneRunnable) {
+        Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                //读取数据
+                StringBuilder stringBuilder = new StringBuilder();
+                try {
+                    AssetManager assetManager = getAssets();
+                    BufferedReader bf = new BufferedReader(new InputStreamReader(
+                            assetManager.open("province.json")));
+                    String line;
+                    while ((line = bf.readLine()) != null) {
+                        stringBuilder.append(line);
+                    }
+                    String jsonStr = stringBuilder.toString();
+                    ArrayList<JsonBean> jsonBean = parseData(jsonStr);//用Gson 转成实体
+                    options1Items = jsonBean;
+                    for (int i = 0; i < jsonBean.size(); i++) {//遍历省份
+                        ArrayList<String> cityList = new ArrayList<>();//该省的城市列表（第二级）
+                        ArrayList<ArrayList<String>> province_AreaList = new ArrayList<>();//该省的所有地区列表（第三极）
+
+                        for (int c = 0; c < jsonBean.get(i).getCityList().size(); c++) {//遍历该省份的所有城市
+                            String cityName = jsonBean.get(i).getCityList().get(c).getName();
+                            cityList.add(cityName);//添加城市
+                            ArrayList<String> city_AreaList = new ArrayList<>();//该城市的所有地区列表
+                            city_AreaList.addAll(jsonBean.get(i).getCityList().get(c).getArea());
+                            province_AreaList.add(city_AreaList);//添加该省所有地区数据
+                        }
+
+                        /**
+                         * 添加城市数据
+                         */
+                        options2Items.add(cityList);
+
+                        /**
+                         * 添加地区数据
+                         */
+                        options3Items.add(province_AreaList);
+
+                        mIsProvinceLoaded = true;
+                        if(doneRunnable != null) {
+                            runOnUiThread(doneRunnable);
+                        }
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    Log.e("parseData--" + e.toString());
+                }
+            }
+        };
+        new Thread(runnable).start();
+    }
+
+    private ArrayList<JsonBean> parseData(String result) {//Gson 解析
+        ArrayList<JsonBean> detail = new ArrayList<>();
+        try {
+            JSONArray data = new JSONArray(result);
+            Gson gson = new Gson();
+            for (int i = 0; i < data.length(); i++) {
+                JsonBean entity = gson.fromJson(data.optJSONObject(i).toString(), JsonBean.class);
+                detail.add(entity);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.e("parseData--" + e.toString());
+        }
+        return detail;
+    }
+
     private void init() {
+        options1Items = new ArrayList<>();
+        options2Items = new ArrayList<>();
+        options3Items = new ArrayList<>();
+
         Retrofit retrofit = NetWorkMg.newRetrofit();
         mApi = retrofit.create(RequestApi.class);
 
@@ -343,13 +434,14 @@ public class RegisterInfoActivity extends BaseActivity {
             }
             break;
             case R.id.register_relayout_jiguan:
-                showEditDialog("籍贯", registerTextJiguan.getText().toString(), registerTextJiguan);
+                doCitySelectDialog(registerTextJiguan);
                 break;
             case R.id.register_relayout_zhiye:
                 showEditDialog("职业", registerTextZhiye.getText().toString(), registerTextZhiye);
                 break;
             case R.id.register_relayout_gzdd:
-                showEditDialog("工作地点", registerTextGzdd.getText().toString(), registerTextGzdd);
+                doCitySelectDialog(registerTextGzdd);
+                //showEditDialog("工作地点", registerTextGzdd.getText().toString(), registerTextGzdd);
                 break;
         }
     }
@@ -370,7 +462,78 @@ public class RegisterInfoActivity extends BaseActivity {
         if (isUpdate) {
             setResult(RESULT_OK);
         }
-        this.finish();
+
+        if(mFrom == FROM_LOGIN) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("取消注册")
+                    .setMessage("是否确定放弃注册，还是继续完成注册？")
+                    .setPositiveButton("继续", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+
+                        }
+                    })
+                    .setNegativeButton("放弃", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            finish();
+                            DataManager.getInstance().setRegisterUserInfo(null);
+                        }
+                    });
+            builder.create().show();
+        }else {
+            this.finish();
+        }
+    }
+
+    private void doCitySelectDialog(final TextView textView) {
+        if(mIsProvinceLoaded) {
+            showCitySelectDialog(textView);
+        }else {
+            getProvinceJsonData(new Runnable() {
+                @Override
+                public void run() {
+                    showCitySelectDialog(textView);
+                }
+            });
+        }
+    }
+
+    private void showCitySelectDialog(final TextView textView) {
+        OptionsPickerView pvOptions = new OptionsPickerBuilder(this, new OnOptionsSelectListener() {
+            @Override
+            public void onOptionsSelect(int options1, int options2, int options3, View v) {
+                //返回的分别是三个级别的选中位置
+                String opt1tx = options1Items.size() > 0 ?
+                        options1Items.get(options1).getPickerViewText() : "";
+
+                String opt2tx = options2Items.size() > 0
+                        && options2Items.get(options1).size() > 0 ?
+                        options2Items.get(options1).get(options2) : "";
+
+                String opt3tx = options2Items.size() > 0
+                        && options3Items.get(options1).size() > 0
+                        && options3Items.get(options1).get(options2).size() > 0 ?
+                        options3Items.get(options1).get(options2).get(options3) : "";
+
+                String tx = opt1tx + opt2tx + opt3tx;
+                if(textView == registerTextJiguan) {
+                    mTempUserInfo.setNative_place(tx);
+                }else if(textView == registerTextGzdd) {
+                    mTempUserInfo.setJob_address(tx);
+                }
+                setData();
+            }
+        })
+
+                .setTitleText("城市选择")
+                .setDividerColor(Color.BLACK)
+                .setTextColorCenter(Color.BLACK) //设置选中项文字颜色
+                .setContentTextSize(20)
+                .build();
+
+        pvOptions.setPicker(options1Items, options2Items, options3Items);//三级选择器
+        pvOptions.show();
     }
 
     private void showEditDialog(String title, String hintText, final View view) {
@@ -498,7 +661,28 @@ public class RegisterInfoActivity extends BaseActivity {
         });
     }
 
+    private boolean checkInfoToRegister() {
+        if(TextUtils.isEmpty(mTempUserInfo.getRole_type())
+                || TextUtils.isEmpty(mTempUserInfo.getNick_name())
+                || TextUtils.isEmpty(mTempUserInfo.getGender())
+                || mTempUserInfo.getMarrige() == -1
+                || mTempUserInfo.getAge() == -1
+                || mTempUserInfo.getTall() == -1
+                || TextUtils.isEmpty(mTempUserInfo.getScholling())
+                || TextUtils.isEmpty(mTempUserInfo.getNative_place())
+                || TextUtils.isEmpty(mTempUserInfo.getProfessional())
+                || TextUtils.isEmpty(mTempUserInfo.getJob_address())) {
+            return false;
+        }
+        return true;
+    }
+
     private void toRegister() {
+        if(!checkInfoToRegister()) {
+            Tools.toast(getApplicationContext(),"请完善资料在提交注册",false);
+            return;
+        }
+
         //先注册
         final String pss = Tools.MD5(AppConstant.MD5_PREFIX + mTempUserInfo.getPassword());
         Observable.create(new ObservableOnSubscribe<Integer>() {
@@ -512,7 +696,7 @@ public class RegisterInfoActivity extends BaseActivity {
                                     observableEmitter.onNext(i);
                                     saveUser(JMessageClient.getMyInfo().getUserName(), pss, JMessageClient.getMyInfo().getAppKey());
                                 } else {
-                                    observableEmitter.onError(new Throwable("JMessage regist error"));
+                                    observableEmitter.onError(new Throwable("JMessage regist error--" + s));
                                 }
                             }
                         });
@@ -532,7 +716,9 @@ public class RegisterInfoActivity extends BaseActivity {
                     @Override
                     public void accept(UserResp userResp) throws Exception {
                         if (userResp.getStatus() == XqErrorCode.SUCCESS) {//注册成功
-                            updateUserInfo();
+                            //updateUserInfo();
+                            //上次图片
+                            upLoadHeadImage(mTempUserInfo.getHead_image(),userResp.getData().getUser_name());
                         }else {
                             Log.e("toRegister--" + userResp.getMsg());
                             Tools.toast(getApplicationContext(),"注册失败",false);
@@ -617,7 +803,17 @@ public class RegisterInfoActivity extends BaseActivity {
                         Log.d("yy", "" + o.toString());
                         String compressImagePath = BitmapUtil.compressImage(o.toString());
                         mTempUserInfo.setHead_image(compressImagePath);
-                        upLoadHeadImage(compressImagePath, DataManager.getInstance().getUserInfo().getUser_name());
+                        if(mFrom == FROM_MY || mFrom == FROM_LEAK_INFO) {
+                            upLoadHeadImage(compressImagePath, DataManager.getInstance().getUserInfo().getUser_name());
+                        }else {
+                            File file = new File(o.toString());
+                            //更新头像
+                            Glide.with(RegisterInfoActivity.this)
+                                    .load(file)
+                                    .centerCrop()
+                                    .bitmapTransform(new GlideCircleTransform(RegisterInfoActivity.this))
+                                    .into(registerImgHead);
+                        }
                     }
 
                     @Override
@@ -670,9 +866,13 @@ public class RegisterInfoActivity extends BaseActivity {
                     Tools.toast(getApplicationContext(), response.body().getMsg(), true);
                     return;
                 }
-                Tools.toast(getApplicationContext(), "设置头像成功", false);
-                DataManager.getInstance().getUserInfo().setHead_image(response.body().getData().getHead_image());
-                isUpdate = true;
+                if(mFrom == FROM_LEAK_INFO || mFrom == FROM_MY) {
+                    Tools.toast(getApplicationContext(), "设置头像成功", false);
+                    DataManager.getInstance().getUserInfo().setHead_image(response.body().getData().getHead_image());
+                    isUpdate = true;
+                }else {
+                    updateUserInfo();
+                }
 
                 //更新头像
                 Glide.with(RegisterInfoActivity.this)
