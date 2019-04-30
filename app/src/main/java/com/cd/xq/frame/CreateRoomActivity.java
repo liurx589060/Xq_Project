@@ -99,6 +99,9 @@ public class CreateRoomActivity extends BaseActivity {
     private String mTXPlayerAddress = "";
     private int mPushAddressType = 0;
 
+    private Calendar mStartCalendar;
+    private Calendar mEndCalendar;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -123,17 +126,23 @@ public class CreateRoomActivity extends BaseActivity {
                 }
             }
         });
-        initTimeDialog();
+
+        mStartCalendar = Calendar.getInstance();
+        mEndCalendar = Calendar.getInstance();
+        mStartCalendar.add(Calendar.MINUTE,5);
+        mEndCalendar.setTimeInMillis(mStartCalendar.getTimeInMillis());
+        mEndCalendar.add(Calendar.HOUR_OF_DAY,2);
+        initTimeDialog(mStartCalendar,mEndCalendar);
     }
 
     /**
      * 初始化TimeDialog
      */
-    private void initTimeDialog() {
-        Calendar startDate = Calendar.getInstance();
-        Calendar endDate = Calendar.getInstance();
-        startDate.add(Calendar.MINUTE,5);
-        endDate.setTimeInMillis(System.currentTimeMillis() + 10 * 60 * 60 * 1000);
+    private void initTimeDialog(Calendar startDate,Calendar endDate) {
+        boolean month = false;
+        if(endDate.get(Calendar.MONTH) != startDate.get(Calendar.MONTH)) {
+            month = true;
+        }
         mDialogAll = new TimePickerBuilder(this, new OnTimeSelectListener() {
             @Override
             public void onTimeSelect(Date date, View v) {
@@ -141,7 +150,7 @@ public class CreateRoomActivity extends BaseActivity {
                 btnStartTime.setText("已预约的时间\n" + mStartTime);
             }
         })
-                .setType(new boolean[]{false, false, true, true, true, false})// 默认全部显示
+                .setType(new boolean[]{false, month, true, true, true, false})// 默认全部显示
                 .setCancelText("取消")//取消按钮文字
                 .setSubmitText("确认")//确认按钮文字
                 .setDate(startDate)
@@ -489,13 +498,21 @@ public class CreateRoomActivity extends BaseActivity {
                 toCommit();
                 break;
             case R.id.btn_start_time:
-                Calendar calendar = Calendar.getInstance();
-                if (TextUtils.isEmpty(mStartTime)) {
-                    calendar.setTimeInMillis(System.currentTimeMillis());
-                } else {
-                    calendar.setTimeInMillis(1000 * DateUtils.getStringToDate(mStartTime, "yyyy-MM-dd HH:mm:ss"));
+//                Calendar calendar = Calendar.getInstance();
+//                if (TextUtils.isEmpty(mStartTime)) {
+//                    calendar.setTimeInMillis(System.currentTimeMillis());
+//                } else {
+//                    calendar.setTimeInMillis(1000 * DateUtils.getStringToDate(mStartTime, "yyyy-MM-dd HH:mm:ss"));
+//                }
+
+                mStartCalendar.setTimeInMillis(System.currentTimeMillis());
+                mStartCalendar.add(Calendar.MINUTE,5);
+                mEndCalendar.setTimeInMillis(mStartCalendar.getTimeInMillis());
+                mEndCalendar.add(Calendar.HOUR_OF_DAY,2);
+                if(mEndCalendar.get(Calendar.MONTH) != mStartCalendar.get(Calendar.MONTH)) {
+                    initTimeDialog(mStartCalendar,mEndCalendar);
                 }
-                mDialogAll.setDate(calendar);
+
                 mDialogAll.show();
                 break;
         }
