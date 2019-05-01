@@ -212,10 +212,13 @@ public class RegisterInfoActivity extends BaseActivity {
             registerRelayoutGzdd.setEnabled(true);
             registerEditPs.setEnabled(true);
         }else if(registerDone.getText().toString().equals(STR_UODATE)) {
-            registerRelayoutRol.setEnabled(false);
+//            registerRelayoutRol.setEnabled(false);
+            registerRelayoutRol.setEnabled(true);
             registerRelayoutNick.setEnabled(true);
-            registerRelayoutGender.setEnabled(false);
-            registerRelayoutMarrage.setEnabled(false);
+//            registerRelayoutGender.setEnabled(false);
+//            registerRelayoutMarrage.setEnabled(false);
+            registerRelayoutGender.setEnabled(true);
+            registerRelayoutMarrage.setEnabled(true);
             registerRelayoutAge.setEnabled(true);
             registerRelayoutTall.setEnabled(true);
             registerRelayoutXueli.setEnabled(true);

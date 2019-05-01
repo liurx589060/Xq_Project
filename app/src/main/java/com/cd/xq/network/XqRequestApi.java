@@ -4,6 +4,7 @@ import com.cd.xq.beans.BCheckRoomExpiry;
 import com.cd.xq.beans.BCheckUpdate;
 import com.cd.xq.beans.BGetArrays;
 import com.cd.xq.beans.BGetBanner;
+import com.cd.xq.beans.BGetBonusByUser;
 import com.cd.xq.beans.BGetChatRoomList;
 import com.cd.xq.beans.BGetConsumeHistory;
 import com.cd.xq.module.chart.beans.BGetGiftItem;
@@ -54,4 +55,12 @@ public interface XqRequestApi {
 
     @GET("Api/getBanner")
     Observable<NetResult<List<BGetBanner>>> getBanner();
+
+    @GET("User/getBonusByUser")
+    Observable<NetResult<BGetBonusByUser>> getBonusByUser(@Query("userName") String userName
+            , @Query("status") int status);
+
+    @GET("User/receiveBonus")
+    Observable<NetResult> receiveBonus(@Query("userName") String userName
+            , @Query("bonusId") int bonusId);
 }

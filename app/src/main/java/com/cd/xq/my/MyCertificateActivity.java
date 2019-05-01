@@ -108,6 +108,8 @@ public class MyCertificateActivity extends BaseActivity {
                             Log.e("requestGetGiftList--" + listNetResult.getMsg());
                             return;
                         }
+
+                        if(listNetResult.getData() == null) return;
                         mCertificateList.clear();
                         mGiftList.clear();
                         for (int i = 0; i < listNetResult.getData().size(); i++) {

@@ -28,6 +28,7 @@ import com.cd.xq.CommonDialogActivity;
 import com.cd.xq.R;
 import com.cd.xq.beans.BCheckRoomExpiry;
 import com.cd.xq.beans.BGetBanner;
+import com.cd.xq.beans.BGetBonusByUser;
 import com.cd.xq.friend.FriendActivity;
 import com.cd.xq.login.BlackCheckListener;
 import com.cd.xq.login.VerifyCodeActivity;
@@ -801,6 +802,7 @@ public class HomeFragment extends BaseFragment {
         super.onLogin();
         //获取房间
         requestGetChatRoomByUser();
+        requestGetBonusByUser();
     }
 
     /**
@@ -1377,5 +1379,76 @@ public class HomeFragment extends BaseFragment {
         public void onDestroy() {
             EventBus.getDefault().unregister(this);
         }
+    }
+
+    /**
+     * 获取资金的礼品奖励
+     */
+    private void requestGetBonusByUser() {
+        mXqApi.getBonusByUser(DataManager.getInstance().getUserInfo().getUser_name(),0)
+                .compose(this.<NetResult<BGetBonusByUser>>bindUntilEvent(FragmentEvent.DESTROY))
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Consumer<NetResult<BGetBonusByUser>>() {
+                    @Override
+                    public void accept(NetResult<BGetBonusByUser> listNetResult) throws Exception {
+                        if(!NetParse.parseNetResult(getActivity(),listNetResult)) return;
+                        if(listNetResult.getData() != null) {
+                            showBonusDialog(listNetResult.getData());
+                        }
+                    }
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Exception {
+                        NetParse.parseError(getActivity(),throwable);
+                    }
+                });
+    }
+
+    /**
+     * 获取资金的礼品奖励
+     */
+    private void requestReceiveBonus(int bonusId) {
+        mXqApi.receiveBonus(DataManager.getInstance().getUserInfo().getUser_name(),bonusId)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Consumer<NetResult>() {
+                    @Override
+                    public void accept(NetResult netResult) throws Exception {
+                        if(!NetParse.parseNetResult(getActivity(),netResult)) return;
+                        requestGetBonusByUser();
+                    }
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Exception {
+                        NetParse.parseError(getActivity(), throwable);
+                    }
+                });
+    }
+
+    private void showBonusDialog(final BGetBonusByUser bonus) {
+        if(bonus.getGift() == null) return;
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("您于")
+                .append(bonus.getCreate_time())
+                .append("因"+ bonus.getBonus_name())
+                .append("获取的如下奖励：\n\n");
+        for(int i = 0 ; i < bonus.getGift().size() ; i++) {
+            BGetGiftItem getGiftItem = bonus.getGift().get(i);
+            stringBuilder.append(getGiftItem.getName())
+                    .append(" X ")
+                    .append(getGiftItem.getNum())
+                    .append("\n");
+        }
+        builder.setTitle("奖励")
+                .setMessage(stringBuilder.toString())
+                .setPositiveButton("领取", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        requestReceiveBonus(bonus.getBonus_id());
+                    }
+                });
+        builder.create().show();
     }
 }

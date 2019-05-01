@@ -42,6 +42,7 @@ public class CommonDialogActivity extends BaseActivity {
         mICommonAppointTimeCloseListener = listener;
     }
 
+
     public static void showDialog(Context context,int type) {
         Intent intent = new Intent(context,CommonDialogActivity.class);
         intent.putExtra("type",type);
