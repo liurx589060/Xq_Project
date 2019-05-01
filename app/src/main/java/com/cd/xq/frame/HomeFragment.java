@@ -215,7 +215,11 @@ public class HomeFragment extends BaseFragment {
                 //参与者加入房间
                 mIsMatch = true;
                 mRoomID = -1;
-                toCommitJoinParticipant();
+                if(DataManager.getInstance().getUserInfo().getGender().equals(Constant.GENDER_LADY)) {
+                    joinChartRoom(Constant.ROOM_ROLETYPE_PARTICIPANTS,mRoomID,mIsMatch); //直接加入
+                }else if(DataManager.getInstance().getUserInfo().getGender().equals(Constant.GENDER_MAN)){
+                    toCommitJoinParticipant();
+                }
             }
         });
 
@@ -1005,7 +1009,11 @@ public class HomeFragment extends BaseFragment {
                         //加入
                         mIsMatch = false;
                         mRoomID = resp.getRoom_id();
-                        toCommitJoinParticipant();
+                        if(DataManager.getInstance().getUserInfo().getGender().equals(Constant.GENDER_LADY)) {
+                            joinChartRoom(Constant.ROOM_ROLETYPE_PARTICIPANTS,mRoomID,mIsMatch); //直接加入
+                        }else if(DataManager.getInstance().getUserInfo().getGender().equals(Constant.GENDER_MAN)){
+                            toCommitJoinParticipant();
+                        }
                     }else if(text.equals(STR_ONLOOKER)) {
                         //围观
                         joinChartRoom(Constant.ROOM_ROLETYPE_ONLOOKER,resp.getRoom_id(),false);

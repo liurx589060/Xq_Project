@@ -105,6 +105,8 @@ public class MyConsumeHistoryActivity extends BaseActivity {
                             Log.e("requestGetConsumeHistory--" + listNetResult.getMsg());
                             return;
                         }
+
+                        if(listNetResult.getData() == null) return;
                         mDataList.clear();
                         mIntCount = 0;
                         mDataList.addAll(listNetResult.getData());

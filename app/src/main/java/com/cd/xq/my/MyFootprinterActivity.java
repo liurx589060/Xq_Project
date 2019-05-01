@@ -113,6 +113,7 @@ public class MyFootprinterActivity extends BaseActivity {
                             Log.e("requestGetChatRoomListByUser--" + listNetResult.getMsg());
                             return;
                         }
+                        if(listNetResult.getData() == null) return;
                         mDataList.clear();
                         mDataList.addAll(listNetResult.getData());
                         myAdapter.notifyDataSetChanged();

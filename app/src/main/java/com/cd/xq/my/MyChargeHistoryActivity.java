@@ -96,6 +96,8 @@ public class MyChargeHistoryActivity extends BaseActivity {
                             Log.e("getPayHistory--" + listNetResult.getMsg());
                             return;
                         }
+
+                        if(listNetResult.getData() == null) return;
                         mDataList.clear();
                         mDataList.addAll(listNetResult.getData());
                         myAdapter.notifyDataSetChanged();

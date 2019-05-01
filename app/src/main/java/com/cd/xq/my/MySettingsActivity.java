@@ -10,10 +10,12 @@ import android.widget.RelativeLayout;
 import com.cd.xq.R;
 import com.cd.xq.login.LoginActivity;
 import com.cd.xq.module.util.base.BaseActivity;
+import com.cd.xq.module.util.manager.DataManager;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import cn.jpush.im.android.api.JMessageClient;
 
 /**
  * 设置
@@ -72,6 +74,18 @@ public class MySettingsActivity extends BaseActivity {
                 jumpToLoginActivity();
                 break;
             case R.id.btn_exit_account:
+                JMessageClient.logout();
+                DataManager.getInstance().setChartBChatRoom(null);
+                DataManager.getInstance().setJmUserName(null);
+                DataManager.getInstance().setUserInfo(null);
+
+                //跳转到登陆页面
+                Intent intent = new Intent(this, LoginActivity.class);
+                Bundle bundle = new Bundle();
+                bundle.putInt("from", LoginActivity.FROM_WELCOME);
+                intent.putExtras(bundle);
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
                 break;
         }
     }

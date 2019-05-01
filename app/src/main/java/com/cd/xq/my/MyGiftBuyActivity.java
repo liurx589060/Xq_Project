@@ -106,6 +106,8 @@ public class MyGiftBuyActivity extends BaseActivity {
                             Log.e("getGiftItem--" + listNetResult.getMsg());
                             return;
                         }
+
+                        if(listNetResult.getData() == null) return;
                         mDataList.clear();
                         mDataList.addAll(listNetResult.getData());
                         myAdapter.notifyDataSetChanged();

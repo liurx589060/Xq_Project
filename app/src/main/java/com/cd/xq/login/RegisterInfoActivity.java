@@ -22,7 +22,6 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.bigkoo.pickerview.builder.OptionsPickerBuilder;
 import com.bigkoo.pickerview.listener.OnOptionsSelectListener;
@@ -30,6 +29,7 @@ import com.bigkoo.pickerview.view.OptionsPickerView;
 import com.bumptech.glide.Glide;
 import com.cd.xq.AppConstant;
 import com.cd.xq.R;
+import com.cd.xq.beans.ProvinceJsonBean;
 import com.cd.xq.frame.MainActivity;
 import com.cd.xq.module.util.Constant;
 import com.cd.xq.module.util.base.BaseActivity;
@@ -44,7 +44,6 @@ import com.cd.xq.module.util.tools.Log;
 import com.cd.xq.module.util.tools.Tools;
 import com.cd.xq.module.util.tools.XqErrorCode;
 import com.google.gson.Gson;
-import com.trello.rxlifecycle2.android.ActivityEvent;
 
 import org.json.JSONArray;
 
@@ -152,10 +151,11 @@ public class RegisterInfoActivity extends BaseActivity {
     private final String STR_EDIT = "编辑";
     private final String STR_UODATE = "更新";
 
-    private List<JsonBean> options1Items;
+    private List<ProvinceJsonBean> options1Items;
     private ArrayList<ArrayList<String>> options2Items;
     private ArrayList<ArrayList<ArrayList<String>>> options3Items;
     private boolean mIsProvinceLoaded;
+    private boolean mIsSelectedMarried;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -167,18 +167,19 @@ public class RegisterInfoActivity extends BaseActivity {
         }
 
         if (mFrom == FROM_LEAK_INFO || mFrom == FROM_LOGIN) {
+            mTempUserInfo = DataManager.getInstance().getRegisterUserInfo();
             if(mFrom == FROM_LEAK_INFO) {
                 registerBtnClose.setVisibility(View.INVISIBLE);
+                setStatus(STR_EDIT);
             }
             if(mFrom == FROM_LOGIN) {
                 setStatus(STR_REGISTER);
             }
-            mTempUserInfo = DataManager.getInstance().getRegisterUserInfo();
         }else {
             //有些不能改变
-            setStatus(STR_EDIT);
             Gson gson = new Gson();
             mTempUserInfo = gson.fromJson(gson.toJson(DataManager.getInstance().getUserInfo()),UserInfoBean.class);
+            setStatus(STR_EDIT);
         }
         init();
         getProvinceJsonData(null);
@@ -245,17 +246,17 @@ public class RegisterInfoActivity extends BaseActivity {
                         stringBuilder.append(line);
                     }
                     String jsonStr = stringBuilder.toString();
-                    ArrayList<JsonBean> jsonBean = parseData(jsonStr);//用Gson 转成实体
-                    options1Items = jsonBean;
-                    for (int i = 0; i < jsonBean.size(); i++) {//遍历省份
+                    ArrayList<ProvinceJsonBean> provinceJsonBean = parseData(jsonStr);//用Gson 转成实体
+                    options1Items = provinceJsonBean;
+                    for (int i = 0; i < provinceJsonBean.size(); i++) {//遍历省份
                         ArrayList<String> cityList = new ArrayList<>();//该省的城市列表（第二级）
                         ArrayList<ArrayList<String>> province_AreaList = new ArrayList<>();//该省的所有地区列表（第三极）
 
-                        for (int c = 0; c < jsonBean.get(i).getCityList().size(); c++) {//遍历该省份的所有城市
-                            String cityName = jsonBean.get(i).getCityList().get(c).getName();
+                        for (int c = 0; c < provinceJsonBean.get(i).getCityList().size(); c++) {//遍历该省份的所有城市
+                            String cityName = provinceJsonBean.get(i).getCityList().get(c).getName();
                             cityList.add(cityName);//添加城市
                             ArrayList<String> city_AreaList = new ArrayList<>();//该城市的所有地区列表
-                            city_AreaList.addAll(jsonBean.get(i).getCityList().get(c).getArea());
+                            city_AreaList.addAll(provinceJsonBean.get(i).getCityList().get(c).getArea());
                             province_AreaList.add(city_AreaList);//添加该省所有地区数据
                         }
 
@@ -283,13 +284,13 @@ public class RegisterInfoActivity extends BaseActivity {
         new Thread(runnable).start();
     }
 
-    private ArrayList<JsonBean> parseData(String result) {//Gson 解析
-        ArrayList<JsonBean> detail = new ArrayList<>();
+    private ArrayList<ProvinceJsonBean> parseData(String result) {//Gson 解析
+        ArrayList<ProvinceJsonBean> detail = new ArrayList<>();
         try {
             JSONArray data = new JSONArray(result);
             Gson gson = new Gson();
             for (int i = 0; i < data.length(); i++) {
-                JsonBean entity = gson.fromJson(data.optJSONObject(i).toString(), JsonBean.class);
+                ProvinceJsonBean entity = gson.fromJson(data.optJSONObject(i).toString(), ProvinceJsonBean.class);
                 detail.add(entity);
             }
         } catch (Exception e) {
@@ -307,7 +308,6 @@ public class RegisterInfoActivity extends BaseActivity {
         Retrofit retrofit = NetWorkMg.newRetrofit();
         mApi = retrofit.create(RequestApi.class);
 
-        setData();
 //        if(mFrom == FROM_MY) {
 //            registerImgHead.setEnabled(false);
 //        }
@@ -629,10 +629,14 @@ public class RegisterInfoActivity extends BaseActivity {
                                 //已婚
                                 mTempUserInfo.setMarrige(Constant.ROLE_MARRIED);
                                 mTempUserInfo.setRole_type(Constant.ROLETYPE_AUDIENCE);
+                                mIsSelectedMarried = true;
                             }else {
                                 //未婚
                                 mTempUserInfo.setMarrige(Constant.ROLE_UNMARRIED);
-                                mTempUserInfo.setRole_type("");
+                                if(mIsSelectedMarried) {
+                                    mTempUserInfo.setRole_type("");
+                                    mIsSelectedMarried = false;
+                                }
                             }
                         }else if(view == registerTextXueli) {
                             mTempUserInfo.setScholling(text);
@@ -675,16 +679,19 @@ public class RegisterInfoActivity extends BaseActivity {
                 || TextUtils.isEmpty(mTempUserInfo.getNative_place())
                 || TextUtils.isEmpty(mTempUserInfo.getProfessional())
                 || TextUtils.isEmpty(mTempUserInfo.getJob_address())) {
+            Tools.toast(getApplicationContext(),"请完善资料在提交注册",false);
+            return false;
+        }
+
+        if(TextUtils.isEmpty(mTempUserInfo.getHead_image())) {
+            Tools.toast(getApplicationContext(),"请先上传头像",false);
             return false;
         }
         return true;
     }
 
     private void toRegister() {
-        if(!checkInfoToRegister()) {
-            Tools.toast(getApplicationContext(),"请完善资料在提交注册",false);
-            return;
-        }
+        if(!checkInfoToRegister()) return;
 
         //先注册
         final String pss = Tools.MD5(AppConstant.MD5_PREFIX + mTempUserInfo.getPassword());
@@ -878,11 +885,13 @@ public class RegisterInfoActivity extends BaseActivity {
                 }
 
                 //更新头像
-                Glide.with(RegisterInfoActivity.this)
-                        .load(DataManager.getInstance().getUserInfo().getHead_image())
-                        .centerCrop()
-                        .bitmapTransform(new GlideCircleTransform(RegisterInfoActivity.this))
-                        .into(registerImgHead);
+                if(mFrom != FROM_LOGIN) {
+                    Glide.with(RegisterInfoActivity.this)
+                            .load(DataManager.getInstance().getUserInfo().getHead_image())
+                            .centerCrop()
+                            .bitmapTransform(new GlideCircleTransform(RegisterInfoActivity.this))
+                            .into(registerImgHead);
+                }
 
                 //删除裁剪的图片
                 File file1 = new File(imagePath);

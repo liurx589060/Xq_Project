@@ -1,4 +1,4 @@
-package com.cd.xq.login;
+package com.cd.xq.beans;
 
 
 import com.contrarywind.interfaces.IPickerViewData;
@@ -9,7 +9,7 @@ import java.util.List;
  * TODO<json数据源>
  */
 
-public class JsonBean implements IPickerViewData {
+public class ProvinceJsonBean implements IPickerViewData {
 
 
     /**

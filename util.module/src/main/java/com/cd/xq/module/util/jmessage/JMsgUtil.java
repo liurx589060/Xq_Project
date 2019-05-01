@@ -34,6 +34,7 @@ public class JMsgUtil {
 
         Message message = JMessageClient.createSingleTextMessage(sendBean.getTargetUserName(),
                 new Gson().toJson(sendBean));
+        if(message == null) return;
         message.setOnSendCompleteCallback(new BasicCallback() {
             @Override
             public void gotResult(int i, String s) {
