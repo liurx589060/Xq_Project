@@ -6,6 +6,7 @@ import com.cd.xq.module.util.beans.jmessage.BChatRoom;
 import com.cd.xq.module.util.beans.jmessage.JMChartResp;
 import com.cd.xq.module.util.beans.jmessage.Member;
 import com.cd.xq.module.util.beans.user.BBlackUser;
+import com.cd.xq.module.util.beans.user.UserInfoBean;
 import com.cd.xq.module.util.beans.user.UserResp;
 
 import java.util.List;
@@ -59,7 +60,7 @@ public interface RequestApi {
     Observable<NetResult<BChatRoom>> exitChatRoom(@QueryMap Map<String, Object> map);
 
     @GET("JMessage/commitChatRoomResult")
-    Observable<NetResult> commitChatRoomResult(@QueryMap Map<String, Object> map);
+    Observable<NetResult<UserInfoBean>> commitChatRoomResult(@QueryMap Map<String, Object> map);
 
     @GET("JMessage/startChatRoom")
     Observable<NetResult<BChatRoom>> startChatRoom(@Query("roomId") long roomId);

@@ -9,7 +9,7 @@
     <ImageView
         android:id="@+id/login_img_icon"
         android:layout_width="@dimen/dp_80"
-        android:layout_height="@dimen/dp_80"
+        android:layout_height="@dimen/dp_40"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="@dimen/dp_100"
@@ -31,7 +31,7 @@
         android:layout_height="@dimen/dp_40"
         android:layout_below="@+id/login_img_icon"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="@dimen/dp_10"
+        android:layout_marginTop="@dimen/dp_15"
         android:orientation="horizontal"
         android:background="@drawable/login_edit_bg"
         android:hint="账号"

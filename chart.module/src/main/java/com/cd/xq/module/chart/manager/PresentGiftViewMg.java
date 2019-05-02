@@ -234,7 +234,7 @@ public class PresentGiftViewMg{
         mPayViewMg.show();
     }
 
-    private void setBalance() {
+    public void setBalance() {
         mTextBalance.setText("余额：" + String.valueOf(DataManager.getInstance().getUserInfo().getBalance()));
     }
 

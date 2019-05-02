@@ -7,6 +7,7 @@ import com.cd.xq.beans.BGetBanner;
 import com.cd.xq.beans.BGetBonusByUser;
 import com.cd.xq.beans.BGetChatRoomList;
 import com.cd.xq.beans.BGetConsumeHistory;
+import com.cd.xq.beans.BGetProfit;
 import com.cd.xq.module.chart.beans.BGetGiftItem;
 import com.cd.xq.beans.BGetPayHistory;
 import com.cd.xq.module.util.beans.NetResult;
@@ -63,4 +64,7 @@ public interface XqRequestApi {
     @GET("User/receiveBonus")
     Observable<NetResult> receiveBonus(@Query("userName") String userName
             , @Query("bonusId") int bonusId);
+
+    @GET("User/getProfitByUser")
+    Observable<NetResult<BGetProfit>> getProfitByUser(@Query("userName") String userName);
 }

@@ -505,6 +505,7 @@ public class XqStatusChartUIViewMg extends AbsChartView{
         params.put("reportType",reportType);
         params.put("reportMsg",reportMsg);
         params.put("roomId",DataManager.getInstance().getChartBChatRoom().getRoom_id());
+        params.put("innerId",DataManager.getInstance().getChartBChatRoom().getInner_id());
         mChatApi.reportUser(params)
                 .subscribeOn(Schedulers.io())
                 .compose(mXqActivity.<NetResult<String>>bindUntilEvent(ActivityEvent.DESTROY))
@@ -932,9 +933,9 @@ public class XqStatusChartUIViewMg extends AbsChartView{
         mApi.commitChatRoomResult(param)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<NetResult>() {
+                .subscribe(new Consumer<NetResult<UserInfoBean>>() {
                     @Override
-                    public void accept(NetResult netResult) throws Exception {
+                    public void accept(NetResult<UserInfoBean> netResult) throws Exception {
                         if (netResult.getStatus() != XqErrorCode.SUCCESS) {
                             com.cd.xq.module.util.tools.Log.e("requestCommitChatRoomResult--" + netResult.getMsg());
                             return;
@@ -942,6 +943,10 @@ public class XqStatusChartUIViewMg extends AbsChartView{
                         //60S后进行下一次，标识为未开始，可进行下一次
 
                         //发送结束的消息
+                        if(netResult.getData() != null) {
+                            DataManager.getInstance().setUserInfo(netResult.getData());
+                            mPresentGiftViewMg.setBalance();
+                        }
                         BaseStatus baseStatus = mStatusManager.getStatus(JMChartRoomSendBean.CHART_STATUS_CHAT_FINAL);
                         JMChartRoomSendBean bean = baseStatus.getChartSendBeanWillSend(null, BaseStatus.MessageType.TYPE_SEND);
                         bean.setMsg(text);
