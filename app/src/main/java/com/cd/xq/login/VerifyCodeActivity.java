@@ -229,6 +229,10 @@ public class VerifyCodeActivity extends BaseActivity {
     }
 
     private void requestSMSCode(final String country, final String phone) {
+        if(!Tools.isTelPhoneNumber(phone)) {
+            Tools.toast(getApplicationContext(),"非法的手机号码",false);
+            return;
+        }
         if (mRequestCode == REQUEST_REGISTER) {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setTitle("获取验证码")

@@ -38,6 +38,7 @@ public class Constant {
     public static String JM_SECRET = "cd7be344156c9afc0d218bad";
 
     public static String TRPAY_KEY = "e08c9287fc9b4f8990c254457820141a";
+    public static String BUGLY_KEY = "baaced6d7c";
 
     public static String TAG = "XQ_HYF";
 

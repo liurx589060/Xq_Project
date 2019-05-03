@@ -235,10 +235,6 @@ public class HomeFragment extends BaseFragment {
         requestGetBanner();
         initSmartRefreshLayout();
         initRoomFloatDialog();
-
-        if(DataManager.getInstance().getUserInfo().isOnLine()) {
-            onLogin();
-        }
     }
 
     private void toShowFloatBtn() {

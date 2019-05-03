@@ -1,5 +1,6 @@
 package com.cd.xq.module.util.network;
 
+import com.cd.xq.module.util.beans.BAppSettings;
 import com.cd.xq.module.util.beans.BaseResp;
 import com.cd.xq.module.util.beans.NetResult;
 import com.cd.xq.module.util.beans.jmessage.BChatRoom;
@@ -29,6 +30,12 @@ import retrofit2.http.QueryMap;
  */
 
 public interface RequestApi {
+    @GET("Api/getAppSettings")
+    Observable<NetResult<BAppSettings>> getAppSettings();
+
+    @GET("User/checkIDCard")
+    Observable<NetResult> checkIDCard(@QueryMap Map<String, Object> map);
+
     @GET("User/regist")
     Observable<UserResp> regist(@Query("userName") String userName, @Query("password") String password);
 

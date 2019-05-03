@@ -18,6 +18,9 @@ public class UserInfoBean implements Serializable{
     private int level = 0;
     private long balance =0;
     private long profit = 0;
+    private String real_name = "";
+    private String id_card = ""; //身份证
+    private int card_valid = 0;  //身份证是否有效
     private String head_image = "";
     private String create_time = "";
     private String modify_time = "";
@@ -264,5 +267,29 @@ public class UserInfoBean implements Serializable{
 
     public void setProfit(long profit) {
         this.profit = profit;
+    }
+
+    public String getId_card() {
+        return id_card;
+    }
+
+    public void setId_card(String id_card) {
+        this.id_card = id_card;
+    }
+
+    public String getReal_name() {
+        return real_name;
+    }
+
+    public void setReal_name(String real_name) {
+        this.real_name = real_name;
+    }
+
+    public int getCard_valid() {
+        return card_valid;
+    }
+
+    public void setCard_valid(int card_valid) {
+        this.card_valid = card_valid;
     }
 }

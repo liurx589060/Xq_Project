@@ -11,8 +11,10 @@ import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.text.InputFilter;
 import android.text.InputType;
 import android.text.TextUtils;
+import android.text.method.NumberKeyListener;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
@@ -33,6 +35,7 @@ import com.cd.xq.beans.ProvinceJsonBean;
 import com.cd.xq.frame.MainActivity;
 import com.cd.xq.module.util.Constant;
 import com.cd.xq.module.util.base.BaseActivity;
+import com.cd.xq.module.util.beans.NetResult;
 import com.cd.xq.module.util.beans.user.UserInfoBean;
 import com.cd.xq.module.util.beans.user.UserResp;
 import com.cd.xq.module.util.glide.GlideCircleTransform;
@@ -40,6 +43,7 @@ import com.cd.xq.module.util.manager.DataManager;
 import com.cd.xq.module.util.network.NetWorkMg;
 import com.cd.xq.module.util.network.RequestApi;
 import com.cd.xq.module.util.tools.BitmapUtil;
+import com.cd.xq.module.util.tools.IDCardUtils;
 import com.cd.xq.module.util.tools.Log;
 import com.cd.xq.module.util.tools.Tools;
 import com.cd.xq.module.util.tools.XqErrorCode;
@@ -51,6 +55,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -96,6 +101,14 @@ public class RegisterInfoActivity extends BaseActivity {
     RelativeLayout registerRelayoutMarrage;
     @BindView(R.id.register_text_marrage)
     TextView registerTextMarrage;
+    @BindView(R.id.register_text_real_name)
+    TextView registerTextRealName;
+    @BindView(R.id.register_relayout_real_name)
+    RelativeLayout registerRelayoutRealName;
+    @BindView(R.id.register_text_id_card)
+    TextView registerTextIdCard;
+    @BindView(R.id.register_relayout_id_card)
+    RelativeLayout registerRelayoutIdCard;
     private int mFrom = FROM_LOGIN;
     private RequestApi mApi;
     private boolean isUpdate;
@@ -168,18 +181,20 @@ public class RegisterInfoActivity extends BaseActivity {
 
         if (mFrom == FROM_LEAK_INFO || mFrom == FROM_LOGIN) {
             mTempUserInfo = DataManager.getInstance().getRegisterUserInfo();
-            if(mFrom == FROM_LEAK_INFO) {
+            if (mFrom == FROM_LEAK_INFO) {
                 registerBtnClose.setVisibility(View.INVISIBLE);
                 setStatus(STR_EDIT);
             }
-            if(mFrom == FROM_LOGIN) {
+            if (mFrom == FROM_LOGIN) {
                 setStatus(STR_REGISTER);
             }
-        }else {
+        } else {
             //有些不能改变
             Gson gson = new Gson();
-            mTempUserInfo = gson.fromJson(gson.toJson(DataManager.getInstance().getUserInfo()),UserInfoBean.class);
+            mTempUserInfo = gson.fromJson(gson.toJson(DataManager.getInstance().getUserInfo()), UserInfoBean.class);
             setStatus(STR_EDIT);
+            registerRelayoutRealName.setVisibility(View.GONE);
+            registerRelayoutIdCard.setVisibility(View.GONE);
         }
         init();
         getProvinceJsonData(null);
@@ -187,7 +202,7 @@ public class RegisterInfoActivity extends BaseActivity {
 
     private void setStatus(String str) {
         registerDone.setText(str);
-        if(registerDone.getText().toString().equals(STR_EDIT)) {
+        if (registerDone.getText().toString().equals(STR_EDIT)) {
             //编辑，状态不可用
             registerRelayoutRol.setEnabled(false);
             registerRelayoutNick.setEnabled(false);
@@ -200,7 +215,7 @@ public class RegisterInfoActivity extends BaseActivity {
             registerRelayoutZhiye.setEnabled(false);
             registerRelayoutGzdd.setEnabled(false);
             registerEditPs.setEnabled(false);
-        }else if(registerDone.getText().toString().equals(STR_REGISTER)){
+        } else if (registerDone.getText().toString().equals(STR_REGISTER)) {
             registerRelayoutRol.setEnabled(true);
             registerRelayoutNick.setEnabled(true);
             registerRelayoutGender.setEnabled(true);
@@ -212,7 +227,7 @@ public class RegisterInfoActivity extends BaseActivity {
             registerRelayoutZhiye.setEnabled(true);
             registerRelayoutGzdd.setEnabled(true);
             registerEditPs.setEnabled(true);
-        }else if(registerDone.getText().toString().equals(STR_UODATE)) {
+        } else if (registerDone.getText().toString().equals(STR_UODATE)) {
 //            registerRelayoutRol.setEnabled(false);
             registerRelayoutRol.setEnabled(true);
             registerRelayoutNick.setEnabled(true);
@@ -271,7 +286,7 @@ public class RegisterInfoActivity extends BaseActivity {
                         options3Items.add(province_AreaList);
 
                         mIsProvinceLoaded = true;
-                        if(doneRunnable != null) {
+                        if (doneRunnable != null) {
                             runOnUiThread(doneRunnable);
                         }
                     }
@@ -325,41 +340,47 @@ public class RegisterInfoActivity extends BaseActivity {
                 .dontAnimate()
                 .centerCrop()
                 .into(registerImgHead);
-        if(!TextUtils.isEmpty(userInfo.getGender())) {
-            registerTextGender.setText(userInfo.getGender() + (registerRelayoutGender.isEnabled()?SUFFIX:""));
+        if (!TextUtils.isEmpty(userInfo.getGender())) {
+            registerTextGender.setText(userInfo.getGender() + (registerRelayoutGender.isEnabled() ? SUFFIX : ""));
         }
-        if(userInfo.getAge() != -1) {
-            registerTextAge.setText(String.valueOf(userInfo.getAge()) + (registerRelayoutAge.isEnabled()?SUFFIX:""));
+        if (userInfo.getAge() != -1) {
+            registerTextAge.setText(String.valueOf(userInfo.getAge()) + (registerRelayoutAge.isEnabled() ? SUFFIX : ""));
         }
-        if(!TextUtils.isEmpty(userInfo.getJob_address())) {
-            registerTextGzdd.setText(userInfo.getJob_address() + (registerRelayoutGzdd.isEnabled()?SUFFIX:""));
+        if (!TextUtils.isEmpty(userInfo.getJob_address())) {
+            registerTextGzdd.setText(userInfo.getJob_address() + (registerRelayoutGzdd.isEnabled() ? SUFFIX : ""));
         }
-        if(!TextUtils.isEmpty(userInfo.getNative_place())) {
-            registerTextJiguan.setText(userInfo.getNative_place() + (registerRelayoutJiguan.isEnabled()?SUFFIX:""));
+        if (!TextUtils.isEmpty(userInfo.getNative_place())) {
+            registerTextJiguan.setText(userInfo.getNative_place() + (registerRelayoutJiguan.isEnabled() ? SUFFIX : ""));
         }
-        if(!TextUtils.isEmpty(userInfo.getNick_name())) {
-            registerTextNick.setText(userInfo.getNick_name() + (registerRelayoutNick.isEnabled()?SUFFIX:""));
+        if (!TextUtils.isEmpty(userInfo.getNick_name())) {
+            registerTextNick.setText(userInfo.getNick_name() + (registerRelayoutNick.isEnabled() ? SUFFIX : ""));
         }
-        if(userInfo.getTall() != -1) {
-            registerTextTall.setText(String.valueOf(userInfo.getTall()) + "cm" + (registerRelayoutTall.isEnabled()?SUFFIX:""));
+        if (userInfo.getTall() != -1) {
+            registerTextTall.setText(String.valueOf(userInfo.getTall()) + "cm" + (registerRelayoutTall.isEnabled() ? SUFFIX : ""));
         }
-        if(!TextUtils.isEmpty(userInfo.getScholling())) {
-            registerTextXueli.setText(userInfo.getScholling() + (registerRelayoutXueli.isEnabled()?SUFFIX:""));
+        if (!TextUtils.isEmpty(userInfo.getScholling())) {
+            registerTextXueli.setText(userInfo.getScholling() + (registerRelayoutXueli.isEnabled() ? SUFFIX : ""));
         }
-        if(!TextUtils.isEmpty(userInfo.getProfessional())) {
-            registerTextZhiye.setText(userInfo.getProfessional() + (registerRelayoutZhiye.isEnabled()?SUFFIX:""));
+        if (!TextUtils.isEmpty(userInfo.getProfessional())) {
+            registerTextZhiye.setText(userInfo.getProfessional() + (registerRelayoutZhiye.isEnabled() ? SUFFIX : ""));
         }
-        if(!TextUtils.isEmpty(userInfo.getRole_type())) {
-            registerTextRole.setText(userInfo.getRole_type() + (registerRelayoutRol.isEnabled()?SUFFIX:""));
-        }else {
-            registerTextRole.setText("请选择角色" + (registerRelayoutZhiye.isEnabled()?SUFFIX:""));
+        if (!TextUtils.isEmpty(userInfo.getRole_type())) {
+            registerTextRole.setText(userInfo.getRole_type() + (registerRelayoutRol.isEnabled() ? SUFFIX : ""));
+        } else {
+            registerTextRole.setText("请选择角色" + (registerRelayoutZhiye.isEnabled() ? SUFFIX : ""));
         }
-        if(userInfo.getMarrige() != -1) {
+        if (userInfo.getMarrige() != -1) {
             registerTextMarrage.setText((userInfo.getMarrige() == Constant.ROLE_MARRIED ? "已婚" : "未婚")
-                    + (registerRelayoutMarrage.isEnabled()?SUFFIX:""));
+                    + (registerRelayoutMarrage.isEnabled() ? SUFFIX : ""));
         }
-        if(!TextUtils.isEmpty(userInfo.getSpecial_info())) {
+        if (!TextUtils.isEmpty(userInfo.getSpecial_info())) {
             registerEditPs.setText(userInfo.getSpecial_info());
+        }
+        if (!TextUtils.isEmpty(userInfo.getReal_name())) {
+            registerTextRealName.setText(userInfo.getReal_name() + (registerTextRealName.isEnabled() ? SUFFIX : ""));
+        }
+        if (!TextUtils.isEmpty(userInfo.getId_card())) {
+            registerTextIdCard.setText(userInfo.getId_card() + (registerTextRealName.isEnabled() ? SUFFIX : ""));
         }
 
         registerImgHead.setOnClickListener(new View.OnClickListener() {
@@ -372,10 +393,18 @@ public class RegisterInfoActivity extends BaseActivity {
 
     @OnClick({R.id.register_relayout_role, R.id.register_relayout_nick, R.id.register_relayout_gender, R.id.register_relayout_age, R.id.register_relayout_tall,
             R.id.register_relayout_xueli, R.id.register_relayout_jiguan, R.id.register_relayout_zhiye, R.id.register_relayout_gzdd, R.id.register_img_head,
-            R.id.register_relayout_marrage})
+            R.id.register_relayout_marrage,R.id.register_relayout_real_name, R.id.register_relayout_id_card})
     public void onViewClicked(View view) {
         UserInfoBean userInfo = mTempUserInfo;
         switch (view.getId()) {
+            case R.id.register_relayout_real_name: {
+                showEditDialog("姓名", registerTextRealName.getText().toString(), registerTextRealName);
+            }
+            break;
+            case R.id.register_relayout_id_card: {
+                showEditDialog("身份证", registerTextIdCard.getText().toString(), registerTextIdCard);
+            }
+            break;
             case R.id.register_relayout_role: {
                 int checkIndex = -1;
                 if (userInfo.getRole_type().equals(Constant.ROLRTYPE_ANGEL)) {
@@ -385,10 +414,10 @@ public class RegisterInfoActivity extends BaseActivity {
                 } else if (userInfo.getRole_type().equals(Constant.ROLETYPE_AUDIENCE)) {
                     checkIndex = 2;
                 }
-                if(userInfo.getMarrige() == Constant.ROLE_MARRIED) {
+                if (userInfo.getMarrige() == Constant.ROLE_MARRIED) {
                     showSelectDialog("角色身份", new String[]{"观众"}, registerTextRole, 0);
-                }else {
-                    showSelectDialog("角色身份", new String[]{"爱心大使","嘉宾","观众"}, registerTextRole, checkIndex);
+                } else {
+                    showSelectDialog("角色身份", new String[]{"爱心大使", "嘉宾", "观众"}, registerTextRole, checkIndex);
                 }
             }
             break;
@@ -451,11 +480,11 @@ public class RegisterInfoActivity extends BaseActivity {
 
     @OnClick(R.id.register_done)
     public void onRegisterDoneClicked() {
-        if(registerDone.getText().toString().equals(STR_EDIT)) {
+        if (registerDone.getText().toString().equals(STR_EDIT)) {
             setStatus(STR_UODATE);
-        }else if(registerDone.getText().toString().equals(STR_UODATE)) {
+        } else if (registerDone.getText().toString().equals(STR_UODATE)) {
             updateUserInfo();
-        }else if(registerDone.getText().toString().equals(STR_REGISTER)) {
+        } else if (registerDone.getText().toString().equals(STR_REGISTER)) {
             toRegister();
         }
     }
@@ -466,7 +495,7 @@ public class RegisterInfoActivity extends BaseActivity {
             setResult(RESULT_OK);
         }
 
-        if(mFrom == FROM_LOGIN) {
+        if (mFrom == FROM_LOGIN) {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setTitle("取消注册")
                     .setMessage("是否确定放弃注册，还是继续完成注册？")
@@ -484,15 +513,15 @@ public class RegisterInfoActivity extends BaseActivity {
                         }
                     });
             builder.create().show();
-        }else {
+        } else {
             this.finish();
         }
     }
 
     private void doCitySelectDialog(final TextView textView) {
-        if(mIsProvinceLoaded) {
+        if (mIsProvinceLoaded) {
             showCitySelectDialog(textView);
-        }else {
+        } else {
             getProvinceJsonData(new Runnable() {
                 @Override
                 public void run() {
@@ -520,9 +549,9 @@ public class RegisterInfoActivity extends BaseActivity {
                         options3Items.get(options1).get(options2).get(options3) : "";
 
                 String tx = opt1tx + opt2tx + opt3tx;
-                if(textView == registerTextJiguan) {
+                if (textView == registerTextJiguan) {
                     mTempUserInfo.setNative_place(tx);
-                }else if(textView == registerTextGzdd) {
+                } else if (textView == registerTextGzdd) {
                     mTempUserInfo.setJob_address(tx);
                 }
                 setData();
@@ -541,12 +570,28 @@ public class RegisterInfoActivity extends BaseActivity {
 
     private void showEditDialog(String title, String hintText, final View view) {
         String rHintText = hintText.replace(SUFFIX, "");
-        View contentView = LayoutInflater.from(this).inflate(R.layout.layout_registerinfo_edit_dialog,null);
+        View contentView = LayoutInflater.from(this).inflate(R.layout.layout_registerinfo_edit_dialog, null);
         final EditText editText = contentView.findViewById(R.id.edit_dialog);
         if (view == registerTextTall
                 || view == registerTextAge) {
             rHintText = rHintText.replace("cm", "");
             editText.setInputType(InputType.TYPE_CLASS_NUMBER);
+        }
+
+        if(view == registerTextIdCard) {
+            editText.setFilters(new InputFilter[]{new InputFilter.LengthFilter(18)});
+            editText.setKeyListener(new NumberKeyListener() {
+                @Override
+                public int getInputType() {
+                    return android.text.InputType.TYPE_CLASS_PHONE;
+                }
+
+                @Override
+                protected char[] getAcceptedChars() {
+                    char[] numberChars = { '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', 'X' };
+                    return numberChars;
+                }
+            });
         }
         if (mFrom == FROM_MY) {
             editText.setText(rHintText);
@@ -562,28 +607,32 @@ public class RegisterInfoActivity extends BaseActivity {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         String text = editText.getText().toString();
-                        if(view == registerTextNick) {
+                        if (view == registerTextNick) {
                             mTempUserInfo.setNick_name(text);
-                        }else if(view == registerTextAge) {
+                        } else if (view == registerTextAge) {
                             int age = 0;
-                            try{
+                            try {
                                 age = Integer.parseInt(text);
-                            }catch (Exception e) {
+                            } catch (Exception e) {
                             }
                             mTempUserInfo.setAge(age);
-                        }else if(view == registerTextTall) {
+                        } else if (view == registerTextTall) {
                             int tall = 0;
-                            try{
+                            try {
                                 tall = Integer.parseInt(text);
-                            }catch (Exception e) {
+                            } catch (Exception e) {
                             }
                             mTempUserInfo.setTall(tall);
-                        }else if(view == registerTextJiguan) {
+                        } else if (view == registerTextJiguan) {
                             mTempUserInfo.setNative_place(text);
-                        }else if(view == registerTextZhiye) {
+                        } else if (view == registerTextZhiye) {
                             mTempUserInfo.setProfessional(text);
-                        }else if(view == registerTextGzdd) {
+                        } else if (view == registerTextGzdd) {
                             mTempUserInfo.setJob_address(text);
+                        } else if(view == registerTextRealName) {
+                            mTempUserInfo.setReal_name(text);
+                        }else if(view == registerTextIdCard) {
+                            mTempUserInfo.setId_card(text);
                         }
                         setData();
                         dialog.dismiss();
@@ -607,7 +656,7 @@ public class RegisterInfoActivity extends BaseActivity {
         editText.postDelayed(new Runnable() {
             @Override
             public void run() {
-                InputMethodManager inputManager =(InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+                InputMethodManager inputManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
                 inputManager.showSoftInput(editText, 0);
             }
         }, 50);
@@ -620,25 +669,25 @@ public class RegisterInfoActivity extends BaseActivity {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         String text = items[which];
-                        if(view == registerTextRole) {
+                        if (view == registerTextRole) {
                             mTempUserInfo.setRole_type(text);
-                        }else if(view == registerTextGender) {
+                        } else if (view == registerTextGender) {
                             mTempUserInfo.setGender(text);
-                        }else if(view == registerTextMarrage) {
-                            if(which==0) {
+                        } else if (view == registerTextMarrage) {
+                            if (which == 0) {
                                 //已婚
                                 mTempUserInfo.setMarrige(Constant.ROLE_MARRIED);
                                 mTempUserInfo.setRole_type(Constant.ROLETYPE_AUDIENCE);
                                 mIsSelectedMarried = true;
-                            }else {
+                            } else {
                                 //未婚
                                 mTempUserInfo.setMarrige(Constant.ROLE_UNMARRIED);
-                                if(mIsSelectedMarried) {
+                                if (mIsSelectedMarried) {
                                     mTempUserInfo.setRole_type("");
                                     mIsSelectedMarried = false;
                                 }
                             }
-                        }else if(view == registerTextXueli) {
+                        } else if (view == registerTextXueli) {
                             mTempUserInfo.setScholling(text);
                         }
                         setData();
@@ -651,8 +700,8 @@ public class RegisterInfoActivity extends BaseActivity {
                         dialog.dismiss();
                     }
                 });
-        if(view == registerTextRole) {
-            builder.setNeutralButton("角色详情",null);
+        if (view == registerTextRole) {
+            builder.setNeutralButton("角色详情", null);
         }
         AlertDialog dialog = builder.create();
         dialog.show();
@@ -669,7 +718,7 @@ public class RegisterInfoActivity extends BaseActivity {
     }
 
     private boolean checkInfoToRegister() {
-        if(TextUtils.isEmpty(mTempUserInfo.getRole_type())
+        if (TextUtils.isEmpty(mTempUserInfo.getRole_type())
                 || TextUtils.isEmpty(mTempUserInfo.getNick_name())
                 || TextUtils.isEmpty(mTempUserInfo.getGender())
                 || mTempUserInfo.getMarrige() == -1
@@ -679,19 +728,36 @@ public class RegisterInfoActivity extends BaseActivity {
                 || TextUtils.isEmpty(mTempUserInfo.getNative_place())
                 || TextUtils.isEmpty(mTempUserInfo.getProfessional())
                 || TextUtils.isEmpty(mTempUserInfo.getJob_address())) {
-            Tools.toast(getApplicationContext(),"请完善资料在提交注册",false);
+            Tools.toast(getApplicationContext(), "请完善资料在提交注册", false);
             return false;
         }
 
-        if(TextUtils.isEmpty(mTempUserInfo.getHead_image())) {
-            Tools.toast(getApplicationContext(),"请先上传头像",false);
+        if(mFrom == FROM_LOGIN) {
+            if(!Tools.isLegalName(mTempUserInfo.getReal_name())) {
+                Tools.toast(getApplicationContext(), "非法的中文姓名", false);
+                return false;
+            }
+
+            try {
+                if(!IDCardUtils.IDCardValidate(mTempUserInfo.getId_card())) {
+                    Tools.toast(getApplicationContext(), "非法的身份证号码", false);
+                    return false;
+                }
+            } catch (ParseException e) {
+                e.printStackTrace();
+                return false;
+            }
+        }
+
+        if (TextUtils.isEmpty(mTempUserInfo.getHead_image())) {
+            Tools.toast(getApplicationContext(), "请先上传头像", false);
             return false;
         }
         return true;
     }
 
     private void toRegister() {
-        if(!checkInfoToRegister()) return;
+        if (!checkInfoToRegister()) return;
 
         //先注册
         final String pss = Tools.MD5(AppConstant.MD5_PREFIX + mTempUserInfo.getPassword());
@@ -711,10 +777,24 @@ public class RegisterInfoActivity extends BaseActivity {
                             }
                         });
             }
-        }).observeOn(Schedulers.io()).flatMap(new Function<Integer, ObservableSource<UserResp>>() {
+        }).observeOn(Schedulers.io()).flatMap(new Function<Integer, ObservableSource<NetResult>>() {
             @Override
-            public ObservableSource<UserResp> apply(Integer integer) throws Exception {
+            public ObservableSource<NetResult> apply(Integer integer) throws Exception {
+                HashMap<String,Object> params = new HashMap<>();
+                params.put("userName",DataManager.getInstance().getUserInfo().getUser_name());
+                params.put("name",mTempUserInfo.getReal_name());
+                params.put("idCard",mTempUserInfo.getId_card());
+                params.put("handleType",1);
+                return mApi.checkIDCard(params);
+            }
+        }).flatMap(new Function<NetResult, ObservableSource<UserResp>>() {
+            @Override
+            public ObservableSource<UserResp> apply(NetResult netResult) throws Exception {
                 try {
+                    if(netResult.getStatus() != XqErrorCode.SUCCESS) {
+                        Tools.toast(getApplicationContext(),"身份证和姓名未能匹配",false);
+                        return Observable.error(new Throwable("身份证和姓名未能匹配"));
+                    }
                     return mApi.regist(mTempUserInfo.getUser_name(), pss);
                 } catch (Exception e) {
                     return Observable.error(e);
@@ -728,17 +808,17 @@ public class RegisterInfoActivity extends BaseActivity {
                         if (userResp.getStatus() == XqErrorCode.SUCCESS) {//注册成功
                             //updateUserInfo();
                             //上次图片
-                            upLoadHeadImage(mTempUserInfo.getHead_image(),userResp.getData().getUser_name());
-                        }else {
+                            upLoadHeadImage(mTempUserInfo.getHead_image(), userResp.getData().getUser_name());
+                        } else {
                             Log.e("toRegister--" + userResp.getMsg());
-                            Tools.toast(getApplicationContext(),"注册失败",false);
+                            Tools.toast(getApplicationContext(), "注册失败", false);
                         }
                     }
                 }, new Consumer<Throwable>() {
                     @Override
                     public void accept(Throwable throwable) throws Exception {
                         Log.e("toRegister--" + throwable.toString());
-                        Tools.toast(getApplicationContext(),"注册失败",false);
+                        Tools.toast(getApplicationContext(), "注册失败", false);
                     }
                 });
     }
@@ -755,6 +835,8 @@ public class RegisterInfoActivity extends BaseActivity {
 
 
     private void updateUserInfo() {
+        if (!checkInfoToRegister()) return;
+
         UserInfoBean mUserInfo = mTempUserInfo;
         mUserInfo.setSpecial_info(registerEditPs.getText().toString());
 
@@ -773,6 +855,13 @@ public class RegisterInfoActivity extends BaseActivity {
         params.put("phone", mUserInfo.getPhone());
         params.put("role_type", mUserInfo.getRole_type());
         params.put("special_info", mUserInfo.getSpecial_info());
+        params.put("real_name", mUserInfo.getReal_name());
+        params.put("id_card", mUserInfo.getId_card());
+        if(mFrom == FROM_LOGIN) {
+            params.put("handleType",1); //注册
+        }else {
+            params.put("handleType",2);  //更新
+        }
 
         mApi.updateUserInfo(params)
                 .subscribeOn(Schedulers.io())
@@ -813,9 +902,9 @@ public class RegisterInfoActivity extends BaseActivity {
                         Log.d("yy", "" + o.toString());
                         String compressImagePath = BitmapUtil.compressImage(o.toString());
                         mTempUserInfo.setHead_image(compressImagePath);
-                        if(mFrom == FROM_MY || mFrom == FROM_LEAK_INFO) {
+                        if (mFrom == FROM_MY || mFrom == FROM_LEAK_INFO) {
                             upLoadHeadImage(compressImagePath, DataManager.getInstance().getUserInfo().getUser_name());
-                        }else {
+                        } else {
                             File file = new File(o.toString());
                             //更新头像
                             Glide.with(RegisterInfoActivity.this)
@@ -876,16 +965,16 @@ public class RegisterInfoActivity extends BaseActivity {
                     Tools.toast(getApplicationContext(), response.body().getMsg(), true);
                     return;
                 }
-                if(mFrom == FROM_LEAK_INFO || mFrom == FROM_MY) {
+                if (mFrom == FROM_LEAK_INFO || mFrom == FROM_MY) {
                     Tools.toast(getApplicationContext(), "设置头像成功", false);
                     DataManager.getInstance().getUserInfo().setHead_image(response.body().getData().getHead_image());
                     isUpdate = true;
-                }else {
+                } else {
                     updateUserInfo();
                 }
 
                 //更新头像
-                if(mFrom != FROM_LOGIN) {
+                if (mFrom != FROM_LOGIN) {
                     Glide.with(RegisterInfoActivity.this)
                             .load(DataManager.getInstance().getUserInfo().getHead_image())
                             .centerCrop()

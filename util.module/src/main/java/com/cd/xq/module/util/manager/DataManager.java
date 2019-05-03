@@ -1,5 +1,6 @@
 package com.cd.xq.module.util.manager;
 
+import com.cd.xq.module.util.beans.BAppSettings;
 import com.cd.xq.module.util.beans.jmessage.BChatRoom;
 import com.cd.xq.module.util.beans.jmessage.Member;
 import com.cd.xq.module.util.beans.user.UserInfoBean;
@@ -15,6 +16,7 @@ public class DataManager {
     private String jmUserName;
     private boolean isInChatRoom;
     private UserInfoBean registerUserInfo;
+    private BAppSettings appSettings;
 
     private DataManager(){}
 
@@ -83,5 +85,13 @@ public class DataManager {
 
     public void setRegisterUserInfo(UserInfoBean registerUserInfo) {
         this.registerUserInfo = registerUserInfo;
+    }
+
+    public BAppSettings getAppSettings() {
+        return appSettings;
+    }
+
+    public void setAppSettings(BAppSettings mAppSettings) {
+        this.appSettings = mAppSettings;
     }
 }

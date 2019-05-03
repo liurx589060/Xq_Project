@@ -1,19 +1,27 @@
 package com.cd.xq.frame;
 
 import android.annotation.SuppressLint;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
+import android.text.TextUtils;
+import android.text.method.NumberKeyListener;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.WindowManager;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -34,8 +42,10 @@ import com.cd.xq.module.util.beans.EventBusParam;
 import com.cd.xq.module.util.beans.NetResult;
 import com.cd.xq.module.util.beans.user.UserResp;
 import com.cd.xq.module.util.manager.DataManager;
+import com.cd.xq.module.util.network.NetParse;
 import com.cd.xq.module.util.network.NetWorkMg;
 import com.cd.xq.module.util.network.RequestApi;
+import com.cd.xq.module.util.tools.IDCardUtils;
 import com.cd.xq.module.util.tools.Log;
 import com.cd.xq.module.util.tools.Tools;
 import com.cd.xq.module.util.tools.XqErrorCode;
@@ -46,7 +56,9 @@ import com.trello.rxlifecycle2.android.ActivityEvent;
 
 import org.greenrobot.eventbus.EventBus;
 
+import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -102,6 +114,19 @@ public class MainActivity extends BaseActivity {
 
         //检测是否更新
         requestCheckUpdate();
+    }
+
+    private void onLogin() {
+        for(int i = 0 ; i < mFragmentHolderList.size() ; i++) {
+            if(mFragmentHolderList.get(i).mFragment != null) {
+                mFragmentHolderList.get(i).mFragment.onLogin();
+            }
+        }
+
+        if(DataManager.getInstance().getUserInfo().getCard_valid() == 0) {
+            //没实名制
+            showIDCardSupply();
+        }
     }
 
     /**
@@ -165,6 +190,14 @@ public class MainActivity extends BaseActivity {
         });
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if(DataManager.getInstance().getUserInfo().isOnLine()) {
+            onLogin();
+        }
+    }
+
     /**
      * 自动登陆自己的服务器
      */
@@ -181,11 +214,7 @@ public class MainActivity extends BaseActivity {
                         if(userResp.getStatus() == XqErrorCode.SUCCESS) {
                             DataManager.getInstance().setUserInfo(userResp.getData());
                             DataManager.getInstance().getUserInfo().setOnLine(true);
-                            for(int i = 0 ; i < mFragmentHolderList.size() ; i++) {
-                                if(mFragmentHolderList.get(i).mFragment != null) {
-                                    mFragmentHolderList.get(i).mFragment.onLogin();
-                                }
-                            }
+                            onLogin();
 
                             //检测信息是否完整
                             if (CheckUtil.checkToCompleteUserInfo(DataManager.getInstance().getUserInfo())) {
@@ -330,5 +359,109 @@ public class MainActivity extends BaseActivity {
                 mFragmentHolderList.get(i).mFragment.onActivityResult(requestCode,resultCode,data);
             }
         }
+    }
+
+    /**
+     * 补充实名制
+     */
+    private void showIDCardSupply() {
+        final AlertDialog dialog = new AlertDialog.Builder(this).create();
+        View contentView = LayoutInflater.from(this).inflate(R.layout.layout_dialog_idcard_supply,null);
+        final EditText editName = contentView.findViewById(R.id.edit_name);
+        final EditText editIdCard = contentView.findViewById(R.id.edit_idcard);
+        Button btnIngore = contentView.findViewById(R.id.btn_ignore);
+        Button btnCommit = contentView.findViewById(R.id.btn_commit);
+        editIdCard.setKeyListener(new NumberKeyListener() {
+            @Override
+            public int getInputType() {
+                return android.text.InputType.TYPE_CLASS_PHONE;
+            }
+
+            @Override
+            protected char[] getAcceptedChars() {
+                char[] numberChars = { '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', 'X' };
+                return numberChars;
+            }
+        });
+        btnIngore.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
+        btnCommit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String name = editName.getText().toString();
+                String idCard = editIdCard.getText().toString();
+                if(TextUtils.isEmpty(name)
+                        || TextUtils.isEmpty(idCard)) {
+                    Tools.toast(getApplicationContext(),"请完善资料",false);
+                    return;
+                }
+                if(!Tools.isLegalName(name)) {
+                    Tools.toast(getApplicationContext(),"非法的姓名",false);
+                    return;
+                }
+                try {
+                    if(!IDCardUtils.IDCardValidate(idCard)) {
+                        Tools.toast(getApplicationContext(),"非法的身份证号",false);
+                        return;
+                    }
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                    return;
+                }
+
+                requestCheckIDCard(dialog,name,idCard);
+            }
+        });
+        if(DataManager.getInstance().getAppSettings().getIs_idcard_must() == 1) {
+            //必须实名制，否在退出程序
+            btnIngore.setVisibility(View.GONE);
+            dialog.setCanceledOnTouchOutside(false);
+            dialog.setOnKeyListener(new DialogInterface.OnKeyListener() {
+                @Override
+                public boolean onKey(DialogInterface dialog, int keyCode, KeyEvent event) {
+                    if (keyCode== KeyEvent.KEYCODE_BACK && event.getRepeatCount()==0) {
+                        return true;
+                    }
+                    return false;
+                }
+            });
+        }
+
+        dialog.show();
+        dialog.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM);
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        dialog.getWindow().setContentView(contentView);
+        WindowManager.LayoutParams params = dialog.getWindow().getAttributes();
+        params.width = getResources().getDimensionPixelOffset(R.dimen.dp_300);
+        params.height = WindowManager.LayoutParams.WRAP_CONTENT;
+        dialog.getWindow().setAttributes(params);
+    }
+
+    private void requestCheckIDCard(final Dialog dialog, String name, String idCard) {
+        HashMap<String,Object> params = new HashMap<>();
+        params.put("userName",DataManager.getInstance().getUserInfo().getUser_name());
+        params.put("name",name);
+        params.put("idCard",idCard);
+        params.put("handleType",2);
+        mApi.checkIDCard(params)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Consumer<NetResult>() {
+                    @Override
+                    public void accept(NetResult netResult) throws Exception {
+                        if(!NetParse.parseNetResult(getApplicationContext(),netResult)) return;
+                        Tools.toast(getApplicationContext(),"实名认证成功",false);
+                        dialog.dismiss();
+                    }
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Exception {
+                        NetParse.parseError(getApplicationContext(),throwable);
+                    }
+                });
     }
 }

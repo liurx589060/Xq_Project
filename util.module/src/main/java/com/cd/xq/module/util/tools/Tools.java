@@ -23,6 +23,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.functions.Consumer;
@@ -195,5 +197,41 @@ public class Tools {
             Log.e("getVerName--" + e.toString());
         }
         return verName;
+    }
+
+    /**
+     * 手机号号段校验，
+     第1位：1；
+     第2位：{3、4、5、6、7、8}任意数字；
+     第3—11位：0—9任意数字
+     * @param value
+     * @return
+     */
+    public static boolean isTelPhoneNumber(String value) {
+        if (value != null && value.length() == 11) {
+            Pattern pattern = Pattern.compile("^1[3|4|5|6|7|8][0-9]\\d{8}$");
+            Matcher matcher = pattern.matcher(value);
+            return matcher.matches();
+        }
+        return false;
+    }
+
+    /**
+     * 验证输入的名字是否为“中文”或者是否包含“·”
+     */
+    public static boolean isLegalName(String name){
+        if (name.contains("·") || name.contains("•")){
+            if (name.matches("^[\\u4e00-\\u9fa5]+[·•][\\u4e00-\\u9fa5]+$")){
+                return true;
+            }else {
+                return false;
+            }
+        }else {
+            if (name.matches("^[\\u4e00-\\u9fa5]+$")){
+                return true;
+            }else {
+                return false;
+            }
+        }
     }
 }

@@ -5,6 +5,7 @@ import android.content.Context;
 import android.support.multidex.MultiDex;
 
 import com.base.bj.paysdk.utils.TrPay;
+import com.cd.xq.module.util.Constant;
 import com.cd.xq.module.util.tools.Log;
 import com.hc.lib.msc.MscManager;
 import com.hjq.toast.ToastUtils;
@@ -47,7 +48,7 @@ public class XqApplication extends Application {
         });
 
         //bugly
-        CrashReport.initCrashReport(getApplicationContext(), "baaced6d7c", true);
+        CrashReport.initCrashReport(getApplicationContext(), Constant.BUGLY_KEY, true);
 
         TXLiveBase.setAppID("1252463788");
         TXLiveBase.setConsoleEnabled(true);
