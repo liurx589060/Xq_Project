@@ -175,6 +175,7 @@ public class CreateRoomActivity extends BaseActivity {
             Tools.toast(getApplicationContext(), "请选择开始开始时间", false);
             return;
         }
+
         //创建房间
         mApi.checkRoomExpiry(DataManager.getInstance().getUserInfo().getUser_name(), 1)
                 .compose(this.<NetResult<BCheckRoomExpiry>>bindUntilEvent(ActivityEvent.DESTROY))
@@ -498,13 +499,6 @@ public class CreateRoomActivity extends BaseActivity {
                 toCommit();
                 break;
             case R.id.btn_start_time:
-//                Calendar calendar = Calendar.getInstance();
-//                if (TextUtils.isEmpty(mStartTime)) {
-//                    calendar.setTimeInMillis(System.currentTimeMillis());
-//                } else {
-//                    calendar.setTimeInMillis(1000 * DateUtils.getStringToDate(mStartTime, "yyyy-MM-dd HH:mm:ss"));
-//                }
-
                 mStartCalendar.setTimeInMillis(System.currentTimeMillis());
                 mStartCalendar.add(Calendar.MINUTE,5);
                 mEndCalendar.setTimeInMillis(mStartCalendar.getTimeInMillis());

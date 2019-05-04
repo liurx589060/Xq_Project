@@ -44,11 +44,13 @@ public class MyReceiver extends BroadcastReceiver {
 				int nType = object.getInt("type");
 				switch (nType) {
 					case EventBusParam.EVENT_BUS_CHATROOM_CREATE:
-					case EventBusParam.EVENT_BUS_CHATROOM_DELETE: {
+					case EventBusParam.EVENT_BUS_CHATROOM_DELETE:
+					case EventBusParam.EVENT_BUS_CHATROOM_JOIN:
+					case EventBusParam.EVENT_BUS_CHATROOM_EXIT: {
 						EventBusParam<BusChatRoomParam> param = new EventBusParam();
 						param.setEventBusCode(nType);
-						BusChatRoomParam chatRoomParam = new BusChatRoomParam();
-						chatRoomParam.setMessage(msg);
+						BusChatRoomParam chatRoomParam = new Gson().fromJson(object.getJSONObject("data").toString()
+								,BusChatRoomParam.class);
 						param.setData(chatRoomParam);
 						EventBus.getDefault().post(param);
 					}

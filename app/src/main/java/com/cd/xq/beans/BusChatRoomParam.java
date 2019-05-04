@@ -5,13 +5,22 @@ package com.cd.xq.beans;
  */
 
 public class BusChatRoomParam {
-    private String message;
+    private String user_name;
+    private long room_id;
 
-    public String getMessage() {
-        return message;
+    public String getUser_name() {
+        return user_name;
     }
 
-    public void setMessage(String message) {
-        this.message = message;
+    public void setUser_name(String user_name) {
+        this.user_name = user_name;
+    }
+
+    public long getRoom_id() {
+        return room_id;
+    }
+
+    public void setRoom_id(long room_id) {
+        this.room_id = room_id;
     }
 }

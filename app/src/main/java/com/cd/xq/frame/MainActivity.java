@@ -190,14 +190,6 @@ public class MainActivity extends BaseActivity {
         });
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        if(DataManager.getInstance().getUserInfo().isOnLine()) {
-            onLogin();
-        }
-    }
-
     /**
      * 自动登陆自己的服务器
      */

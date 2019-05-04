@@ -44,6 +44,7 @@ import com.cd.xq.module.chart.status.statusBeans.StatusManSecondSelectBean;
 import com.cd.xq.module.chart.status.statusBeans.StatusParticipantsEnterBean;
 import com.cd.xq.module.chart.status.statusBeans.StatusOnLookerEnterBean;
 import com.cd.xq.module.util.Constant;
+import com.cd.xq.module.util.beans.EventBusParam;
 import com.cd.xq.module.util.beans.JMNormalSendBean;
 import com.cd.xq.module.util.beans.JMRoomSendParam;
 import com.cd.xq.module.util.beans.NetResult;
@@ -70,6 +71,7 @@ import com.iflytek.cloud.SpeechError;
 import com.trello.rxlifecycle2.android.ActivityEvent;
 import com.trello.rxlifecycle2.android.FragmentEvent;
 
+import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 import org.json.JSONObject;
@@ -160,6 +162,7 @@ public class XqStatusChartUIViewMg extends AbsChartView{
     private ArrayList<BGetReportItem> mReportItemList;
     private boolean mIsRoomStarted = false;  //房间是否开始
     private boolean mIsCreater;
+    private EventBusHelp mEventBusHelp;
 
     private ISpeechListener mSpeechListener = new ISpeechListener() {
         @Override
@@ -212,6 +215,7 @@ public class XqStatusChartUIViewMg extends AbsChartView{
     @Override
     public void onDestroy() {
         JMessageClient.unRegisterEventReceiver(this);
+        mEventBusHelp.onDestroy();
         resetLiveStatus();
         stopTiming();
         for (AbsChartView viewMg:viewMgList) {
@@ -347,6 +351,7 @@ public class XqStatusChartUIViewMg extends AbsChartView{
         initPresentGiftView();
 
         JMessageClient.registerEventReceiver(this);
+        mEventBusHelp = new EventBusHelp();
         upDataMembers();
 
         mBtnDisturb.setVisibility(View.GONE);
@@ -369,11 +374,6 @@ public class XqStatusChartUIViewMg extends AbsChartView{
 
         //发送加入房间的消息
         sendEnterRoomMessage();
-//        BaseStatus status = mStatusManager.getStatus(JMChartRoomSendBean.CHART_STATUS_CHAT_FINAL);
-//        JMChartRoomSendBean sendBean = status.getChartSendBeanWillSend(null
-//                , BaseStatus.MessageType.TYPE_SEND);
-//        sendBean.setMsg("wys30201匹配成功");
-//        mStatusManager.sendRoomMessage(sendBean);
 
         if(DataManager.getInstance().getUserInfo().getRole_type().equals(Constant.ROLRTYPE_ANGEL)) {
             boolean isFull = false;
@@ -2000,5 +2000,32 @@ public class XqStatusChartUIViewMg extends AbsChartView{
                         com.cd.xq.module.util.tools.Log.e("getReportItems--" + throwable.toString());
                     }
                 });
+    }
+
+
+    /**
+     * 处理EventBus的类
+     */
+    public class EventBusHelp {
+        public EventBusHelp() {
+            EventBus.getDefault().register(this);
+        }
+
+        /**
+         * EventBus事件
+         *
+         * @param param
+         */
+        @Subscribe(threadMode = ThreadMode.MAIN)
+        public void onEventBus(EventBusParam param) {
+            if (param.getEventBusCode() == EventBusParam.EVENT_BUS_CHATROOM_DELETE) {
+                Tools.toast(mXqActivity,"房间被解散",true);
+                mXqActivity.finish();
+            }
+        }
+
+        public void onDestroy() {
+            EventBus.getDefault().unregister(this);
+        }
     }
 }

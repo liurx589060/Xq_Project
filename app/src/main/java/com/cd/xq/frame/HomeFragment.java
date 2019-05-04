@@ -29,6 +29,7 @@ import com.cd.xq.R;
 import com.cd.xq.beans.BCheckRoomExpiry;
 import com.cd.xq.beans.BGetBanner;
 import com.cd.xq.beans.BGetBonusByUser;
+import com.cd.xq.beans.BusChatRoomParam;
 import com.cd.xq.friend.FriendActivity;
 import com.cd.xq.login.BlackCheckListener;
 import com.cd.xq.login.VerifyCodeActivity;
@@ -193,6 +194,11 @@ public class HomeFragment extends BaseFragment {
                     return;
                 }
 
+                if(mJmChartResp != null) {
+                    Tools.toast(getActivity().getApplicationContext(),"您已创建过其他房间",false);
+                    return;
+                }
+
                 Intent intent = new Intent(getActivity(), CreateRoomActivity.class);
                 getActivity().startActivity(intent);
             }
@@ -235,6 +241,10 @@ public class HomeFragment extends BaseFragment {
         requestGetBanner();
         initSmartRefreshLayout();
         initRoomFloatDialog();
+
+        if(DataManager.getInstance().getUserInfo().isOnLine()) {
+            onLogin();
+        }
     }
 
     private void toShowFloatBtn() {
@@ -364,11 +374,6 @@ public class HomeFragment extends BaseFragment {
                             Log.e(jmChartResp.getMsg());
                             return;
                         }
-                        //发送加入房间的消息
-                        JMRoomSendParam param = new JMRoomSendParam();
-                        param.setCode(JM_ROOM_CODE_JOIN); //加入的消息
-                        param.setRoomId(jmChartResp.getData().getRoom_id());
-                        sendJMRoomMessage(param,true);
                     }
                 }, new Consumer<Throwable>() {
                     @Override
@@ -534,12 +539,6 @@ public class HomeFragment extends BaseFragment {
      */
     private void requestDeleteChatRoom(final int status) {
         if(mJmChartResp == null) return;
-        //发送聊天室删除消息
-        JMRoomSendParam sendParam = new JMRoomSendParam();
-        sendParam.setCode(JM_ROOM_CODE_DELETE); //加入的消息
-        sendParam.setRoomId(mJmChartResp.getRoom_id());
-        sendJMRoomMessage(sendParam,false);
-
         HashMap<String,Object> param = new HashMap<>();
         param.put("userName",DataManager.getInstance().getUserInfo().getUser_name());
         param.put("roomId",mJmChartResp.getRoom_id());
@@ -592,11 +591,6 @@ public class HomeFragment extends BaseFragment {
 
                        mJmChartResp = null;
                        setFloatViewInfo();
-                       //发送退出房间的消息
-                       JMRoomSendParam sendParam = new JMRoomSendParam();
-                       sendParam.setCode(JM_ROOM_CODE_EXIT); //加入的消息
-                       sendParam.setRoomId(bChatRoomNetResult.getData().getRoom_id());
-                       sendJMRoomMessage(sendParam,true);
                        //退出聊天室
                        JMsgUtil.exitJMChatRoom(bChatRoomNetResult.getData().getRoom_id(),null);
 
@@ -1028,6 +1022,11 @@ public class HomeFragment extends BaseFragment {
 
     /*******************参与者加入房间**************************/
     private void toCommitJoinParticipant() {
+        if(mJmChartResp != null) {
+            Tools.toast(getActivity().getApplicationContext(),"您已加入过其他房间",false);
+            return;
+        }
+
         //加入房间
         mXqApi.checkRoomExpiry(DataManager.getInstance().getUserInfo().getUser_name(), 2)
                 .compose(this.<NetResult<BCheckRoomExpiry>>bindUntilEvent(FragmentEvent.DESTROY))
@@ -1262,39 +1261,10 @@ public class HomeFragment extends BaseFragment {
     }
 
     /****************************JM 房间信息处理*********************************************/
-    private final int JM_ROOM_CODE_JOIN = 1;
-    private final int JM_ROOM_CODE_EXIT = 2;
-    private final int JM_ROOM_CODE_DELETE = 3;
-
-    private void sendJMRoomMessage(JMRoomSendParam param,boolean isHanldeSelf) {
-        JMsgUtil.sendJMRoomMessage(param);
-        if(isHanldeSelf) {
-            handleJMRoomMessage(param);
-        }
-    }
-
     private void sendJMSingleMessage(JMSingleSendParam param,boolean isHanldeSelf) {
         JMsgUtil.sendJMSigleMessage(param);
         if(isHanldeSelf) {
             handleJMSingleMessage(param);
-        }
-    }
-
-    /**
-     * 处理聊天室的消息
-     * @param param
-     */
-    private void handleJMRoomMessage(JMRoomSendParam param) {
-        if(param.getCode() == JM_ROOM_CODE_JOIN
-                || param.getCode() == JM_ROOM_CODE_EXIT
-                || param.getCode() == JM_ROOM_CODE_DELETE) {
-            //有人加入房间，更新自己的房间
-            mIsSelfRoomDelete = false;
-            if(param.getCode() == JM_ROOM_CODE_DELETE) {
-                mIsSelfRoomDelete = true;
-            }
-            mIsShowChatInfoDialog = false;
-            requestGetChatRoomByUser();
         }
     }
 
@@ -1323,7 +1293,6 @@ public class HomeFragment extends BaseFragment {
                 JSONObject object = new JSONObject(jsonStr);
                 text = object.getString("text");
                 JMRoomSendParam chartRoomSendBean = new Gson().fromJson(text,JMRoomSendParam.class);
-                handleJMRoomMessage(chartRoomSendBean);
             }catch (Exception e) {
                 Log.e("yy",e.toString());
                 return;
@@ -1366,8 +1335,28 @@ public class HomeFragment extends BaseFragment {
         @Subscribe(threadMode = ThreadMode.MAIN)
         public void onEventBus(EventBusParam param) {
             if (param.getEventBusCode() == EventBusParam.EVENT_BUS_CHATROOM_CREATE
-                    || param.getEventBusCode() == EventBusParam.EVENT_BUS_CHATROOM_DELETE) {
+                    || param.getEventBusCode() == EventBusParam.EVENT_BUS_CHATROOM_DELETE
+                    || param.getEventBusCode() == EventBusParam.EVENT_BUS_CHATROOM_JOIN
+                    || param.getEventBusCode() == EventBusParam.EVENT_BUS_CHATROOM_EXIT) {
                 //更新聊天室列表
+                //有人加入房间，更新自己的房间
+                mIsSelfRoomDelete = false;
+                if(param.getEventBusCode() == EventBusParam.EVENT_BUS_CHATROOM_DELETE) {
+                    mIsSelfRoomDelete = true;
+                }
+
+                mIsShowChatInfoDialog = true;
+                if(param.getEventBusCode() == EventBusParam.EVENT_BUS_CHATROOM_DELETE
+                        || param.getEventBusCode() == EventBusParam.EVENT_BUS_CHATROOM_CREATE) {
+                    mIsShowChatInfoDialog = false;
+                }
+
+                if(param.getEventBusCode() == EventBusParam.EVENT_BUS_CHATROOM_JOIN
+                        && DataManager.getInstance().getUserInfo().getUser_name()
+                        .equals(((BusChatRoomParam)param.getData()).getUser_name())) {
+                    //加入且是自己
+                    mIsShowChatInfoDialog = false;
+                }
                 requestGetChatRoomByUser();
             } else if (param.getEventBusCode() == EventBusParam.EVENT_BUS_CHECK_BLACKUSER) {
                 //检查是否是黑名单
