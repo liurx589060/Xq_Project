@@ -357,3 +357,7 @@
 -keep class com.bigkoo.pickerview.**{*;}
 -dontwarn com.contrarywind.**
 -keep class com.contrarywind.**{*;}
+
+#========================versionchecklib================================
+-dontwarn com.allenliu.versionchecklib.**
+-keep class com.allenliu.versionchecklib.**{*;}

@@ -147,7 +147,7 @@
                     android:layout_alignParentRight="true"
                     android:layout_centerVertical="true"
                     android:layout_marginRight="@dimen/dp_20"
-                    android:hint="请输入身份证号   >"
+                    android:text="请输入身份证号   >"
                     android:textSize="@dimen/sp_16" />
             </RelativeLayout>
 
@@ -176,7 +176,7 @@
                     android:layout_alignParentRight="true"
                     android:layout_centerVertical="true"
                     android:layout_marginRight="@dimen/dp_20"
-                    android:hint="请选择角色   >"
+                    android:text="请选择角色   >"
                     android:textSize="@dimen/sp_16" />
             </RelativeLayout>
 
@@ -204,7 +204,7 @@
                     android:layout_alignParentRight="true"
                     android:layout_centerVertical="true"
                     android:layout_marginRight="@dimen/dp_20"
-                    android:hint="请输入昵称   >"
+                    android:text="请输入昵称   >"
                     android:textSize="@dimen/sp_16" />
             </RelativeLayout>
 
@@ -232,7 +232,7 @@
                     android:layout_alignParentRight="true"
                     android:layout_centerVertical="true"
                     android:layout_marginRight="@dimen/dp_20"
-                    android:hint="请选择性别   >"
+                    android:text="请选择性别   >"
                     android:textSize="@dimen/sp_16" />
             </RelativeLayout>
 
@@ -260,7 +260,7 @@
                     android:layout_alignParentRight="true"
                     android:layout_centerVertical="true"
                     android:layout_marginRight="@dimen/dp_20"
-                    android:hint="请输入当前婚姻   >"
+                    android:text="请输入当前婚姻   >"
                     android:textSize="@dimen/sp_16" />
             </RelativeLayout>
 
@@ -288,7 +288,7 @@
                     android:layout_alignParentRight="true"
                     android:layout_centerVertical="true"
                     android:layout_marginRight="@dimen/dp_20"
-                    android:hint="请输入年龄   >"
+                    android:text="请输入年龄   >"
                     android:textSize="@dimen/sp_16" />
             </RelativeLayout>
 
@@ -316,7 +316,7 @@
                     android:layout_alignParentRight="true"
                     android:layout_centerVertical="true"
                     android:layout_marginRight="@dimen/dp_20"
-                    android:hint="请输入身高   >"
+                    android:text="请输入身高   >"
                     android:textSize="@dimen/sp_16" />
             </RelativeLayout>
 
@@ -344,7 +344,7 @@
                     android:layout_alignParentRight="true"
                     android:layout_centerVertical="true"
                     android:layout_marginRight="@dimen/dp_20"
-                    android:hint="请选择学历   >"
+                    android:text="请选择学历   >"
                     android:textSize="@dimen/sp_16" />
             </RelativeLayout>
 
@@ -372,7 +372,7 @@
                     android:layout_alignParentRight="true"
                     android:layout_centerVertical="true"
                     android:layout_marginRight="@dimen/dp_20"
-                    android:hint="请输入籍贯   >"
+                    android:text="请输入籍贯   >"
                     android:textSize="@dimen/sp_16" />
             </RelativeLayout>
 
@@ -400,7 +400,7 @@
                     android:layout_alignParentRight="true"
                     android:layout_centerVertical="true"
                     android:layout_marginRight="@dimen/dp_20"
-                    android:hint="请输入职业   >"
+                    android:text="请输入职业   >"
                     android:textSize="@dimen/sp_16" />
             </RelativeLayout>
 
@@ -428,7 +428,7 @@
                     android:layout_alignParentRight="true"
                     android:layout_centerVertical="true"
                     android:layout_marginRight="@dimen/dp_20"
-                    android:hint="请输入工作地点   >"
+                    android:text="请输入工作地点   >"
                     android:textSize="@dimen/sp_16" />
             </RelativeLayout>
 

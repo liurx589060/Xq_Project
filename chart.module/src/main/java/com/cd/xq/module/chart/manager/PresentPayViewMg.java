@@ -208,7 +208,7 @@ public class PresentPayViewMg {
                         String callbackUrl = "http://" + NetWorkMg.IP_ADDRESS + "/thinkphp/Sample_Mjmz/Pay/handleTrPayCallback";
                         TrPay.getInstance(mActivity).callPay(bean.getDescription(),
                                 order.getOrder_id(),
-                                (long) bean.getMoney()/6,
+                                (long) bean.getMoney(),
                                 "",
                                 callbackUrl,
                                 DataManager.getInstance().getUserInfo().getUser_name(),
@@ -292,7 +292,7 @@ public class PresentPayViewMg {
         public void onBindViewHolder(final MyViewHolder holder, final int position) {
             final BGetPayItem bean = mDataList.get(position);
             holder.textCoin.setText(String.valueOf(bean.getCoin() + bean.getBonus()));
-            holder.textMoney.setText("¥ " + String.valueOf(bean.getMoney()/10.0f));
+            holder.textMoney.setText("¥ " + String.valueOf(bean.getMoney()/100.0f));
             holder.itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {

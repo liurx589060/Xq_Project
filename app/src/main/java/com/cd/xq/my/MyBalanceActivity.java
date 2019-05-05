@@ -233,7 +233,7 @@ public class MyBalanceActivity extends BaseActivity {
                         String callbackUrl = "http://" + NetWorkMg.IP_ADDRESS + "/thinkphp/Sample_Mjmz/Pay/handleTrPayCallback";
                         TrPay.getInstance(MyBalanceActivity.this).callPay(bean.getDescription(),
                                 order.getOrder_id(),
-                                (long) bean.getMoney()/6,
+                                (long) bean.getMoney(),
                                 "",
                                 callbackUrl,
                                 DataManager.getInstance().getUserInfo().getUser_name(),
@@ -310,7 +310,7 @@ public class MyBalanceActivity extends BaseActivity {
         public void onBindViewHolder(MyViewHolder holder, int position) {
             final BGetPayItem bean = mDataList.get(position);
             holder.textCoinCount.setText("" + (bean.getCoin() + bean.getBonus()));
-            holder.btnPay.setText("¥ " + bean.getMoney()/10.0f);
+            holder.btnPay.setText("¥ " + bean.getMoney()/100.0f);
             holder.itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
