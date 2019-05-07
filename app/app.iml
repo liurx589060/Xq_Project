@@ -166,6 +166,7 @@
     <orderEntry type="library" name="com.mob:MobGUI:2019.0306.1850@jar" level="project" />
     <orderEntry type="library" name="com.squareup.retrofit2:adapter-rxjava2:2.2.0@jar" level="project" />
     <orderEntry type="library" name="com.squareup.retrofit2:converter-scalars:2.0.0@jar" level="project" />
+    <orderEntry type="library" scope="TEST" name="com.android.support:multidex-instrumentation-1.0.2" level="project" />
     <orderEntry type="library" name="__local_aars__:I.\Working_Space\AS_WorkingSpace\Xq_Project_2.0\util.module\libs\X5webview.jar:unspecified@jar" level="project" />
     <orderEntry type="library" name="com.squareup.retrofit2:retrofit:2.2.0@jar" level="project" />
     <orderEntry type="library" name="com.android.support:transition-26.1.0" level="project" />
@@ -205,13 +206,11 @@
     <orderEntry type="library" name="com.android.support:support-annotations:27.0.0@jar" level="project" />
     <orderEntry type="library" name="cn.jiguang.sdk:jcore-1.2.5" level="project" />
     <orderEntry type="library" name="org.greenrobot:eventbus:3.1.1@jar" level="project" />
+    <orderEntry type="library" name="com.wang.avi:library-2.1.3" level="project" />
     <orderEntry type="library" name="io.reactivex.rxjava2:rxjava:2.1.3@jar" level="project" />
     <orderEntry type="library" name="com.android.support:cardview-v7-26.1.0" level="project" />
     <orderEntry type="library" name="com.trello.rxlifecycle2:rxlifecycle-components-2.2.1" level="project" />
     <orderEntry type="library" name="com.github.bumptech.glide:glide:3.7.0@jar" level="project" />
-    <orderEntry type="module" module-name="util.module" />
-    <orderEntry type="module" module-name="chart.module" />
-    <orderEntry type="library" scope="TEST" name="com.android.support:multidex-instrumentation-1.0.2" level="project" />
     <orderEntry type="module" module-name="util.module" />
     <orderEntry type="module" module-name="chart.module" />
   </component>

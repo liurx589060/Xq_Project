@@ -361,3 +361,8 @@
 #========================versionchecklib================================
 -dontwarn com.allenliu.versionchecklib.**
 -keep class com.allenliu.versionchecklib.**{*;}
+
+#========================versionchecklib================================
+-dontwarn com.wang.avi.**
+-keep class com.wang.avi.** { *; }
+-keep class com.wang.avi.indicators.** { *; }
