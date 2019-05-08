@@ -1,5 +1,6 @@
 package com.cd.xq.my;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
@@ -18,6 +19,7 @@ import com.cd.xq.R;
 import com.cd.xq.beans.BGetConsumeHistory;
 import com.cd.xq.module.util.Constant;
 import com.cd.xq.module.util.base.BaseActivity;
+import com.cd.xq.module.util.base.BaseRecyclerAdapter;
 import com.cd.xq.module.util.beans.NetResult;
 import com.cd.xq.module.util.common.MultiItemDivider;
 import com.cd.xq.module.util.glide.GlideCircleTransform;
@@ -80,7 +82,24 @@ public class MyConsumeHistoryActivity extends BaseActivity {
                 ContextCompat.getDrawable(this, R.drawable.shape_consume_history_recycler_divider));
         divider.setDividerMode(MultiItemDivider.INSIDE);
         recycler.addItemDecoration(divider);
-        myAdapter = new MyAdapter();
+        myAdapter = new MyAdapter(this);
+        myAdapter.setIBaseLayoutListener(new BaseRecyclerAdapter.IBaseLayoutListener() {
+            @Override
+            public void onRetry() {
+                myAdapter.showLayoutType(BaseRecyclerAdapter.ELayoutType.LAYOUT_LOADING);
+                requestGetConsumeHistory();
+            }
+
+            @Override
+            public RecyclerView.ViewHolder onCreateLayout(ViewGroup parent, BaseRecyclerAdapter.ELayoutType layoutType) {
+                return null;
+            }
+
+            @Override
+            public boolean onBindLayout(RecyclerView.ViewHolder viewHolder, BaseRecyclerAdapter.ELayoutType layoutType) {
+                return false;
+            }
+        });
         recycler.setAdapter(myAdapter);
 
         //获取消费记录
@@ -106,7 +125,10 @@ public class MyConsumeHistoryActivity extends BaseActivity {
                             return;
                         }
 
-                        if(listNetResult.getData() == null) return;
+                        if(listNetResult.getData() == null) {
+                            myAdapter.showLayoutType(BaseRecyclerAdapter.ELayoutType.LAYOUT_EMPTY);
+                            return;
+                        }
                         mDataList.clear();
                         mIntCount = 0;
                         mDataList.addAll(listNetResult.getData());
@@ -122,6 +144,7 @@ public class MyConsumeHistoryActivity extends BaseActivity {
                     public void accept(Throwable throwable) throws Exception {
                         Tools.toast(getApplicationContext(), throwable.toString(), false);
                         Log.e("requestGetConsumeHistory--" + throwable.toString());
+                        myAdapter.showLayoutType(BaseRecyclerAdapter.ELayoutType.LAYOUT_NET);
                     }
                 });
     }
@@ -147,16 +170,20 @@ public class MyConsumeHistoryActivity extends BaseActivity {
         }
     }
 
-    private class MyAdapter extends RecyclerView.Adapter<MyViewHolder> {
+    private class MyAdapter extends BaseRecyclerAdapter<MyViewHolder> {
+
+        public MyAdapter(Context context) {
+            super(context);
+        }
 
         @Override
-        public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        public MyViewHolder onRealCreateViewHolder(ViewGroup parent, int viewType) {
             return new MyViewHolder(LayoutInflater.from(MyConsumeHistoryActivity.this)
                     .inflate(R.layout.layout_consume_history_recycler_item, parent, false));
         }
 
         @Override
-        public void onBindViewHolder(MyViewHolder holder, int position) {
+        public void onRealBindViewHolder(MyViewHolder holder, int position) {
             BGetConsumeHistory bean = mDataList.get(position);
             String str = "";
             if (bean.getType() == Constant.GIFT_TYPE_LIPIN) {
@@ -187,7 +214,7 @@ public class MyConsumeHistoryActivity extends BaseActivity {
         }
 
         @Override
-        public int getItemCount() {
+        public int getRealItemCount() {
             return mDataList.size();
         }
     }

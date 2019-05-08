@@ -177,6 +177,7 @@ public class CreateRoomActivity extends BaseActivity {
         }
 
         //创建房间
+        getLoadingDialog().show();
         mApi.checkRoomExpiry(DataManager.getInstance().getUserInfo().getUser_name(), 1)
                 .compose(this.<NetResult<BCheckRoomExpiry>>bindUntilEvent(ActivityEvent.DESTROY))
                 .subscribeOn(Schedulers.io())
@@ -184,6 +185,7 @@ public class CreateRoomActivity extends BaseActivity {
                 .subscribe(new Consumer<NetResult<BCheckRoomExpiry>>() {
                     @Override
                     public void accept(NetResult<BCheckRoomExpiry> bCheckRoomExpiry) throws Exception {
+                        getLoadingDialog().dismiss();
                         if (bCheckRoomExpiry.getStatus() != XqErrorCode.SUCCESS) {
                             Tools.toast(getApplicationContext(), bCheckRoomExpiry.getMsg(), false);
                             Log.e("checkRoomExpiry--" + bCheckRoomExpiry.getMsg());
@@ -215,6 +217,7 @@ public class CreateRoomActivity extends BaseActivity {
                     public void accept(Throwable throwable) throws Exception {
                         Tools.toast(getApplicationContext(), throwable.toString(), false);
                         Log.e("checkRoomExpiry--" + throwable.toString());
+                        getLoadingDialog().dismiss();
                     }
                 });
     }
@@ -232,6 +235,7 @@ public class CreateRoomActivity extends BaseActivity {
     }
 
     private void requestConsumeGift(final BGetGiftItem item, final int handleType) {
+        getLoadingDialog().show();
         HashMap<String, Object> params = new HashMap<>();
         params.put("userName", DataManager.getInstance().getUserInfo().getUser_name());
         params.put("giftId", item.getGift_id());
@@ -254,6 +258,7 @@ public class CreateRoomActivity extends BaseActivity {
                                 Tools.toast(getApplicationContext(), netResult.getMsg(), false);
                             }
                             Log.e("requestConsumeGift--" + netResult.getMsg());
+                            getLoadingDialog().dismiss();
                             return;
                         }
 
@@ -267,6 +272,7 @@ public class CreateRoomActivity extends BaseActivity {
                     public void accept(Throwable throwable) throws Exception {
                         Tools.toast(getApplicationContext(), throwable.toString(), false);
                         Log.e("requestConsumeGift--" + throwable.toString());
+                        getLoadingDialog().dismiss();
                     }
                 });
     }
@@ -460,12 +466,14 @@ public class CreateRoomActivity extends BaseActivity {
             return;
         }
 
+        getLoadingDialog().show();
         mCommonApi.appointChatRoom(params)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Consumer<JMChartResp>() {
                     @Override
                     public void accept(JMChartResp jmChartResp) throws Exception {
+                        getLoadingDialog().dismiss();
                         if (jmChartResp == null) {
                             Log.e("jmChartResp is null");
                             Tools.toast(getApplicationContext(), "jmChartResp is null", true);
@@ -485,6 +493,7 @@ public class CreateRoomActivity extends BaseActivity {
                     public void accept(Throwable throwable) throws Exception {
                         Log.e(throwable.toString());
                         Tools.toast(getApplicationContext(), throwable.toString(), true);
+                        getLoadingDialog().dismiss();
                     }
                 });
     }

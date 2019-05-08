@@ -44,7 +44,6 @@ public class ResetPasswordActivity extends BaseActivity {
     EditText resetPasswordEditUserName;
 
     private XqRequestApi mApi;
-    private Dialog mLoadingDialog;
 
     @Override
 
@@ -54,7 +53,6 @@ public class ResetPasswordActivity extends BaseActivity {
         ButterKnife.bind(this);
 
         mApi = NetWorkMg.newRetrofit().create(XqRequestApi.class);
-        mLoadingDialog = DialogFactory.createLoadingDialog(this);
         Bundle bundle = getIntent().getExtras();
         if(bundle != null) {
             String name = bundle.getString("userName","");
@@ -88,7 +86,7 @@ public class ResetPasswordActivity extends BaseActivity {
             return;
         }
 
-        mLoadingDialog.show();
+        getLoadingDialog().show();
         String password = Tools.MD5(AppConstant.MD5_PREFIX + password_1);
         mApi.changePassword(userName,password)
                 .subscribeOn(Schedulers.io())
@@ -96,7 +94,7 @@ public class ResetPasswordActivity extends BaseActivity {
                 .subscribe(new Consumer<NetResult<String>>() {
                     @Override
                     public void accept(NetResult<String> stringNetResult) throws Exception {
-                        mLoadingDialog.dismiss();
+                        getLoadingDialog().dismiss();
                         if(stringNetResult.getStatus() != XqErrorCode.SUCCESS) {
                             Tools.toast(getApplicationContext(),"修改密码失败--" + stringNetResult.getMsg(),false);
                             return;
@@ -108,7 +106,7 @@ public class ResetPasswordActivity extends BaseActivity {
                 }, new Consumer<Throwable>() {
                     @Override
                     public void accept(Throwable throwable) throws Exception {
-                        mLoadingDialog.dismiss();
+                        getLoadingDialog().dismiss();
                         Tools.toast(getApplicationContext(),"修改密码失败",false);
                         Log.e("commitResetPassword--" + throwable.toString());
                     }
@@ -130,6 +128,6 @@ public class ResetPasswordActivity extends BaseActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        mLoadingDialog.dismiss();
+        getLoadingDialog().dismiss();
     }
 }

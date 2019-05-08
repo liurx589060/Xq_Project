@@ -761,6 +761,7 @@ public class RegisterInfoActivity extends BaseActivity {
 
         //先注册
         final String pss = Tools.MD5(AppConstant.MD5_PREFIX + mTempUserInfo.getPassword());
+        getLoadingDialog().show();
         Observable.create(new ObservableOnSubscribe<Integer>() {
             @Override
             public void subscribe(final ObservableEmitter<Integer> observableEmitter) throws Exception {
@@ -805,6 +806,7 @@ public class RegisterInfoActivity extends BaseActivity {
                 .subscribe(new Consumer<UserResp>() {
                     @Override
                     public void accept(UserResp userResp) throws Exception {
+                        getLoadingDialog().dismiss();
                         if (userResp.getStatus() == XqErrorCode.SUCCESS) {//注册成功
                             //updateUserInfo();
                             //上次图片
@@ -819,6 +821,7 @@ public class RegisterInfoActivity extends BaseActivity {
                     public void accept(Throwable throwable) throws Exception {
                         Log.e("toRegister--" + throwable.toString());
                         Tools.toast(getApplicationContext(), "注册失败", false);
+                        getLoadingDialog().dismiss();
                     }
                 });
     }
@@ -837,6 +840,7 @@ public class RegisterInfoActivity extends BaseActivity {
     private void updateUserInfo() {
         if (!checkInfoToRegister()) return;
 
+        getLoadingDialog().show();
         UserInfoBean mUserInfo = mTempUserInfo;
         mUserInfo.setSpecial_info(registerEditPs.getText().toString());
 
@@ -869,6 +873,7 @@ public class RegisterInfoActivity extends BaseActivity {
                 .subscribe(new Consumer<UserResp>() {
                     @Override
                     public void accept(UserResp userResp) throws Exception {
+                        getLoadingDialog().dismiss();
                         Log.i(new Gson().toJson(userResp));
                         DataManager.getInstance().setUserInfo(userResp.getData());
                         DataManager.getInstance().setRegisterUserInfo(null);
@@ -887,6 +892,7 @@ public class RegisterInfoActivity extends BaseActivity {
                     public void accept(Throwable throwable) throws Exception {
                         Log.e(throwable.toString());
                         Tools.toast(RegisterInfoActivity.this, throwable.toString(), true);
+                        getLoadingDialog().dismiss();
                     }
                 });
     }
@@ -938,6 +944,7 @@ public class RegisterInfoActivity extends BaseActivity {
     }
 
     private void upLoadHeadImage(final String imagePath, String userName) {
+        getLoadingDialog().show();
         File file = new File(imagePath);
 
         Map<String, RequestBody> params = new HashMap<>();
@@ -952,6 +959,7 @@ public class RegisterInfoActivity extends BaseActivity {
             @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
             @Override
             public void onResponse(Call<UserResp> call, Response<UserResp> response) {
+                getLoadingDialog().dismiss();
                 if (RegisterInfoActivity.this == null || RegisterInfoActivity.this.isDestroyed()) {
                     return;
                 }
@@ -998,6 +1006,7 @@ public class RegisterInfoActivity extends BaseActivity {
                 if (file1.exists()) {
                     file1.delete();
                 }
+                getLoadingDialog().dismiss();
             }
         });
     }

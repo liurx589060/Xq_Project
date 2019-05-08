@@ -1,6 +1,7 @@
 package com.cd.xq.module.chart.manager;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Rect;
@@ -21,6 +22,7 @@ import com.cd.xq.module.chart.beans.BMakePayOrder;
 import com.cd.xq.module.chart.beans.BusPaySuccessParam;
 import com.cd.xq.module.chart.network.ChatRequestApi;
 import com.cd.xq.module.util.AppConfig;
+import com.cd.xq.module.util.base.BaseActivity;
 import com.cd.xq.module.util.beans.EventBusParam;
 import com.cd.xq.module.util.beans.NetResult;
 import com.cd.xq.module.util.manager.DataManager;
@@ -76,6 +78,10 @@ public class PresentPayViewMg {
 
         //获取支付项
         requestPayItem();
+    }
+
+    private Dialog getLoadingDialog() {
+        return ((BaseActivity)mActivity).getLoadingDialog();
     }
 
     private void init() {
@@ -182,6 +188,7 @@ public class PresentPayViewMg {
      * @param bean
      */
     private void requestMakePayOrder(final BGetPayItem bean) {
+        getLoadingDialog().show();
         HashMap<String,Object> params = new HashMap<>();
         params.put("userName",DataManager.getInstance().getUserInfo().getUser_name());
         params.put("payType",1);
@@ -193,6 +200,7 @@ public class PresentPayViewMg {
                 .subscribe(new Consumer<NetResult<BMakePayOrder>>() {
                     @Override
                     public void accept(NetResult<BMakePayOrder> bMakePayOrderNetResult) throws Exception {
+                        getLoadingDialog().dismiss();
                         if(bMakePayOrderNetResult.getStatus() != XqErrorCode.SUCCESS) {
                             Tools.toast(mActivity.getApplicationContext(),"下单失败",false);
                             Log.e("requestMakePayOrder--" + bMakePayOrderNetResult.getMsg());
@@ -243,6 +251,7 @@ public class PresentPayViewMg {
                     public void accept(Throwable throwable) throws Exception {
                         Tools.toast(mActivity.getApplicationContext(),throwable.toString(),false);
                         Log.e("requestMakePayOrder--" + throwable.toString());
+                        getLoadingDialog().dismiss();
                     }
                 });
     }

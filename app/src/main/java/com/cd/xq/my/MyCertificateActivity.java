@@ -94,6 +94,7 @@ public class MyCertificateActivity extends BaseActivity {
      * 获取我的礼物列表
      */
     private void requestGetGiftList() {
+        getLoadingDialog().show();
         //获取未消耗的礼物
         mApi.getGiftList(DataManager.getInstance().getUserInfo().getUser_name())
                 .compose(this.<NetResult<List<BGetGiftItem>>>bindUntilEvent(ActivityEvent.DESTROY))
@@ -103,6 +104,7 @@ public class MyCertificateActivity extends BaseActivity {
                     @Override
                     public void accept(NetResult<List<BGetGiftItem>> listNetResult) throws
                             Exception {
+                        getLoadingDialog().dismiss();
                         if (listNetResult.getStatus() != XqErrorCode.SUCCESS) {
                             Tools.toast(getApplicationContext(), listNetResult.getMsg(), false);
                             Log.e("requestGetGiftList--" + listNetResult.getMsg());
@@ -130,6 +132,7 @@ public class MyCertificateActivity extends BaseActivity {
                     public void accept(Throwable throwable) throws Exception {
                         Tools.toast(getApplicationContext(), throwable.toString(), false);
                         Log.e("requestGetGiftList--" + throwable.toString());
+                        getLoadingDialog().dismiss();
                     }
                 });
     }

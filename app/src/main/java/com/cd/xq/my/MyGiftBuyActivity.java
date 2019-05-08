@@ -1,5 +1,6 @@
 package com.cd.xq.my;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
@@ -19,6 +20,7 @@ import com.cd.xq.module.chart.beans.BGetGiftItem;
 import com.cd.xq.module.chart.network.ChatRequestApi;
 import com.cd.xq.module.chart.utils.ChatTools;
 import com.cd.xq.module.util.base.BaseActivity;
+import com.cd.xq.module.util.base.BaseRecyclerAdapter;
 import com.cd.xq.module.util.beans.EventBusParam;
 import com.cd.xq.module.util.beans.NetResult;
 import com.cd.xq.module.util.common.MultiItemDivider;
@@ -81,7 +83,24 @@ public class MyGiftBuyActivity extends BaseActivity {
         divider.setDividerMode(MultiItemDivider.INSIDE);
         recycler.addItemDecoration(divider);
         recycler.setLayoutManager(layoutManager);
-        myAdapter = new MyAdapter();
+        myAdapter = new MyAdapter(this);
+        myAdapter.setIBaseLayoutListener(new BaseRecyclerAdapter.IBaseLayoutListener() {
+            @Override
+            public void onRetry() {
+                myAdapter.showLayoutType(BaseRecyclerAdapter.ELayoutType.LAYOUT_LOADING);
+                requestGetGiftItem();
+            }
+
+            @Override
+            public RecyclerView.ViewHolder onCreateLayout(ViewGroup parent, BaseRecyclerAdapter.ELayoutType layoutType) {
+                return null;
+            }
+
+            @Override
+            public boolean onBindLayout(RecyclerView.ViewHolder viewHolder, BaseRecyclerAdapter.ELayoutType layoutType) {
+                return false;
+            }
+        });
         recycler.setAdapter(myAdapter);
 
         //获取数据
@@ -107,7 +126,10 @@ public class MyGiftBuyActivity extends BaseActivity {
                             return;
                         }
 
-                        if(listNetResult.getData() == null) return;
+                        if(listNetResult.getData() == null) {
+                            myAdapter.showLayoutType(BaseRecyclerAdapter.ELayoutType.LAYOUT_EMPTY);
+                            return;
+                        }
                         mDataList.clear();
                         mDataList.addAll(listNetResult.getData());
                         myAdapter.notifyDataSetChanged();
@@ -118,6 +140,7 @@ public class MyGiftBuyActivity extends BaseActivity {
                     public void accept(Throwable throwable) throws Exception {
                         Tools.toast(getApplicationContext(),throwable.toString(),false);
                         Log.e("getGiftItem--" + throwable.toString());
+                        myAdapter.showLayoutType(BaseRecyclerAdapter.ELayoutType.LAYOUT_NET);
                     }
                 });
     }
@@ -142,6 +165,7 @@ public class MyGiftBuyActivity extends BaseActivity {
      * @param item
      */
     private void requestBuyGift(final BGetGiftItem item) {
+        getLoadingDialog().show();
         HashMap<String,Object> params = new HashMap<>();
         params.put("userName",DataManager.getInstance().getUserInfo().getUser_name());
         params.put("giftId",item.getGift_id());
@@ -152,6 +176,7 @@ public class MyGiftBuyActivity extends BaseActivity {
                 .subscribe(new Consumer<NetResult<Long>>() {
                     @Override
                     public void accept(NetResult<Long> netResult) throws Exception {
+                        getLoadingDialog().dismiss();
                         if (netResult.getStatus() != XqErrorCode.SUCCESS) {
                             if(netResult.getStatus() == XqErrorCode.ERROR_LACK_STOCK) {
                                 //余额不足
@@ -178,6 +203,7 @@ public class MyGiftBuyActivity extends BaseActivity {
                     public void accept(Throwable throwable) throws Exception {
                         Tools.toast(getApplicationContext(), throwable.toString(), false);
                         Log.e("requestGetGiftItem--" + throwable.toString());
+                        getLoadingDialog().dismiss();
                     }
                 });
     }
@@ -200,16 +226,20 @@ public class MyGiftBuyActivity extends BaseActivity {
         }
     }
 
-    private class MyAdapter extends RecyclerView.Adapter<MyViewHolder> {
+    private class MyAdapter extends BaseRecyclerAdapter<MyViewHolder> {
+
+        public MyAdapter(Context context) {
+            super(context);
+        }
 
         @Override
-        public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        public MyViewHolder onRealCreateViewHolder(ViewGroup parent, int viewType) {
             return new MyViewHolder(LayoutInflater.from(MyGiftBuyActivity.this)
                     .inflate(R.layout.layout_gift_buy_recycler_item, parent, false));
         }
 
         @Override
-        public void onBindViewHolder(MyViewHolder holder, int position) {
+        public void onRealBindViewHolder(MyViewHolder holder, int position) {
             final BGetGiftItem bean = mDataList.get(position);
             Glide.with(MyGiftBuyActivity.this)
                     .load(bean.getImage())
@@ -227,7 +257,7 @@ public class MyGiftBuyActivity extends BaseActivity {
         }
 
         @Override
-        public int getItemCount() {
+        public int getRealItemCount() {
             return mDataList.size();
         }
     }

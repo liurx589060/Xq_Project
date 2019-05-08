@@ -206,6 +206,7 @@ public class MyBalanceActivity extends BaseActivity {
      * @param bean
      */
     private void requestMakePayOrder(final BGetPayItem bean) {
+        getLoadingDialog().show();
         HashMap<String,Object> params = new HashMap<>();
         params.put("userName",DataManager.getInstance().getUserInfo().getUser_name());
         params.put("payType",1);
@@ -218,6 +219,7 @@ public class MyBalanceActivity extends BaseActivity {
                 .subscribe(new Consumer<NetResult<BMakePayOrder>>() {
                     @Override
                     public void accept(NetResult<BMakePayOrder> bMakePayOrderNetResult) throws Exception {
+                        getLoadingDialog().dismiss();
                         if(bMakePayOrderNetResult.getStatus() != XqErrorCode.SUCCESS) {
                             Tools.toast(getApplicationContext(),"下单失败",false);
                             Log.e("requestMakePayOrder--" + bMakePayOrderNetResult.getMsg());
@@ -268,6 +270,7 @@ public class MyBalanceActivity extends BaseActivity {
                     public void accept(Throwable throwable) throws Exception {
                         Tools.toast(getApplicationContext(),throwable.toString(),false);
                         Log.e("requestMakePayOrder--" + throwable.toString());
+                        getLoadingDialog().dismiss();
                     }
                 });
     }

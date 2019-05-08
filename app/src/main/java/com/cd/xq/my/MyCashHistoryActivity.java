@@ -1,5 +1,6 @@
 package com.cd.xq.my;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
@@ -16,6 +17,7 @@ import android.widget.Toast;
 import com.cd.xq.R;
 import com.cd.xq.beans.BGetPayHistory;
 import com.cd.xq.module.util.base.BaseActivity;
+import com.cd.xq.module.util.base.BaseRecyclerAdapter;
 import com.cd.xq.module.util.beans.NetResult;
 import com.cd.xq.module.util.common.MultiItemDivider;
 import com.cd.xq.module.util.manager.DataManager;
@@ -69,7 +71,7 @@ public class MyCashHistoryActivity extends BaseActivity {
                 ContextCompat.getDrawable(this, R.drawable.shape_consume_history_recycler_divider));
         divider.setDividerMode(MultiItemDivider.INSIDE);
         recycler.addItemDecoration(divider);
-        myAdapter = new MyAdapter();
+        myAdapter = new MyAdapter(this);
         recycler.setAdapter(myAdapter);
     }
 
@@ -90,20 +92,24 @@ public class MyCashHistoryActivity extends BaseActivity {
         }
     }
 
-    private class MyAdapter extends RecyclerView.Adapter<MyViewHolder> {
+    private class MyAdapter extends BaseRecyclerAdapter<MyViewHolder> {
+
+        public MyAdapter(Context context) {
+            super(context);
+        }
 
         @Override
-        public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        public MyViewHolder onRealCreateViewHolder(ViewGroup parent, int viewType) {
             return new MyViewHolder(LayoutInflater.from(MyCashHistoryActivity.this)
                     .inflate(R.layout.layout_cash_history_recycler_item,parent,false));
         }
 
         @Override
-        public void onBindViewHolder(MyViewHolder holder, int position) {
+        public void onRealBindViewHolder(MyViewHolder holder, int position) {
         }
 
         @Override
-        public int getItemCount() {
+        public int getRealItemCount() {
             return 200;
         }
     }

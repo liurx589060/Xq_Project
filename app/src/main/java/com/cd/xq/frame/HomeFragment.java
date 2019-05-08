@@ -326,7 +326,7 @@ public class HomeFragment extends BaseFragment {
      * @param roomRoleType
      * @param roomId
      */
-    private void joinChartRoom(int roomRoleType,long roomId,boolean isMatch) {
+    private void joinChartRoom(final int roomRoleType, long roomId, boolean isMatch) {
         if (!DataManager.getInstance().getUserInfo().isOnLine()) {
             Tools.toast(getActivity(), "请先登录...", true);
             return;
@@ -348,6 +348,8 @@ public class HomeFragment extends BaseFragment {
             //指定模式
             params.put("handleType",2);
         }
+
+        getLoadingDialog().show();
         mApi.joinChatRoom(params)
                 .subscribeOn(Schedulers.io())
                 .compose(this.<NetResult<BChatRoom>>bindUntilEvent(FragmentEvent.DESTROY))
@@ -355,24 +357,11 @@ public class HomeFragment extends BaseFragment {
                 .subscribe(new Consumer<NetResult<BChatRoom>>() {
                     @Override
                     public void accept(NetResult<BChatRoom> jmChartResp) throws Exception {
-                        if (jmChartResp == null) {
-                            Log.e("jmChartResp is null");
-                            return;
-                        }
-                        if (jmChartResp.getStatus() != XqErrorCode.SUCCESS) {
-                            if(jmChartResp.getStatus() == XqErrorCode.ERROR_FULL_CHATROOM) {
-                                Tools.toast(getActivity(), "房间已满员", false);
-                            }else if(jmChartResp.getStatus() == XqErrorCode.ERROR_ALREADY_START_CHATROOM) {
-                                Tools.toast(getActivity(), "房间已开始", false);
-                            }else if(jmChartResp.getStatus() == XqErrorCode.ERROR_NOT_FIND_CHATROOM) {
-                                Tools.toast(getActivity(), "未找到房间", false);
-                            }else if(jmChartResp.getStatus() == XqErrorCode.ERROR_ALREADY_JOIN_CHATROOM) {
-                                Tools.toast(getActivity(), "你已加入过其他房间", false);
-                            }else {
-                                Tools.toast(getActivity(), jmChartResp.getMsg(), false);
-                            }
-                            Log.e(jmChartResp.getMsg());
-                            return;
+                        getLoadingDialog().dismiss();
+                        if(!NetParse.parseNetResult(getActivity().getApplicationContext(),jmChartResp)) return;
+                        if(roomRoleType == Constant.ROOM_ROLETYPE_ONLOOKER) {
+                            //加入是围观，则自己手动刷新
+                            requestGetChatRoomByUser();
                         }
                     }
                 }, new Consumer<Throwable>() {
@@ -380,6 +369,7 @@ public class HomeFragment extends BaseFragment {
                     public void accept(Throwable throwable) throws Exception {
                         Log.e(throwable.toString());
                         Tools.toast(getActivity(), throwable.toString(), true);
+                        getLoadingDialog().dismiss();
                     }
                 });
     }
@@ -500,6 +490,7 @@ public class HomeFragment extends BaseFragment {
         HashMap<String,Object> param = new HashMap<>();
         param.put("userName",DataManager.getInstance().getUserInfo().getUser_name());
         param.put("roomId",mJmChartResp.getRoom_id());
+        getLoadingDialog().show();
         mApi.enterChatRoom(param)
                 .compose(this.<NetResult<BChatRoom>>bindUntilEvent(FragmentEvent.DESTROY))
                 .subscribeOn(Schedulers.io())
@@ -507,6 +498,7 @@ public class HomeFragment extends BaseFragment {
                 .subscribe(new Consumer<NetResult<BChatRoom>>() {
                     @Override
                     public void accept(NetResult<BChatRoom> netResult) throws Exception {
+                        getLoadingDialog().dismiss();
                         if (netResult.getStatus() != XqErrorCode.SUCCESS) {
                             Log.e("requestEnterChatRoom--" + netResult.getMsg());
                             return;
@@ -529,6 +521,7 @@ public class HomeFragment extends BaseFragment {
                     public void accept(Throwable throwable) throws Exception {
                         Log.e("requestEnterChatRoom--" + throwable.toString());
                         Tools.toast(getActivity().getApplicationContext(),throwable.toString(),false);
+                        getLoadingDialog().dismiss();
                     }
                 });
 
@@ -543,6 +536,7 @@ public class HomeFragment extends BaseFragment {
         param.put("userName",DataManager.getInstance().getUserInfo().getUser_name());
         param.put("roomId",mJmChartResp.getRoom_id());
         param.put("status",status); //失败
+        getLoadingDialog().show();
         mApi.deleteChatRoom(param)
                 .compose(this.<NetResult<BChatRoom>>bindUntilEvent(FragmentEvent.DESTROY))
                 .subscribeOn(Schedulers.io())
@@ -550,6 +544,7 @@ public class HomeFragment extends BaseFragment {
                 .subscribe(new Consumer<NetResult<BChatRoom>>() {
                     @Override
                     public void accept(NetResult<BChatRoom> netResult) throws Exception {
+                        getLoadingDialog().dismiss();
                         if (netResult.getStatus() != XqErrorCode.SUCCESS) {
                             Log.e("requestDeleteChatRoom--" + netResult.getMsg());
                             return;
@@ -564,6 +559,7 @@ public class HomeFragment extends BaseFragment {
                     public void accept(Throwable throwable) throws Exception {
                         Log.e("requestDeleteChatRoom--" + throwable.toString());
                         Tools.toast(getActivity().getApplicationContext(),throwable.toString(),false);
+                        getLoadingDialog().dismiss();
                     }
                 });
     }
@@ -580,6 +576,7 @@ public class HomeFragment extends BaseFragment {
        param.put("status",status); //失败
        param.put("innerId",-1);
        param.put("joinType",mJmChartResp.getIsQueue());
+       getLoadingDialog().show();
        mApi.exitChatRoom(param)
                .compose(this.<NetResult<BChatRoom>>bindUntilEvent(FragmentEvent.DESTROY))
                .subscribeOn(Schedulers.io())
@@ -587,6 +584,7 @@ public class HomeFragment extends BaseFragment {
                .subscribe(new Consumer<NetResult<BChatRoom>>() {
                    @Override
                    public void accept(NetResult<BChatRoom> bChatRoomNetResult) throws Exception {
+                       getLoadingDialog().dismiss();
                        if(!NetParse.parseNetResult(getActivity(),bChatRoomNetResult)) return;
 
                        mJmChartResp = null;
@@ -602,6 +600,7 @@ public class HomeFragment extends BaseFragment {
                    @Override
                    public void accept(Throwable throwable) throws Exception {
                        NetParse.parseError(getActivity(),throwable);
+                       getLoadingDialog().dismiss();
                    }
                });
    }
@@ -1028,6 +1027,7 @@ public class HomeFragment extends BaseFragment {
         }
 
         //加入房间
+        getLoadingDialog().show();
         mXqApi.checkRoomExpiry(DataManager.getInstance().getUserInfo().getUser_name(), 2)
                 .compose(this.<NetResult<BCheckRoomExpiry>>bindUntilEvent(FragmentEvent.DESTROY))
                 .subscribeOn(Schedulers.io())
@@ -1035,6 +1035,7 @@ public class HomeFragment extends BaseFragment {
                 .subscribe(new Consumer<NetResult<BCheckRoomExpiry>>() {
                     @Override
                     public void accept(NetResult<BCheckRoomExpiry> bCheckRoomExpiry) throws Exception {
+                        getLoadingDialog().dismiss();
                         if (bCheckRoomExpiry.getStatus() != XqErrorCode.SUCCESS) {
                             Tools.toast(getActivity().getApplicationContext(), bCheckRoomExpiry.getMsg(), false);
                             Log.e("checkRoomExpiry--" + bCheckRoomExpiry.getMsg());
@@ -1066,6 +1067,7 @@ public class HomeFragment extends BaseFragment {
                     public void accept(Throwable throwable) throws Exception {
                         Tools.toast(getActivity().getApplicationContext(), throwable.toString(), false);
                         Log.e("checkRoomExpiry--" + throwable.toString());
+                        getLoadingDialog().dismiss();
                     }
                 });
     }
@@ -1083,6 +1085,7 @@ public class HomeFragment extends BaseFragment {
     }
 
     private void requestConsumeGift(final BGetGiftItem item, final int handleType) {
+        getLoadingDialog().show();
         HashMap<String, Object> params = new HashMap<>();
         params.put("userName", DataManager.getInstance().getUserInfo().getUser_name());
         params.put("giftId", item.getGift_id());
@@ -1095,6 +1098,7 @@ public class HomeFragment extends BaseFragment {
                 .subscribe(new Consumer<NetResult<BConsumeGift>>() {
                     @Override
                     public void accept(NetResult<BConsumeGift> netResult) throws Exception {
+                        getLoadingDialog().dismiss();
                         if (netResult.getStatus() != XqErrorCode.SUCCESS) {
                             if (netResult.getStatus() == XqErrorCode.ERROR_LACK_STOCK) {
                                 //余额不足
@@ -1118,6 +1122,7 @@ public class HomeFragment extends BaseFragment {
                     public void accept(Throwable throwable) throws Exception {
                         Tools.toast(getActivity().getApplicationContext(), throwable.toString(), false);
                         Log.e("requestConsumeGift--" + throwable.toString());
+                        getLoadingDialog().dismiss();
                     }
                 });
     }

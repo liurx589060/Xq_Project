@@ -111,6 +111,7 @@ public class RegisterActivity extends BaseActivity {
 
 
     private void requestCheckUserExist() {
+        getLoadingDialog().show();
         textTip.setText("");
         mApi.checkUserExist(editUserName.getText().toString())
                 .subscribeOn(Schedulers.io())
@@ -119,6 +120,7 @@ public class RegisterActivity extends BaseActivity {
                 .subscribe(new Consumer<BaseResp>() {
                     @Override
                     public void accept(BaseResp baseResp) throws Exception {
+                        getLoadingDialog().dismiss();
                         if (baseResp.getStatus() == XqErrorCode.ERROR_USER_NOT_EXIST) {
                             DataManager.getInstance().getRegisterUserInfo().setUser_name(editUserName.getText().toString());
                             DataManager.getInstance().getRegisterUserInfo().setPassword(editPassword.getText().toString());
@@ -136,6 +138,7 @@ public class RegisterActivity extends BaseActivity {
                     @Override
                     public void accept(Throwable throwable) throws Exception {
                         NetParse.parseError(RegisterActivity.this, throwable);
+                        getLoadingDialog().dismiss();
                     }
                 });
     }

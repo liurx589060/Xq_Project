@@ -145,6 +145,7 @@ public class VerifyCodeActivity extends BaseActivity {
                 new Handler(Looper.getMainLooper(), new Handler.Callback() {
                     @Override
                     public boolean handleMessage(Message msg) {
+                        getLoadingDialog().dismiss();
                         int event = msg.arg1;
                         int result = msg.arg2;
                         Object data = msg.obj;
@@ -268,6 +269,7 @@ public class VerifyCodeActivity extends BaseActivity {
             case R.id.btn_verify_code:
                 // 提交验证码，其中的code表示验证码，如“1357”
                 textTip.setText("");
+                getLoadingDialog().show();
                 SMSSDK.submitVerificationCode("86", editPhone.getText().toString(), editCode.getText().toString());
                 break;
         }

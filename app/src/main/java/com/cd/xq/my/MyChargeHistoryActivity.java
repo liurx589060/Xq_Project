@@ -1,5 +1,6 @@
 package com.cd.xq.my;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -16,6 +17,7 @@ import android.widget.TextView;
 import com.cd.xq.R;
 import com.cd.xq.beans.BGetPayHistory;
 import com.cd.xq.module.util.base.BaseActivity;
+import com.cd.xq.module.util.base.BaseRecyclerAdapter;
 import com.cd.xq.module.util.beans.NetResult;
 import com.cd.xq.module.util.common.MultiItemDivider;
 import com.cd.xq.module.util.manager.DataManager;
@@ -74,7 +76,24 @@ public class MyChargeHistoryActivity extends BaseActivity {
         divider.setDividerMode(MultiItemDivider.INSIDE);
         recycler.addItemDecoration(divider);
         recycler.setLayoutManager(layoutManager);
-        myAdapter = new MyAdapter();
+        myAdapter = new MyAdapter(this);
+        myAdapter.setIBaseLayoutListener(new BaseRecyclerAdapter.IBaseLayoutListener() {
+            @Override
+            public void onRetry() {
+                myAdapter.showLayoutType(BaseRecyclerAdapter.ELayoutType.LAYOUT_LOADING);
+                requestGetPayHistory();
+            }
+
+            @Override
+            public RecyclerView.ViewHolder onCreateLayout(ViewGroup parent, BaseRecyclerAdapter.ELayoutType layoutType) {
+                return null;
+            }
+
+            @Override
+            public boolean onBindLayout(RecyclerView.ViewHolder viewHolder, BaseRecyclerAdapter.ELayoutType layoutType) {
+                return false;
+            }
+        });
         recycler.setAdapter(myAdapter);
 
         //获取充值记录
@@ -97,7 +116,10 @@ public class MyChargeHistoryActivity extends BaseActivity {
                             return;
                         }
 
-                        if(listNetResult.getData() == null) return;
+                        if(listNetResult.getData() == null) {
+                            myAdapter.showLayoutType(BaseRecyclerAdapter.ELayoutType.LAYOUT_EMPTY);
+                            return;
+                        }
                         mDataList.clear();
                         mDataList.addAll(listNetResult.getData());
                         myAdapter.notifyDataSetChanged();
@@ -107,6 +129,7 @@ public class MyChargeHistoryActivity extends BaseActivity {
                     public void accept(Throwable throwable) throws Exception {
                         Tools.toast(getApplicationContext(), throwable.toString(), false);
                         Log.e("getPayHistory--" + throwable.toString());
+                        myAdapter.showLayoutType(BaseRecyclerAdapter.ELayoutType.LAYOUT_NET);
                     }
                 });
     }
@@ -136,16 +159,20 @@ public class MyChargeHistoryActivity extends BaseActivity {
         }
     }
 
-    private class MyAdapter extends RecyclerView.Adapter<MyViewHolder> {
+    private class MyAdapter extends BaseRecyclerAdapter<MyViewHolder> {
+
+        public MyAdapter(Context context) {
+            super(context);
+        }
 
         @Override
-        public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        public MyViewHolder onRealCreateViewHolder(ViewGroup parent, int viewType) {
             return new MyViewHolder(LayoutInflater.from(MyChargeHistoryActivity.this)
                     .inflate(R.layout.layout_charge_history_recycler_item, parent, false));
         }
 
         @Override
-        public void onBindViewHolder(MyViewHolder holder, int position) {
+        public void onRealBindViewHolder(MyViewHolder holder, int position) {
             BGetPayHistory bean = mDataList.get(position);
             String text = "您充值了" + bean.getMoney()/10.0f + "元" + ",获得" + bean.getCoin() + "钻石";
             holder.textContent.setText(text);
@@ -155,7 +182,7 @@ public class MyChargeHistoryActivity extends BaseActivity {
         }
 
         @Override
-        public int getItemCount() {
+        public int getRealItemCount() {
             return mDataList.size();
         }
     }

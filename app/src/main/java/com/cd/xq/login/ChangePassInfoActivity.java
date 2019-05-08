@@ -56,6 +56,7 @@ public class ChangePassInfoActivity extends BaseActivity {
     }
 
     private void requestUserInfo() {
+        getLoadingDialog().show();
         textTip.setText("");
         mApi.getUserInfoByUserName(editUserName.getText().toString())
                 .compose(this.<UserResp>bindUntilEvent(ActivityEvent.DESTROY))
@@ -64,6 +65,7 @@ public class ChangePassInfoActivity extends BaseActivity {
                 .subscribe(new Consumer<UserResp>() {
                     @Override
                     public void accept(UserResp userResp) throws Exception {
+                        getLoadingDialog().dismiss();
                         if (userResp.getStatus() != XqErrorCode.SUCCESS) {
                             Tools.toast(getApplicationContext(), "用户不存在",false);
                             textTip.setText("用户不存在");
@@ -81,6 +83,7 @@ public class ChangePassInfoActivity extends BaseActivity {
                     @Override
                     public void accept(Throwable throwable) throws Exception {
                         NetParse.parseError(ChangePassInfoActivity.this,throwable);
+                        getLoadingDialog().dismiss();
                     }
                 });
     }

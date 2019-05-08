@@ -42,7 +42,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/dp_10"
-        android:text="aaaaaaaaaaa"
+        android:text=""
         android:textColor="#aaaaaa"
         android:textSize="@dimen/sp_14"
         android:gravity="center"/>
