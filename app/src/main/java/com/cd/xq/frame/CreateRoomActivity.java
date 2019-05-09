@@ -2,7 +2,6 @@ package com.cd.xq.frame;
 
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
@@ -20,17 +19,14 @@ import com.bigkoo.pickerview.builder.TimePickerBuilder;
 import com.bigkoo.pickerview.listener.OnTimeSelectChangeListener;
 import com.bigkoo.pickerview.listener.OnTimeSelectListener;
 import com.bigkoo.pickerview.view.TimePickerView;
-import com.cd.xq.AppConstant;
 import com.cd.xq.R;
 import com.cd.xq.beans.BCheckRoomExpiry;
-import com.cd.xq.module.chart.ChartRoomActivity;
 import com.cd.xq.module.chart.beans.BConsumeGift;
 import com.cd.xq.module.chart.beans.BGetGiftItem;
 import com.cd.xq.module.chart.network.ChatRequestApi;
 import com.cd.xq.module.chart.utils.ChatTools;
 import com.cd.xq.module.util.Constant;
 import com.cd.xq.module.util.base.BaseActivity;
-import com.cd.xq.module.util.beans.EventBusParam;
 import com.cd.xq.module.util.beans.NetResult;
 import com.cd.xq.module.util.beans.jmessage.JMChartResp;
 import com.cd.xq.module.util.beans.user.UserInfoBean;
@@ -43,10 +39,7 @@ import com.cd.xq.module.util.tools.Tools;
 import com.cd.xq.module.util.tools.XqErrorCode;
 import com.cd.xq.my.MyGiftBuyActivity;
 import com.cd.xq.network.XqRequestApi;
-import com.google.gson.Gson;
 import com.trello.rxlifecycle2.android.ActivityEvent;
-
-import org.greenrobot.eventbus.EventBus;
 
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
@@ -116,6 +109,7 @@ public class CreateRoomActivity extends BaseActivity {
 
     private void init() {
         editTitle.setHint("一起来相亲吧");
+        editLadyCount.setText("女嘉宾人数" + DataManager.getInstance().getAppSettings().getRoom_lady_count() + "人");
         radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
@@ -258,7 +252,7 @@ public class CreateRoomActivity extends BaseActivity {
                                 Tools.toast(getApplicationContext(), netResult.getMsg(), false);
                             }
                             Log.e("requestConsumeGift--" + netResult.getMsg());
-                            getLoadingDialog().dismiss();
+
                             return;
                         }
 
@@ -420,23 +414,7 @@ public class CreateRoomActivity extends BaseActivity {
         userInfo.setRole_type(DataManager.getInstance().getUserInfo().getRole_type());
         userInfo.setGender(DataManager.getInstance().getUserInfo().getGender());
         userInfo.setLevel(DataManager.getInstance().getUserInfo().getLevel());
-        String ladyCount = editLadyCount.getText().toString();
-        try {
-            if (TextUtils.isEmpty(ladyCount)) {
-                userInfo.setLimitLady(AppConstant.CHATROOM_LIMIT_LADY_COUNT);
-            } else {
-                int count = Integer.parseInt(ladyCount);
-                if (count < 2 || count > 10) {
-                    Tools.toast(getApplicationContext(), "女嘉宾人数需是2--10人", true);
-                    return;
-                }
-                userInfo.setLimitLady(count);
-            }
-        } catch (Exception e) {
-            Tools.toast(getApplicationContext(), "女嘉宾人数输入有误", true);
-            Log.e("createChartRoom--" + e.toString());
-            return;
-        }
+        userInfo.setLimitLady(DataManager.getInstance().getAppSettings().getRoom_lady_count());
         userInfo.setLimitLevel(-1);
 
         setLiveAddress();

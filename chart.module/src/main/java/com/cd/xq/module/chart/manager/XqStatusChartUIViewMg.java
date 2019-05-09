@@ -1225,8 +1225,8 @@ public class XqStatusChartUIViewMg extends AbsChartView{
 
         @Override
         public int getItemCount() {
-            //return (DataManager.getInstance().getChartBChatRoom().getLimitLady() + 1)/2;
-            return 5;
+            return (DataManager.getInstance().getChartBChatRoom().getLimit_lady() + 1)/2;
+            //return 5;
         }
 
         /**
