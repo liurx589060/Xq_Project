@@ -2,10 +2,12 @@ package com.cd.xq;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
@@ -218,9 +220,16 @@ public class InviteRoomDlgActivity extends Activity {
         super.onDestroy();
         JMessageClient.unRegisterEventReceiver(this);
 
-        if(mTimeRunnable != null) {
-            mHandler.removeCallbacks(mTimeRunnable);
+        mHandler.removeCallbacksAndMessages(null);
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if(keyCode==KeyEvent.KEYCODE_BACK && event.getRepeatCount()==0) {
+            //返回键
+            return true;
         }
+        return super.onKeyDown(keyCode, event);
     }
 
     /**

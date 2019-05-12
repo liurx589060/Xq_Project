@@ -7,9 +7,9 @@
         android:layout_width="@dimen/dp_300"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:background="#eeeeee"
+        android:background="@drawable/shape_invite_room_bg"
         android:paddingTop="@dimen/dp_10"
-        android:paddingBottom="@dimen/dp_10"
+        android:paddingBottom="@dimen/dp_20"
         android:gravity="center"
         android:visibility="gone"
         >
@@ -42,9 +42,9 @@
         android:layout_width="@dimen/dp_300"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:background="#eeeeee"
+        android:background="@drawable/shape_invite_room_bg"
         android:paddingTop="@dimen/dp_10"
-        android:paddingBottom="@dimen/dp_10"
+        android:paddingBottom="@dimen/dp_20"
         android:gravity="center">
 
         <de.hdodenhof.circleimageview.CircleImageView
@@ -78,7 +78,7 @@
                 android:textSize="@dimen/sp_16"
                 android:layout_alignParentLeft="true"
                 android:layout_marginLeft="@dimen/dp_20"
-                android:background="#32b7b9"
+                android:background="#aaaaaa"
                 />
 
             <Button
@@ -90,7 +90,7 @@
                 android:textSize="@dimen/sp_16"
                 android:layout_alignParentRight="true"
                 android:layout_marginRight="@dimen/dp_30"
-                android:background="#564512"
+                android:background="#E9967A"
                 />
 
         </RelativeLayout>
